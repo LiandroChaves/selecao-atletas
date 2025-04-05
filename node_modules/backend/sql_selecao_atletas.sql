@@ -20,7 +20,7 @@ CREATE TYPE tipo_titulo AS ENUM ('Nacional', 'Internacional', 'Individual');
 CREATE TYPE pe_dominante_enum AS ENUM ('D', 'E', 'A');
 
 CREATE TABLE paises (
-    id SMALLINT PRIMARY KEY,
+    id SERIAL SMALLINT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
@@ -193,6 +193,6 @@ CREATE INDEX idx_partidas_data ON partidas(data);
 CREATE INDEX idx_estatisticas_partidas_jogador ON estatisticas_partidas(jogador_id);
 CREATE INDEX idx_estatisticas_partidas_partida ON estatisticas_partidas(partida_id);
 
--- -- apagar e recriar tudo do zero
--- DROP SCHEMA public CASCADE;
--- CREATE SCHEMA public;
+-- apagar e recriar tudo do zero
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
