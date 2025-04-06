@@ -4,12 +4,21 @@ import { useRouter } from "next/navigation";
 import { FaUserPlus, FaSearch, FaDatabase, FaInfoCircle } from "react-icons/fa";
 import BotaoTema from "../../../utils/utilities/changeTheme";
 import { useTheme } from "../../../utils/context/ThemeContext";
+import { useLoading } from "../../../utils/context/LoadingProvider";
 
 import { useState } from "react";
 
 export default function Home() {
     const { isDarkMode, toggleTheme } = useTheme();
+    const { setIsLoading } = useLoading();
     const router = useRouter();
+
+    const irParaOutraRota = () => {
+        setIsLoading(true);
+        setTimeout(() => {
+            router.push("/routes/cadastros");
+        }, 300); // pequena espera pra exibir loading
+    };
 
     const buttons = [
         { label: "Cadastrar", icon: <FaUserPlus />, onClick: () => router.push("/routes/cadastros") },
@@ -29,11 +38,11 @@ export default function Home() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6 }}
-                className={`text-center p-8 rounded-2xl shadow-2xl w-full max-w-xs md:max-w-md transition-all duration-500 ${isDarkMode ? "bg-teal-800" : "bg-gray-200"
+                className={`text-center p-8 rounded-2xl shadow-2xl w-full max-w-xs md:max-w-md transition-all duration-500 ${isDarkMode ? "bg-teal-800" : "bg-gray-300"
                     }`}
             >
                 <h1
-                    className={`text-4xl md:text-5xl font-extrabold mb-8 tracking-wide transition-all duration-500 ${isDarkMode ? "text-lime-200" : "text-gray-700"
+                    className={`text-4xl md:text-5xl font-extrabold mb-8 tracking-wide transition-all duration-500 ${isDarkMode ? "text-white" : "text-gray-700"
                         }`}
                 >
                     Cadastro de Atletas

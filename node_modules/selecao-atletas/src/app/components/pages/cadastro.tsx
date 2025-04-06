@@ -62,7 +62,7 @@ export default function CadastroOptions() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6 }}
-                className={`text-center p-8 rounded-2xl shadow-2xl w-full max-w-2xl transition-all duration-500 ${isDarkMode ? "bg-teal-800" : "bg-white"
+                className={`text-center p-8 rounded-2xl shadow-2xl w-full max-w-2xl transition-all duration-500 ${isDarkMode ? "bg-teal-800" : "bg-gray-300"
                     }`}
             >
                 <button
@@ -77,7 +77,7 @@ export default function CadastroOptions() {
                 </button>
 
                 <h1
-                    className={`text-3xl md:text-4xl font-extrabold mb-6 tracking-wide transition-all duration-500 ${isDarkMode ? "text-lime-200" : "text-gray-700"
+                    className={`text-3xl md:text-4xl font-extrabold mb-6 tracking-wide transition-all duration-500 ${isDarkMode ? "text-white" : "text-gray-700"
                         }`}
                 >
                     O que deseja cadastrar?
