@@ -1,8 +1,9 @@
-// app/cadastrar/page.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { FaArrowLeft } from "react-icons/fa";
+
 import {
     FaFlag,
     FaStarHalfAlt,
@@ -15,6 +16,9 @@ import {
     FaTrophy,
     FaUserShield,
 } from "react-icons/fa";
+
+import { useTheme } from "../../../utils/context/ThemeContext";
+import BotaoTema from "../../../utils/utilities/changeTheme";
 
 const cadastros = [
     { label: "Países", icon: <FaFlag /> },
@@ -38,23 +42,44 @@ function slugify(text: string) {
     return text
         .toLowerCase()
         .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "") // Remove acentos
-        .replace(/[^a-z0-9]+/g, "-")     // Substitui espaços/acentos por hífen
-        .replace(/(^-|-$)+/g, "");       // Remove hífens extras no início/fim
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)+/g, "");
 }
 
 export default function CadastroOptions() {
     const router = useRouter();
+    const { isDarkMode } = useTheme();
 
     return (
-        <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-100 via-teal-200 to-teal-300 p-4 font-[Inter]">
+        <main
+            className={`min-h-screen flex items-center justify-center p-4 font-[Inter] transition-all duration-500 ${isDarkMode
+                ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700"
+                : "bg-gradient-to-br from-white via-gray-100 to-gray-200"
+                }`}
+        >
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6 }}
-                className="bg-teal-800 text-center p-8 rounded-2xl shadow-2xl w-full max-w-2xl"
+                className={`text-center p-8 rounded-2xl shadow-2xl w-full max-w-2xl transition-all duration-500 ${isDarkMode ? "bg-teal-800" : "bg-white"
+                    }`}
             >
-                <h1 className="text-3xl md:text-4xl font-extrabold text-lime-200 mb-6 tracking-wide">
+                <button
+                    onClick={() => router.back()}
+                    className={`flex items-center gap-2 mb-4 text-sm font-medium transition duration-200 ${isDarkMode
+                        ? "text-lime-200 hover:text-lime-100"
+                        : "text-gray-700 hover:text-gray-900"
+                        }`}
+                >
+                    <FaArrowLeft />
+                    Voltar
+                </button>
+
+                <h1
+                    className={`text-3xl md:text-4xl font-extrabold mb-6 tracking-wide transition-all duration-500 ${isDarkMode ? "text-lime-200" : "text-gray-700"
+                        }`}
+                >
                     O que deseja cadastrar?
                 </h1>
 
@@ -64,7 +89,10 @@ export default function CadastroOptions() {
                             key={idx}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.97 }}
-                            className="flex items-center justify-center gap-3 bg-emerald-400 hover:bg-emerald-300 text-teal-900 font-semibold py-3 px-4 rounded-xl shadow-md transition-all duration-300"
+                            className={`flex items-center justify-center gap-3 font-semibold py-3 px-4 rounded-xl shadow-md transition-all duration-300 ${isDarkMode
+                                ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900"
+                                : "bg-gray-600 hover:bg-gray-500 text-white"
+                                }`}
                             onClick={() => router.push(`/routes/cadastros/${slugify(label)}`)}
                         >
                             {icon}
@@ -73,6 +101,8 @@ export default function CadastroOptions() {
                     ))}
                 </div>
             </motion.div>
+
+            <BotaoTema />
         </main>
     );
 }

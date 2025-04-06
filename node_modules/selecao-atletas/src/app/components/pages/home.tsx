@@ -2,8 +2,13 @@
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { FaUserPlus, FaSearch, FaDatabase, FaInfoCircle } from "react-icons/fa";
+import BotaoTema from "../../../utils/utilities/changeTheme";
+import { useTheme } from "../../../utils/context/ThemeContext";
+
+import { useState } from "react";
 
 export default function Home() {
+    const { isDarkMode, toggleTheme } = useTheme();
     const router = useRouter();
 
     const buttons = [
@@ -14,14 +19,23 @@ export default function Home() {
     ];
 
     return (
-        <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-100 via-teal-200 to-teal-300 p-4">
+        <main
+            className={`min-h-screen flex items-center justify-center p-4 transition-all duration-500 ${isDarkMode
+                ? "bg-gradient-to-br from-gray-900 via-gray-800 to-teal-900"
+                : "bg-gradient-to-br from-white via-gray-100 to-gray-200"
+                }`}
+        >
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6 }}
-                className="bg-teal-800 text-center p-8 rounded-2xl shadow-2xl w-full max-w-xs md:max-w-md"
+                className={`text-center p-8 rounded-2xl shadow-2xl w-full max-w-xs md:max-w-md transition-all duration-500 ${isDarkMode ? "bg-teal-800" : "bg-gray-200"
+                    }`}
             >
-                <h1 className="text-4xl md:text-5xl font-extrabold text-lime-200 mb-8 tracking-wide">
+                <h1
+                    className={`text-4xl md:text-5xl font-extrabold mb-8 tracking-wide transition-all duration-500 ${isDarkMode ? "text-lime-200" : "text-gray-700"
+                        }`}
+                >
                     Cadastro de Atletas
                 </h1>
 
@@ -32,7 +46,10 @@ export default function Home() {
                             whileTap={{ scale: 0.97 }}
                             key={idx}
                             onClick={onClick}
-                            className="flex items-center justify-center gap-3 bg-emerald-400 hover:bg-emerald-300 text-teal-900 font-bold py-3 rounded-xl shadow-md transition-all duration-300"
+                            className={`flex items-center justify-center gap-3 font-bold py-3 rounded-xl shadow-md transition-all duration-300 ${isDarkMode
+                                ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900"
+                                : "bg-gray-600 hover:bg-gray-500 text-white"
+                                }`}
                         >
                             {icon}
                             {label}
@@ -40,6 +57,10 @@ export default function Home() {
                     ))}
                 </div>
             </motion.div>
+
+            <BotaoTema />
         </main>
+
+
     );
 }

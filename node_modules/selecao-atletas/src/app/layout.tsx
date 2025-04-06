@@ -1,20 +1,22 @@
-// app/layout.tsx (ou onde você define a fonte global)
 import "./globals.css";
-import { Bebas_Neue } from "next/font/google";
+import { Inter } from "next/font/google";
+import { ThemeProvider } from "../utils/context/ThemeContext";
 
-const bebas = Bebas_Neue({
-  weight: "400",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Cadastro de Atletas",
+  description: "Projeto de gestão de atletas",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+import { ReactNode } from "react";
+
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="pt-BR">
-      <body className={bebas.className}>{children}</body>
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body className={inter.className}>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }

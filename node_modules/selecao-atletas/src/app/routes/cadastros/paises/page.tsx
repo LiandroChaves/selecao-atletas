@@ -1,42 +1,45 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { FaArrowLeft } from "react-icons/fa";
+import { useRouter } from "next/navigation";
+import { useTheme } from "@/utils/context/ThemeContext";
+import BotaoTema from "@/utils/utilities/changeTheme";
+import { motion } from "framer-motion";
 
 export default function CadastroPaises() {
     const [nome, setNome] = useState("");
     const [paises, setPaises] = useState<{ id: number; nome: string }[]>([]);
+    const [erro, setErro] = useState("");
+    const router = useRouter();
+    const { isDarkMode } = useTheme();
 
-    // PEGAR
     async function fetchPaises() {
         try {
             const res = await fetch("http://localhost:3001/api/paises/pegarPaises");
             const data = await res.json();
             setPaises(data);
-            console.log("🌍 Países carregados:", data);
         } catch (error) {
             console.error("❌ Erro ao buscar países:", error);
         }
     }
 
-    // INSERIR
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
         if (!nome.trim()) {
-            console.warn("⚠️ Nome do país está vazio");
+            setErro("⚠️ O nome do país é obrigatório.");
+            setTimeout(() => setErro(""), 3000);
             return;
         }
 
-        // Capitaliza a primeira letra
         const nomeFormatado = nome.charAt(0).toUpperCase() + nome.slice(1).toLowerCase();
 
         try {
             const res = await fetch("http://localhost:3001/api/paises/inserirPaises", {
                 method: "POST",
                 body: JSON.stringify({ nome: nomeFormatado }),
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
             });
 
             const data = await res.json();
@@ -59,9 +62,33 @@ export default function CadastroPaises() {
     }, []);
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-800 text-white p-6">
-            <div className="w-full max-w-md">
-                <h2 className="text-2xl font-bold mb-4 text-center">Cadastro de Países</h2>
+        <main
+            className={`min-h-screen flex items-center justify-center p-4 transition-all duration-500 ${isDarkMode
+                ? "bg-gradient-to-br from-gray-900 via-gray-800 to-teal-900"
+                : "bg-gradient-to-br from-white via-gray-100 to-gray-200"
+                }`}
+        >
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6 }}
+                className={`text-center p-8 rounded-2xl shadow-2xl w-full max-w-md transition-all duration-500 ${isDarkMode ? "bg-teal-800" : "bg-gray-200"}`}
+            >
+                <button
+                    onClick={() => router.back()}
+                    className={`flex items-center gap-2 mb-4 text-sm font-medium transition duration-200 ${isDarkMode
+                        ? "text-lime-200 hover:text-lime-100"
+                        : "text-gray-700 hover:text-gray-900"
+                        }`}
+                >
+                    <FaArrowLeft />
+                    <span className="text-sm font-medium">Voltar</span>
+                </button>
+
+                <h2 className={`text-2xl font-bold mb-4 transition-all duration-500 ${isDarkMode ? "text-lime-200" : "text-gray-700"}`}>
+                    Cadastro de Países
+                </h2>
+
                 <form onSubmit={handleSubmit} className="mb-6 flex flex-col gap-4">
                     <input
                         value={nome}
@@ -69,20 +96,32 @@ export default function CadastroPaises() {
                         placeholder="Nome do país"
                         className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
                     />
-                    <button className="bg-teal-500 px-4 py-2 rounded hover:bg-teal-400 font-bold text-gray-800 transition duration-200 trasition-transform transform hover:scale-103 cursor-pointer">
+                    {erro && (
+                        <p className="text-red-400 font-medium text-sm">{erro}</p>
+                    )}
+                    <button
+                        className={`px-4 py-2 rounded font-semibold transition duration-300 hover:scale-[1.03] ${isDarkMode
+                            ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900"
+                            : "bg-gray-600 hover:bg-gray-500 text-white"
+                            }`}
+                    >
                         Cadastrar
                     </button>
                 </form>
-                <ul className="space-y-2">
+
+                <ul className="space-y-2 text-left">
                     {paises.map((pais) => (
-                        <li key={pais.id} className="bg-teal-700 p-2 rounded">
-                            <span className="font-semibold">ID:</span> {pais.id} -{" "}
-                            {pais.nome}
+                        <li
+                            key={pais.id}
+                            className={`p-2 rounded transition-all ${isDarkMode ? "bg-teal-600 text-white" : "bg-white text-black border border-gray-300"}`}
+                        >
+                            <span className="font-normal">ID:</span> {pais.id} - {pais.nome}
                         </li>
                     ))}
                 </ul>
-            </div>
-        </div>
+            </motion.div>
 
+            <BotaoTema />
+        </main>
     );
 }
