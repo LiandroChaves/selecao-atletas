@@ -27,7 +27,7 @@ CREATE TABLE paises (
 );
 
 CREATE TABLE niveis_ambidestria (
-    id SMALLINT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     descricao VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
