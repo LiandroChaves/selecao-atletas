@@ -1,8 +1,9 @@
 import express from "express";
 import cors from "cors";
-import testConnection from "./database/seq.js"; // Caminho ajustado
-import models from "./database/models/index.js"; // Caminho ajustado
-import paisesRoutes from "./routes/paises.js"; // Novo import
+import testConnection from "./database/seq.js";
+import models from "./database/models/index.js";
+import paisesRoutes from "./routes/paises.js";
+import ambidestriaRoutes from "./routes/ambidestria.js";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -16,7 +17,8 @@ app.use(express.urlencoded({ extended: true }));
 testConnection();
 
 // Rotas
-app.use("/api/paises", paisesRoutes); // Nova rota de países
+app.use("/api/paises", paisesRoutes); // Rota de países
+app.use("/api/ambidestria", ambidestriaRoutes); // Rota de ambidestria
 
 // Rota padrão
 app.get("/", (req, res) => {

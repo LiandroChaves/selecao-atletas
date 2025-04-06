@@ -1,77 +1,67 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FaArrowLeft } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { FaArrowLeft } from "react-icons/fa";
+import { motion } from "framer-motion";
 import { useTheme } from "@/utils/context/ThemeContext";
 import BotaoTema from "@/utils/utilities/changeTheme";
-import { motion } from "framer-motion";
 
-export default function CadastroPaises() {
-    const [nome, setNome] = useState("");
-    const [paises, setPaises] = useState<{ id: number; nome: string }[]>([]);
+export default function CadastroNiveisAmbidestria() {
+    const [descricao, setDescricao] = useState("");
+    const [niveis, setNiveis] = useState<{ id: number; descricao: string }[]>([]);
     const [erro, setErro] = useState("");
     const router = useRouter();
     const { isDarkMode } = useTheme();
 
-    async function fetchPaises() {
+    async function fetchNiveis() {
         try {
-            const res = await fetch("http://localhost:3001/api/paises/pegarPaises");
+            const res = await fetch("http://localhost:3001/api/ambidestria/pegarNiveis");
             const data = await res.json();
-            setPaises(data);
+            setNiveis(data);
         } catch (error) {
-            console.error("❌ Erro ao buscar países:", error);
+            console.error("❌ Erro ao buscar níveis:", error);
         }
     }
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
-        if (!nome.trim()) {
-            setErro("⚠️ O nome do país é obrigatório.");
+        if (!descricao.trim()) {
+            setErro("⚠️ A descrição é obrigatória.");
             setTimeout(() => setErro(""), 3000);
             return;
         }
 
-        const palavrasMinusculas = ["de", "do", "da", "das", "dos", "e", "em", "no", "na", "nos", "nas"];
-
-        const nomeFormatado = nome
-            .toLowerCase()
-            .split(" ")
-            .map((palavra, index) => {
-                if (index === 0 || !palavrasMinusculas.includes(palavra)) {
-                    return palavra.charAt(0).toUpperCase() + palavra.slice(1);
-                } else {
-                    return palavra;
-                }
-            })
-            .join(" ");
-
+        // Formata: primeira letra maiúscula, o resto minúsculo
+        const descricaoFormatada =
+            descricao.charAt(0).toUpperCase() + descricao.slice(1).toLowerCase();
 
         try {
-            const res = await fetch("http://localhost:3001/api/paises/inserirPaises", {
+            const res = await fetch("http://localhost:3001/api/ambidestria/inserirNivel", {
                 method: "POST",
-                body: JSON.stringify({ nome: nomeFormatado }),
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ descricao: descricaoFormatada }),
             });
 
             const data = await res.json();
 
             if (res.ok) {
-                console.log("✅ País inserido com sucesso:", data.pais);
+                console.log("✅ Nível inserido com sucesso:", data.nivel);
+                setDescricao("");
+                fetchNiveis();
             } else {
-                console.warn("⚠️ Falha ao inserir país:", data.error);
+                console.warn("⚠️ Falha ao inserir nível:", data.error);
             }
-
-            setNome("");
-            fetchPaises();
         } catch (error) {
-            console.error("❌ Erro ao inserir país:", error);
+            console.error("❌ Erro ao inserir nível:", error);
         }
     }
 
     useEffect(() => {
-        fetchPaises();
+        fetchNiveis();
     }, []);
 
     return (
@@ -99,14 +89,14 @@ export default function CadastroPaises() {
                 </button>
 
                 <h2 className={`text-2xl font-bold mb-4 transition-all duration-500 ${isDarkMode ? "text-lime-200" : "text-gray-700"}`}>
-                    Cadastro de Países
+                    Cadastro de Níveis de Ambidestria
                 </h2>
 
                 <form onSubmit={handleSubmit} className="mb-6 flex flex-col gap-4">
                     <input
-                        value={nome}
-                        onChange={(e) => setNome(e.target.value)}
-                        placeholder="Nome do país"
+                        value={descricao}
+                        onChange={(e) => setDescricao(e.target.value)}
+                        placeholder="Descrição do nível (ex: Total, Parcial)"
                         className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
                     />
                     {erro && (
@@ -123,12 +113,12 @@ export default function CadastroPaises() {
                 </form>
 
                 <ul className="space-y-2 text-left">
-                    {paises.map((pais) => (
+                    {niveis.map((nivel) => (
                         <li
-                            key={pais.id}
+                            key={nivel.id}
                             className={`p-2 rounded transition-all ${isDarkMode ? "bg-teal-600 text-white" : "bg-white text-black border border-gray-300"}`}
                         >
-                            <span className="font-normal">ID:</span> {pais.id} - {pais.nome}
+                            <span className="font-normal">ID:</span> {nivel.id} - {nivel.descricao}
                         </li>
                     ))}
                 </ul>
