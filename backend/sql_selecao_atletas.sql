@@ -1,5 +1,6 @@
 -- SELECTS
 SELECT * FROM paises;
+SELECT * FROM cidades;
 SELECT * FROM niveis_ambidestria;
 SELECT * FROM posicoes;
 SELECT * FROM clubes;
@@ -15,15 +16,38 @@ SELECT * FROM agentes;
 SELECT * FROM jogadores_agentes;
 
 
--- Tipos ENUM (melhor prática no PostgreSQL)
+-- ENUMs
 CREATE TYPE tipo_titulo AS ENUM ('Nacional', 'Internacional', 'Individual');
 CREATE TYPE pe_dominante_enum AS ENUM ('D', 'E', 'A');
+
+-- 1. Tabelas básicas de referência
 
 CREATE TABLE paises (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE estados (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    uf CHAR(2) NOT NULL,
+    pais_id INT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    CONSTRAINT fkey_estados_pais FOREIGN KEY (pais_id) REFERENCES paises(id) ON DELETE CASCADE
+);
+
+CREATE TABLE cidades (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    pais_id SMALLINT,
+    estado_id SMALLINT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    CONSTRAINT fkey_cidades_pais FOREIGN KEY (pais_id) REFERENCES paises(id) ON DELETE CASCADE,
+    CONSTRAINT fkey_cidades_estado FOREIGN KEY (estado_id) REFERENCES estados(id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 CREATE TABLE niveis_ambidestria (
@@ -40,6 +64,8 @@ CREATE TABLE posicoes (
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
+-- 2. Clubes
+
 CREATE TABLE clubes (
     id INT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
@@ -51,11 +77,15 @@ CREATE TABLE clubes (
     CONSTRAINT fkey_clubes_pais FOREIGN KEY (pais_id) REFERENCES paises(id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
+-- 3. Jogadores
+
 CREATE TABLE jogadores (
     id INT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     data_nascimento DATE NOT NULL,
     pais_id SMALLINT NOT NULL,
+    estado_id SMALLINT, -- ✅ NOVO
+    cidade_id SMALLINT NOT NULL,
     altura DECIMAL(4,2) NOT NULL,
     peso DECIMAL(5,2) NOT NULL,
     pe_dominante pe_dominante_enum NOT NULL,
@@ -68,10 +98,14 @@ CREATE TABLE jogadores (
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     CONSTRAINT fkey_jogadores_pais FOREIGN KEY (pais_id) REFERENCES paises(id),
+    CONSTRAINT fkey_jogadores_estado FOREIGN KEY (estado_id) REFERENCES estados(id) ON DELETE SET NULL,
+    CONSTRAINT fkey_jogadores_cidade FOREIGN KEY (cidade_id) REFERENCES cidades(id) ON DELETE SET NULL,
     CONSTRAINT fkey_jogadores_nivel FOREIGN KEY (nivel_ambidestria_id) REFERENCES niveis_ambidestria(id),
     CONSTRAINT fkey_jogadores_posicao FOREIGN KEY (posicao_id) REFERENCES posicoes(id),
     CONSTRAINT fkey_jogadores_clube FOREIGN KEY (clube_atual_id) REFERENCES clubes(id)
 );
+
+-- 4. Estatísticas
 
 CREATE TABLE estatisticas_gerais (
     jogador_id INT PRIMARY KEY,
@@ -86,6 +120,8 @@ CREATE TABLE estatisticas_gerais (
     updated_at TIMESTAMP DEFAULT NOW(),
     CONSTRAINT fkey_estatisticas_jogador FOREIGN KEY (jogador_id) REFERENCES jogadores(id) ON DELETE CASCADE
 );
+
+-- 5. Partidas
 
 CREATE TABLE partidas (
     id INT PRIMARY KEY,
@@ -122,6 +158,8 @@ CREATE TABLE estatisticas_partidas (
     CONSTRAINT fkey_estatisticas_partida_partida FOREIGN KEY (partida_id) REFERENCES partidas(id) ON DELETE CASCADE
 );
 
+-- 6. Histórico
+
 CREATE TABLE historico_clubes (
     id INT PRIMARY KEY,
     jogador_id INT NOT NULL,
@@ -146,6 +184,8 @@ CREATE TABLE historico_lesoes (
     CONSTRAINT fkey_lesoes_jogador FOREIGN KEY (jogador_id) REFERENCES jogadores(id) ON DELETE CASCADE
 );
 
+-- 7. Títulos
+
 CREATE TABLE titulos (
     id INT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
@@ -167,6 +207,8 @@ CREATE TABLE jogadores_titulos (
     CONSTRAINT fkey_titulos_clube FOREIGN KEY (clube_id) REFERENCES clubes(id)
 );
 
+-- 8. Agentes
+
 CREATE TABLE agentes (
     id INT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
@@ -187,11 +229,13 @@ CREATE TABLE jogadores_agentes (
     CONSTRAINT fkey_agentes_agente FOREIGN KEY (agente_id) REFERENCES agentes(id)
 );
 
--- Índices úteis
+-- 9. Índices
+
 CREATE INDEX idx_jogadores_nome ON jogadores(nome);
 CREATE INDEX idx_partidas_data ON partidas(data);
 CREATE INDEX idx_estatisticas_partidas_jogador ON estatisticas_partidas(jogador_id);
 CREATE INDEX idx_estatisticas_partidas_partida ON estatisticas_partidas(partida_id);
+CREATE INDEX idx_jogadores_cidade ON jogadores(cidade_id);
 
 -- -- apagar e recriar tudo do zero
 -- DROP SCHEMA public CASCADE;

@@ -15,6 +15,8 @@ import {
     FaBriefcaseMedical,
     FaTrophy,
     FaUserShield,
+    FaCity,
+    FaMapMarkedAlt,
 } from "react-icons/fa";
 
 import { useTheme } from "../../../utils/context/ThemeContext";
@@ -22,6 +24,8 @@ import BotaoTema from "../../../utils/utilities/changeTheme";
 
 const cadastros = [
     { label: "Países", icon: <FaFlag /> },
+    { label: "Estados", icon: <FaMapMarkedAlt /> },
+    { label: "Cidades", icon: <FaCity /> },
     { label: "Níveis Ambidestria", icon: <FaStarHalfAlt /> },
     { label: "Posições", icon: <FaUserTag /> },
     { label: "Clubes", icon: <FaUsers /> },
@@ -37,7 +41,6 @@ const cadastros = [
     { label: "Jogadores - Agentes", icon: <FaUserShield /> },
 ];
 
-// Função utilitária para transformar label em slug
 function slugify(text: string) {
     return text
         .toLowerCase()

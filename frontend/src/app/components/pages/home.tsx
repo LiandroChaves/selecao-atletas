@@ -4,21 +4,11 @@ import { useRouter } from "next/navigation";
 import { FaUserPlus, FaSearch, FaDatabase, FaInfoCircle } from "react-icons/fa";
 import BotaoTema from "../../../utils/utilities/changeTheme";
 import { useTheme } from "../../../utils/context/ThemeContext";
-import { useLoading } from "../../../utils/context/LoadingProvider";
 
-import { useState } from "react";
 
 export default function Home() {
-    const { isDarkMode, toggleTheme } = useTheme();
-    const { setIsLoading } = useLoading();
+    const { isDarkMode } = useTheme();
     const router = useRouter();
-
-    const irParaOutraRota = () => {
-        setIsLoading(true);
-        setTimeout(() => {
-            router.push("/routes/cadastros");
-        }, 300); // pequena espera pra exibir loading
-    };
 
     const buttons = [
         { label: "Cadastrar", icon: <FaUserPlus />, onClick: () => router.push("/routes/cadastros") },
