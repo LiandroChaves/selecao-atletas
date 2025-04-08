@@ -4,6 +4,7 @@ import testConnection from "./database/seq.js";
 import models from "./database/models/index.js";
 import paisesRoutes from "./routes/paises.js";
 import ambidestriaRoutes from "./routes/ambidestria.js";
+import estadosRoutes from "./routes/estados.js";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -19,6 +20,7 @@ testConnection();
 // Rotas
 app.use("/api/paises", paisesRoutes); // Rota de países
 app.use("/api/ambidestria", ambidestriaRoutes); // Rota de ambidestria
+app.use("/api/estados", estadosRoutes);
 
 // Rota padrão
 app.get("/", (req, res) => {
