@@ -14,7 +14,7 @@ const Pais = sequelize.define("Pais", {
     },
 }, {
     tableName: "paises",
-    timestamps: false, // ou true se quiser usar createdAt/updatedAt automáticos
+    timestamps: false,
 });
 
 
