@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { FaArrowLeft } from "react-icons/fa";
+import { useTheme } from "../../../utils/context/ThemeContext";
+import BotaoTema from "../../../utils/utilities/changeTheme";
 
 import {
     FaFlag,
@@ -19,8 +21,6 @@ import {
     FaMapMarkedAlt,
 } from "react-icons/fa";
 
-import { useTheme } from "../../../utils/context/ThemeContext";
-import BotaoTema from "../../../utils/utilities/changeTheme";
 
 const cadastros = [
     { label: "Países", icon: <FaFlag /> },
@@ -37,8 +37,6 @@ const cadastros = [
     { label: "Histórico de Lesões", icon: <FaBriefcaseMedical /> },
     { label: "Títulos", icon: <FaTrophy /> },
     { label: "Jogadores - Títulos", icon: <FaTrophy /> },
-    { label: "Agentes", icon: <FaUserShield /> },
-    { label: "Jogadores - Agentes", icon: <FaUserShield /> },
 ];
 
 function slugify(text: string) {

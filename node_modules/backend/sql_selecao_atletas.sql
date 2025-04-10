@@ -12,8 +12,7 @@ SELECT * FROM historico_clubes;
 SELECT * FROM historico_lesoes;
 SELECT * FROM titulos;
 SELECT * FROM jogadores_titulos;
-SELECT * FROM agentes;
-SELECT * FROM jogadores_agentes;
+SELECT * FROM usuarios;
 
 
 -- ENUMs
@@ -21,6 +20,15 @@ CREATE TYPE tipo_titulo AS ENUM ('Nacional', 'Internacional', 'Individual');
 CREATE TYPE pe_dominante_enum AS ENUM ('D', 'E', 'A');
 
 -- 1. Tabelas básicas de referência
+
+CREATE TABLE usuarios (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    senha VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 
 CREATE TABLE paises (
     id SERIAL PRIMARY KEY,
@@ -58,7 +66,7 @@ CREATE TABLE niveis_ambidestria (
 );
 
 CREATE TABLE posicoes (
-    id SMALLINT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
@@ -207,29 +215,7 @@ CREATE TABLE jogadores_titulos (
     CONSTRAINT fkey_titulos_clube FOREIGN KEY (clube_id) REFERENCES clubes(id)
 );
 
--- 8. Agentes
-
-CREATE TABLE agentes (
-    id INT PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL,
-    empresa VARCHAR(255),
-    telefone VARCHAR(20),
-    email VARCHAR(255),
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE TABLE jogadores_agentes (
-    jogador_id INT NOT NULL,
-    agente_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    PRIMARY KEY (jogador_id, agente_id),
-    CONSTRAINT fkey_agentes_jogador FOREIGN KEY (jogador_id) REFERENCES jogadores(id) ON DELETE CASCADE,
-    CONSTRAINT fkey_agentes_agente FOREIGN KEY (agente_id) REFERENCES agentes(id)
-);
-
--- 9. Índices
+-- 8. Índices
 
 CREATE INDEX idx_jogadores_nome ON jogadores(nome);
 CREATE INDEX idx_partidas_data ON partidas(data);

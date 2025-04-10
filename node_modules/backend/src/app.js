@@ -6,8 +6,7 @@ import paisesRoutes from "./routes/paises.js";
 import ambidestriaRoutes from "./routes/ambidestria.js";
 import estadosRoutes from "./routes/estados.js";
 import cidadesRoutes from "./routes/cidades.js";
-
-
+import posicoesRoutes from "./routes/posicoes.js";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -24,7 +23,9 @@ testConnection();
 app.use("/api/paises", paisesRoutes); // Rota de países
 app.use("/api/ambidestria", ambidestriaRoutes); // Rota de ambidestria
 app.use("/api/estados", estadosRoutes); // Rota de estados
-app.use("/api/cidades", cidadesRoutes);
+app.use("/api/cidades", cidadesRoutes); // Rota de cidades
+app.use("/api/posicoes", posicoesRoutes); // Rota de posições
+
 
 // Rota padrão
 app.get("/", (req, res) => {
@@ -35,3 +36,5 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
     console.log(`🔥 Servidor rodando em http://localhost:${PORT}`);
 });
+
+// http://localhost:3001/api/   // Rota padrão
