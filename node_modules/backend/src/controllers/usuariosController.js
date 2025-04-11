@@ -1,6 +1,9 @@
 import Usuarios from "../database/models/Login.js";
+import { hash } from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export const cadastrarUsuario = async (req, res) => {
+
     const { email, senha } = req.body;
 
     if (!email || !senha) {
@@ -14,9 +17,12 @@ export const cadastrarUsuario = async (req, res) => {
             return res.status(409).json({ message: "Usuário já existe." });
         }
 
+        const senhaCriptograda = await hash(senha, 6);
+        console.log("Senha criptografada:", senha);
+
         const novoUsuario = await Usuarios.create({
             email,
-            senha, // salvando a senha em texto puro (atenção)
+            senha: senhaCriptograda,
         });
 
         console.log("Usuário cadastrado com sucesso:", novoUsuario);

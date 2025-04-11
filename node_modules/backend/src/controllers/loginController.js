@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import Usuarios from "../database/models/Login.js";
+import bcrypt from "bcryptjs";
 
 const JWT_SECRET = process.env.JWT_SECRET || "segredo_supersecreto";
 const JWT_EXPIRATION = "1h";
@@ -19,10 +20,16 @@ export const login = async (req, res) => {
 
         console.log("Usuário encontrado:", usuario.email);
 
-        if (senha !== usuario.senha) {
-            console.warn("Senha incorreta para o usuário:", email);
+        const senhaValida = await bcrypt.compare(senha, usuario.senha);
+        if (!senhaValida) {
+            console.warn("Senha inválida para o usuário:", email);
             return res.status(401).json({ mensagem: "Email ou senha inválidos" });
         }
+
+        // if (senha !== usuario.senha) {
+        //     console.warn("Senha incorreta para o usuário:", email);
+        //     return res.status(401).json({ mensagem: "Email ou senha inválidos" });
+        // }
 
         const token = jwt.sign(
             { id: usuario.id, email: usuario.email },

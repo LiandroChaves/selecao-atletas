@@ -29,6 +29,7 @@ CREATE TABLE usuarios (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+insert into usuarios (email, senha) values ('LChaveszzz','Lc+lf@123')
 
 CREATE TABLE paises (
     id SERIAL PRIMARY KEY,

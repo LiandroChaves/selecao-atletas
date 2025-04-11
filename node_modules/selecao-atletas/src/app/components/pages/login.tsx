@@ -17,6 +17,7 @@ export default function LoginPage() {
     const [mostrarModalCadastro, setMostrarModalCadastro] = useState(false);
     const [novoUsuario, setNovoUsuario] = useState("");
     const [novaSenha, setNovaSenha] = useState("");
+    const [mostrarSenhaLogin, setMostrarSenhaLogin] = useState(false);
     const [mostrarSenha, setMostrarSenha] = useState(false);
 
     const handleLogin = async (e: React.FormEvent) => {
@@ -95,7 +96,7 @@ export default function LoginPage() {
                     />
                 </div>
 
-                <div className="mb-6">
+                <div className="mb-6 relative">
                     <label
                         className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-gray-800"
                             }`}
@@ -103,12 +104,20 @@ export default function LoginPage() {
                         Senha
                     </label>
                     <input
-                        type="password"
+                        type={mostrarSenhaLogin ? "text" : "password"}
                         value={senha}
                         onChange={(e) => setSenha(e.target.value)}
                         className="w-full p-2 rounded-lg border border-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                        placeholder="Digite sua senha"
                         required
                     />
+                    <button
+                        type="button"
+                        onClick={() => setMostrarSenhaLogin(!mostrarSenhaLogin)}
+                        className={`absolute right-3 top-9 text-lg ${isDarkMode ? "text-white" : "text-gray-700"}`}
+                    >
+                        {mostrarSenhaLogin ? <FaEyeSlash color="gray" /> : <FaEye color="gray" />}
+                    </button>
                 </div>
 
                 <motion.button
@@ -189,7 +198,7 @@ export default function LoginPage() {
                                         onClick={() => setMostrarSenha(!mostrarSenha)}
                                         className={`absolute right-3 top-9 text-lg ${isDarkMode ? "text-white" : "text-gray-700"}`}
                                     >
-                                        {mostrarSenha ? <FaEyeSlash /> : <FaEye />}
+                                        {mostrarSenha ? <FaEyeSlash color="gray" /> : <FaEye color="gray" />}
                                     </button>
                                 </div>
                                 <motion.button
