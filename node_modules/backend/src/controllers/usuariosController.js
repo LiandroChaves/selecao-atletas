@@ -27,3 +27,16 @@ export const cadastrarUsuario = async (req, res) => {
         return res.status(500).json({ message: "Erro interno do servidor." });
     }
 };
+
+export const getUsuarios = async (req, res) => {
+    try {
+        const usuarios = await Usuarios.findAll({
+            attributes: ['id', 'email', 'created_at', 'updated_at'] // Evita expor a senha
+        });
+
+        return res.status(200).json(usuarios);
+    } catch (error) {
+        console.error("Erro ao buscar usuários:", error);
+        return res.status(500).json({ message: "Erro ao buscar usuários." });
+    }
+};
