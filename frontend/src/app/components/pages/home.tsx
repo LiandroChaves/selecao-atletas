@@ -54,9 +54,22 @@ export default function Home() {
                             {label}
                         </motion.button>
                     ))}
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => {
+                            localStorage.removeItem("token");
+                            router.push("/routes/login");
+                        }}
+                        className={`flex items-center justify-center gap-3 font-bold py-3 rounded-xl shadow-md transition-all duration-300 ${isDarkMode
+                            ? "bg-red-500 hover:bg-red-400 text-white"
+                            : "bg-red-200 hover:bg-red-300 text-red-800"
+                            }`}
+                    >
+                        🚪 Sair
+                    </motion.button>
                 </div>
             </motion.div>
-
             <BotaoTema />
         </main>
 

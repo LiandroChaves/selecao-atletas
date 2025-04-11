@@ -23,14 +23,32 @@ export default function LoginPage() {
         e.preventDefault();
         setErro("");
 
-        // Simulando autenticação
-        if (email === "LChaveszzz" && senha === "Lc+lf@123") {
+        try {
+            const response = await fetch("http://localhost:3001/api/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, senha }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.mensagem || "Erro ao autenticar");
+            }
+
+            // Salva token e autenticação
+            localStorage.setItem("token", data.token);
             localStorage.setItem("autenticado", "true");
+            localStorage.setItem("token_expira_em", Date.now() + 3600000 + ""); // +1h
+
             router.push("/routes/home");
-        } else {
-            setErro("Email ou senha incorretos.");
+        } catch (err: any) {
+            setErro(err.message);
         }
     };
+
 
 
     return (
@@ -177,10 +195,26 @@ export default function LoginPage() {
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.97 }}
-                                    onClick={() => {
-                                        console.log("Cadastrar:", novoUsuario, novaSenha);
-                                        setMostrarModalCadastro(false);
-                                        // Aqui você pode chamar uma função de cadastro real futuramente
+                                    onClick={async () => {
+                                        try {
+                                            const res = await fetch("http://localhost:3001/api/usuarios/cadastro", {
+                                                method: "POST",
+                                                headers: { "Content-Type": "application/json" },
+                                                body: JSON.stringify({ email: novoUsuario, senha: novaSenha }),
+                                            });
+
+                                            const data = await res.json();
+
+                                            if (res.ok) {
+                                                alert("Usuário cadastrado com sucesso!");
+                                                setMostrarModalCadastro(false);
+                                            } else {
+                                                alert(data.message || "Erro ao cadastrar.");
+                                            }
+                                        } catch (error) {
+                                            console.error("Erro ao cadastrar:", error);
+                                            alert("Erro de conexão com o servidor.");
+                                        }
                                     }}
                                     className={`mt-4 w-full py-2 rounded-xl font-semibold shadow-md transition-all duration-300 ${isDarkMode
                                         ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900"

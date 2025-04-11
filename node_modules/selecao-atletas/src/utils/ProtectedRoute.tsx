@@ -2,37 +2,53 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import LoginPage from "@/app/components/pages/login";
+import { jwtDecode } from "jwt-decode";
 
 interface ProtectedRouteProps {
-    children: React.ReactNode;
+  children: React.ReactNode;
+}
+
+interface TokenPayload {
+  exp: number;
+  iat: number;
+  id: number;
+  email: string;
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-    const [isChecking, setIsChecking] = useState(true);
-    const [hasAccess, setHasAccess] = useState(false);
-    const router = useRouter();
+  const [isChecking, setIsChecking] = useState(true);
+  const [hasAccess, setHasAccess] = useState(false);
+  const router = useRouter();
 
-    useEffect(() => {
-        const acesso = localStorage.getItem("autenticado");
+  useEffect(() => {
+    const token = localStorage.getItem("token");
 
-        if (acesso === "true") {
-            setHasAccess(true);
+    if (token) {
+      try {
+        const decoded = jwtDecode<TokenPayload>(token);
+
+        const isExpired = decoded.exp * 1000 < Date.now();
+        if (isExpired) {
+          localStorage.removeItem("token");
+          router.push("/routes/login");
         } else {
-            router.push("/routes/login");
+          setHasAccess(true);
         }
-
-        setIsChecking(false);
-    }, [router]);
-
-
-    if (!hasAccess) {
-        return (
-            <LoginPage/>
-        );
+      } catch (error) {
+        console.error("Token inválido:", error);
+        localStorage.removeItem("token");
+        router.push("/routes/login");
+      }
+    } else {
+      router.push("/routes/login");
     }
 
-    return <>{children}</>;
+    setIsChecking(false);
+  }, [router]);
+
+  if (isChecking) return null;
+
+  return hasAccess ? <>{children}</> : null;
 };
 
 export default ProtectedRoute;

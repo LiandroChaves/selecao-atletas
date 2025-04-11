@@ -1,0 +1,29 @@
+import Usuarios from "../database/models/Login.js";
+
+export const cadastrarUsuario = async (req, res) => {
+    const { email, senha } = req.body;
+
+    if (!email || !senha) {
+        return res.status(400).json({ message: "Nome (ou email) e senha são obrigatórios." });
+    }
+
+    try {
+        const usuarioExistente = await Usuarios.findOne({ where: { email } });
+
+        if (usuarioExistente) {
+            return res.status(409).json({ message: "Usuário já existe." });
+        }
+
+        const novoUsuario = await Usuarios.create({
+            email,
+            senha, // salvando a senha em texto puro (atenção)
+        });
+
+        console.log("Usuário cadastrado com sucesso:", novoUsuario);
+
+        return res.status(201).json({ message: "Usuário cadastrado com sucesso!" });
+    } catch (error) {
+        console.error("Erro ao cadastrar usuário:", error);
+        return res.status(500).json({ message: "Erro interno do servidor." });
+    }
+};
