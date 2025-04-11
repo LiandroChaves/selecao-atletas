@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "@/utils/context/ThemeContext";
 import BotaoTema from "@/utils/utilities/changeTheme";
 import { motion } from "framer-motion";
+import { useLoading } from "../../../../utils/context/LoadingProvider";
+import { verificarTokenValido } from "@/utils/verificarTokenValido";
+
 
 export default function CadastroEstados() {
     const [nome, setNome] = useState("");
@@ -16,6 +19,11 @@ export default function CadastroEstados() {
     const [erro, setErro] = useState("");
     const router = useRouter();
     const { isDarkMode } = useTheme();
+    const { setIsLoading } = useLoading();
+
+    useEffect(() => {
+        setIsLoading(false);
+    }, []);
 
     useEffect(() => {
         fetchPaises();
@@ -43,7 +51,6 @@ export default function CadastroEstados() {
         }
     }
 
-
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
@@ -60,10 +67,19 @@ export default function CadastroEstados() {
             return;
         }
 
+        // 🔐 Verificação do token
+        if (!verificarTokenValido()) return;  // Reutiliza a função para verificar o token
+
+        // ✅ Requisição segura
         try {
+            const token = localStorage.getItem("token");
+
             const res = await fetch("http://localhost:3001/api/estados/inserirEstados", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
                 body: JSON.stringify({
                     nome: nome.trim(),
                     uf: uf.trim().toUpperCase(),

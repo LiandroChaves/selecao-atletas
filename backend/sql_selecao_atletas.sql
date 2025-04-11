@@ -30,6 +30,7 @@ CREATE TABLE usuarios (
 );
 
 insert into usuarios (email, senha) values ('LChaveszzz','Lc+lf@123')
+delete from usuarios
 
 CREATE TABLE paises (
     id SERIAL PRIMARY KEY,

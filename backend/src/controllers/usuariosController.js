@@ -1,6 +1,5 @@
 import Usuarios from "../database/models/Login.js";
 import { hash } from "bcrypt";
-import bcrypt from "bcryptjs";
 
 export const cadastrarUsuario = async (req, res) => {
 

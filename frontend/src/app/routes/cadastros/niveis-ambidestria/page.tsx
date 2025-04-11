@@ -6,6 +6,8 @@ import { FaArrowLeft } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useTheme } from "@/utils/context/ThemeContext";
 import BotaoTema from "@/utils/utilities/changeTheme";
+import { useLoading } from "../../../../utils/context/LoadingProvider";
+import { verificarTokenValido } from "@/utils/verificarTokenValido";
 
 export default function CadastroNiveisAmbidestria() {
     const [descricao, setDescricao] = useState("");
@@ -13,6 +15,11 @@ export default function CadastroNiveisAmbidestria() {
     const [erro, setErro] = useState("");
     const router = useRouter();
     const { isDarkMode } = useTheme();
+    const { setIsLoading } = useLoading();
+
+    useEffect(() => {
+        setIsLoading(false);
+    }, []);
 
     async function fetchNiveis() {
         try {
@@ -37,11 +44,18 @@ export default function CadastroNiveisAmbidestria() {
         const descricaoFormatada =
             descricao.charAt(0).toUpperCase() + descricao.slice(1).toLowerCase();
 
+        // 🔐 Verificação do token
+        if (!verificarTokenValido()) return;  // Reutiliza a função para verificar o token
+
+        // ✅ Requisição segura
         try {
+            const token = localStorage.getItem("token");
+
             const res = await fetch("http://localhost:3001/api/ambidestria/inserirNivel", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({ descricao: descricaoFormatada }),
             });

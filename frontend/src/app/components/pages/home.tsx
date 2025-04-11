@@ -4,14 +4,27 @@ import { useRouter } from "next/navigation";
 import { FaUserPlus, FaSearch, FaDatabase, FaInfoCircle } from "react-icons/fa";
 import BotaoTema from "../../../utils/utilities/changeTheme";
 import { useTheme } from "../../../utils/context/ThemeContext";
+import { useLoading } from "../../../utils/context/LoadingProvider";
+
 
 
 export default function Home() {
     const { isDarkMode } = useTheme();
+    const { setIsLoading } = useLoading();
     const router = useRouter();
 
     const buttons = [
-        { label: "Cadastrar", icon: <FaUserPlus />, onClick: () => router.push("/routes/cadastros") },
+        {
+            label: "Cadastrar",
+            icon: <FaUserPlus />,
+            onClick: () => {
+                setIsLoading(true); // Ativa carregamento
+                setTimeout(() => {
+                    router.push("/routes/cadastros");
+                    setIsLoading(false); // Opcional, pois pode ser desativado no useEffect da página de destino
+                }, 200); // pequeno delay só para a animação aparecer
+            },
+        },        
         { label: "Busca e Edição", icon: <FaSearch />, onClick: () => alert("Indo para Busca e Edição") },
         { label: "Banco de Dados", icon: <FaDatabase />, onClick: () => alert("Indo para Banco de Dados") },
         { label: "Instruções", icon: <FaInfoCircle />, onClick: () => alert("Indo para Instruções") },

@@ -25,12 +25,7 @@ export const login = async (req, res) => {
             console.warn("Senha inválida para o usuário:", email);
             return res.status(401).json({ mensagem: "Email ou senha inválidos" });
         }
-
-        // if (senha !== usuario.senha) {
-        //     console.warn("Senha incorreta para o usuário:", email);
-        //     return res.status(401).json({ mensagem: "Email ou senha inválidos" });
-        // }
-
+        
         const token = jwt.sign(
             { id: usuario.id, email: usuario.email },
             JWT_SECRET,

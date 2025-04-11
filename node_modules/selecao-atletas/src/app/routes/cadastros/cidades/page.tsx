@@ -6,6 +6,9 @@ import { motion } from "framer-motion";
 import { FaArrowLeft } from "react-icons/fa";
 import { useTheme } from "../../../../utils/context/ThemeContext";
 import BotaoTema from "@/utils/utilities/changeTheme";
+import { useLoading } from "../../../../utils/context/LoadingProvider";
+import { verificarTokenValido } from "@/utils/verificarTokenValido";
+
 
 export default function CadastroCidades() {
     const [nome, setNome] = useState("");
@@ -17,6 +20,11 @@ export default function CadastroCidades() {
     const [erro, setErro] = useState("");
     const router = useRouter();
     const { isDarkMode } = useTheme();
+    const { setIsLoading } = useLoading();
+    
+    useEffect(() => {
+        setIsLoading(false);
+    }, []);
 
     useEffect(() => {
         fetchPaises();
@@ -56,13 +64,17 @@ export default function CadastroCidades() {
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-
+    
         if (!nome.trim() || !paisId || !estadoId) {
             setErro("⚠️ Preencha todos os campos.");
             setTimeout(() => setErro(""), 3000);
             return;
         }
-
+    
+        if (!verificarTokenValido()) return;
+    
+        const token = localStorage.getItem("token");
+    
         const nomeFormatado = nome
             .toLowerCase()
             .split(" ")
@@ -74,26 +86,29 @@ export default function CadastroCidades() {
                 return palavra;
             })
             .join(" ");
-
+    
         try {
             const res = await fetch("http://localhost:3001/api/cidades/inserirCidade", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
                 body: JSON.stringify({
                     nome: nomeFormatado,
                     pais_id: parseInt(paisId),
                     estado_id: parseInt(estadoId),
                 }),
             });
-
+    
             const data = await res.json();
-
+    
             if (res.ok) {
                 setNome("");
                 setPaisId("");
                 setEstadoId("");
                 console.log("✅ Cidade cadastrada:", data.cidade);
-                fetchCidades(); 
+                fetchCidades();
             } else {
                 console.warn("⚠️ Erro ao cadastrar cidade:", data.error);
             }

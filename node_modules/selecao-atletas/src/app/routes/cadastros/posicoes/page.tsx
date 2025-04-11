@@ -6,6 +6,9 @@ import { motion } from "framer-motion";
 import { FaArrowLeft } from "react-icons/fa";
 import { useTheme } from "../../../../utils/context/ThemeContext";
 import BotaoTema from "@/utils/utilities/changeTheme";
+import { useLoading } from "../../../../utils/context/LoadingProvider";
+import { verificarTokenValido } from "@/utils/verificarTokenValido";
+
 
 export default function CadastroPosicoes() {
     const [nome, setNome] = useState("");
@@ -13,6 +16,11 @@ export default function CadastroPosicoes() {
     const [erro, setErro] = useState("");
     const router = useRouter();
     const { isDarkMode } = useTheme();
+    const { setIsLoading } = useLoading();
+
+    useEffect(() => {
+        setIsLoading(false);
+    }, []);
 
     useEffect(() => {
         fetchPosicoes();
@@ -50,10 +58,19 @@ export default function CadastroPosicoes() {
             })
             .join(" ");
 
+        // 🔐 Verificação do token
+        if (!verificarTokenValido()) return;  // Reutiliza a função para verificar o token
+
+        // ✅ Requisição segura
         try {
+            const token = localStorage.getItem("token");
+
             const res = await fetch("http://localhost:3001/api/posicoes/inserirPosicao", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
                 body: JSON.stringify({ nome: nomeFormatado }),
             });
 

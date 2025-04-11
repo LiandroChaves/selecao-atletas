@@ -6,13 +6,20 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "@/utils/context/ThemeContext";
 import BotaoTema from "@/utils/utilities/changeTheme";
 import { motion } from "framer-motion";
+import { useLoading } from "../../../../utils/context/LoadingProvider";
+import { verificarTokenValido } from "@/utils/verificarTokenValido";
 
 export default function CadastroPaises() {
     const [nome, setNome] = useState("");
     const [paises, setPaises] = useState<{ id: number; nome: string }[]>([]);
     const [erro, setErro] = useState("");
     const router = useRouter();
+    const { setIsLoading } = useLoading();
     const { isDarkMode } = useTheme();
+
+    useEffect(() => {
+        setIsLoading(false);
+    }, []);
 
     async function fetchPaises() {
         try {
@@ -33,6 +40,10 @@ export default function CadastroPaises() {
             return;
         }
 
+        if (!verificarTokenValido()) return;
+
+        const token = localStorage.getItem("token");
+
         const palavrasMinusculas = ["de", "do", "da", "das", "dos", "e", "em", "no", "na", "nos", "nas"];
 
         const nomeFormatado = nome
@@ -47,12 +58,14 @@ export default function CadastroPaises() {
             })
             .join(" ");
 
-
         try {
             const res = await fetch("http://localhost:3001/api/paises/inserirPaises", {
                 method: "POST",
                 body: JSON.stringify({ nome: nomeFormatado }),
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
             });
 
             const data = await res.json();
@@ -69,6 +82,7 @@ export default function CadastroPaises() {
             console.error("❌ Erro ao inserir país:", error);
         }
     }
+
 
     useEffect(() => {
         fetchPaises();

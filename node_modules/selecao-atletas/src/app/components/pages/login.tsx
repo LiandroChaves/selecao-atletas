@@ -7,9 +7,11 @@ import { useTheme } from "../../../utils/context/ThemeContext";
 import BotaoTema from "../../../utils/utilities/changeTheme";
 import { FaSignInAlt, FaEye, FaEyeSlash, FaUserPlus } from "react-icons/fa";
 import { AnimatePresence } from "framer-motion";
+import { useLoading } from "@/utils/context/LoadingProvider";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
+    const { setIsLoading } = useLoading();
     const [senha, setSenha] = useState("");
     const [erro, setErro] = useState("");
     const router = useRouter();
@@ -23,6 +25,7 @@ export default function LoginPage() {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setErro("");
+        setIsLoading(true);
 
         try {
             const response = await fetch("http://localhost:3001/api/login", {
@@ -47,6 +50,8 @@ export default function LoginPage() {
             router.push("/routes/home");
         } catch (err: any) {
             setErro(err.message);
+        } finally {
+            setIsLoading(false); // esconde a tela de loading
         }
     };
 

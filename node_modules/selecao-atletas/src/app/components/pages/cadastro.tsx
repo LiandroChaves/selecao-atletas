@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { FaArrowLeft } from "react-icons/fa";
 import { useTheme } from "../../../utils/context/ThemeContext";
 import BotaoTema from "../../../utils/utilities/changeTheme";
+import { useLoading } from "../../../utils/context/LoadingProvider"; // certifique-se de ter isso no topo
 
 import {
     FaFlag,
@@ -50,6 +51,7 @@ function slugify(text: string) {
 
 export default function CadastroOptions() {
     const router = useRouter();
+    const { setIsLoading } = useLoading(); // dentro do componente CadastroOptions
     const { isDarkMode } = useTheme();
 
     return (
@@ -85,21 +87,32 @@ export default function CadastroOptions() {
                 </h1>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-                    {cadastros.map(({ label, icon }, idx) => (
-                        <motion.button
-                            key={idx}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.97 }}
-                            className={`flex items-center justify-center gap-3 font-semibold py-3 px-4 rounded-xl shadow-md transition-all duration-300 ${isDarkMode
-                                ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900"
-                                : "bg-gray-600 hover:bg-gray-500 text-white"
-                                }`}
-                            onClick={() => router.push(`/routes/cadastros/${slugify(label)}`)}
-                        >
-                            {icon}
-                            {label}
-                        </motion.button>
-                    ))}
+                    {cadastros.map(({ label, icon }, idx) => {
+                        const rota = `/routes/cadastros/${slugify(label)}`;
+                        const handleClick = () => {
+                            setIsLoading(true);
+                            setTimeout(() => {
+                                router.push(rota);
+                            }, 200); // pequeno delay para garantir exibição da animação
+                        };
+
+                        return (
+                            <motion.button
+                                key={idx}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.97 }}
+                                className={`flex items-center justify-center gap-3 font-semibold py-3 px-4 rounded-xl shadow-md transition-all duration-300 ${isDarkMode
+                                    ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900"
+                                    : "bg-gray-600 hover:bg-gray-500 text-white"
+                                    }`}
+                                onClick={handleClick}
+                            >
+                                {icon}
+                                {label}
+                            </motion.button>
+                        );
+                    })}
+
                 </div>
             </motion.div>
 
