@@ -18,6 +18,8 @@ export default function CadastroClubes() {
     const [clubes, setClubes] = useState<any[]>([]);
     const [paises, setPaises] = useState<any[]>([]);
     const [erro, setErro] = useState("");
+    const [inicioContrato, setInicioContrato] = useState("");
+    const [fimContrato, setFimContrato] = useState("");
     const router = useRouter();
     const { isDarkMode } = useTheme();
     const { setIsLoading } = useLoading();
@@ -57,6 +59,26 @@ export default function CadastroClubes() {
             return;
         }
 
+        const nomeFormatado = nome
+        .toLowerCase()
+        .split(" ")
+        .map((palavra, index) =>
+            index === 0 || !["de", "do", "da", "das", "dos", "e", "em", "no", "na", "nos", "nas"].includes(palavra)
+                ? palavra.charAt(0).toUpperCase() + palavra.slice(1)
+                : palavra
+        )
+        .join(" ");
+        
+        const nomeFormatado1 = estadio
+        .toLowerCase()
+        .split(" ")
+        .map((palavra, index) =>
+            index === 0 || !["de", "do", "da", "das", "dos", "e", "em", "no", "na", "nos", "nas"].includes(palavra)
+                ? palavra.charAt(0).toUpperCase() + palavra.slice(1)
+                : palavra
+        )
+        .join(" ");
+
         if (!verificarTokenValido()) return;
         const token = localStorage.getItem("token");
 
@@ -69,10 +91,12 @@ export default function CadastroClubes() {
                 },
                 body: JSON.stringify({
                     id: Number(id),
-                    nome,
+                    nome: nomeFormatado,
                     pais_id: Number(paisId),
                     fundacao: fundacao ? Number(fundacao) : null,
-                    estadio: estadio || null,
+                    estadio: nomeFormatado1 || null,
+                    inicio_contrato: inicioContrato || null,
+                    fim_contrato: fimContrato || null,
                 }),
             });
 
@@ -85,6 +109,8 @@ export default function CadastroClubes() {
                 setPaisId("");
                 setFundacao("");
                 setEstadio("");
+                setInicioContrato("");
+                setFimContrato("");
                 fetchClubes();
             } else {
                 console.warn("Erro ao inserir clube:", data.error);
@@ -125,6 +151,25 @@ export default function CadastroClubes() {
                             <option key={pais.id} value={pais.id}>{pais.nome}</option>
                         ))}
                     </select>
+                    <label className="text-sm font-medium text-gray-200">
+                        Início do contrato do clube
+                        <input
+                            type="date"
+                            value={inicioContrato}
+                            onChange={(e) => setInicioContrato(e.target.value)}
+                            className="mt-1 p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 w-full"
+                        />
+                    </label>
+
+                    <label className="text-sm font-medium text-gray-200">
+                        Fim do contrato do clube
+                        <input
+                            type="date"
+                            value={fimContrato}
+                            onChange={(e) => setFimContrato(e.target.value)}
+                            className="mt-1 p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 w-full"
+                        />
+                    </label>
                     <input type="number" placeholder="Ano de fundação (opcional)" value={fundacao} onChange={(e) => setFundacao(e.target.value)} className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
                     <input placeholder="Estádio (opcional)" value={estadio} onChange={(e) => setEstadio(e.target.value)} className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
 
@@ -140,6 +185,8 @@ export default function CadastroClubes() {
                         <li key={clube.id} className={`p-2 rounded ${isDarkMode ? "bg-teal-600 text-white" : "bg-white text-black border border-gray-300"}`}>
                             <strong>ID:</strong> {clube.id} - <strong>{clube.nome}</strong><br />
                             <span className="text-sm">País: {clube.pais?.nome ?? "Não informado"}</span>
+                            {clube.inicio_contrato && <div className="text-sm">Início: {new Date(clube.inicio_contrato).toLocaleDateString()}</div>}
+                            {clube.fim_contrato && <div className="text-sm">Fim: {new Date(clube.fim_contrato).toLocaleDateString()}</div>}
                             {clube.fundacao && <div className="text-sm">Fundado em: {clube.fundacao}</div>}
                             {clube.estadio && <div className="text-sm">Estádio: {clube.estadio}</div>}
                         </li>

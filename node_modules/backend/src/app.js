@@ -10,7 +10,7 @@ import posicoesRoutes from "./routes/posicoes.js";
 import loginRoutes from "./routes/login.js";
 import usuariosRoutes from "./routes/usuarios.js";
 import clubesRoutes from "./routes/clubes.js";
-
+import jogadoresRoutes from "./routes/jogadores.js";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -31,7 +31,8 @@ app.use("/api/cidades", cidadesRoutes); // Rota de cidades
 app.use("/api/posicoes", posicoesRoutes); // Rota de posições
 app.use("/api/login", loginRoutes); // Rota de login
 app.use("/api/usuarios", usuariosRoutes); // Rota de usuários
-app.use("/api/clubes", clubesRoutes);
+app.use("/api/clubes", clubesRoutes); // Rota de clubes
+app.use("/api/jogadores", jogadoresRoutes); // Rota de jogadores
 
 // Rota padrão
 app.get("/", (req, res) => {

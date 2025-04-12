@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import sequelize from "../db.js";
 import Paises from "./Pais.js";
 
-export const Clubes = sequelize.define("clubes", {
+const Clubes = sequelize.define("clubes", {
     id: {
         type: DataTypes.SMALLINT,
         primaryKey: true,
@@ -25,9 +25,19 @@ export const Clubes = sequelize.define("clubes", {
         type: DataTypes.STRING,
         allowNull: true,
     },
+    inicio_contrato: {
+        type: DataTypes.DATE,
+        allowNull: true,
+    },
+    fim_contrato: {
+        type: DataTypes.DATE,
+        allowNull: true,
+    },
 }, {
     tableName: "clubes",
     timestamps: false,
 });
 
 Clubes.belongsTo(Paises, { foreignKey: "pais_id", as: "pais" });
+
+export default Clubes;

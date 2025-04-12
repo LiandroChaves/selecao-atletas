@@ -82,6 +82,8 @@ CREATE TABLE clubes (
     pais_id SMALLINT NOT NULL,
     fundacao SMALLINT,
     estadio VARCHAR(255),
+    inicio_contrato DATE,
+    fim_contrato DATE,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     CONSTRAINT fkey_clubes_pais FOREIGN KEY (pais_id) REFERENCES paises(id) ON DELETE SET NULL ON UPDATE CASCADE
@@ -90,10 +92,11 @@ CREATE TABLE clubes (
 -- 3. Jogadores
 
 CREATE TABLE jogadores (
-    id INT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     data_nascimento DATE NOT NULL,
     pais_id SMALLINT NOT NULL,
+	nacionalidade VARCHAR(255),
     estado_id SMALLINT, -- ✅ NOVO
     cidade_id SMALLINT NOT NULL,
     altura DECIMAL(4,2) NOT NULL,
