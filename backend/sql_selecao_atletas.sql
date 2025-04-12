@@ -29,8 +29,8 @@ CREATE TABLE usuarios (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-insert into usuarios (email, senha) values ('LChaveszzz','Lc+lf@123')
-delete from usuarios
+-- insert into usuarios (email, senha) values ('LChaveszzz','Lc+lf@123')
+-- delete from usuarios
 
 CREATE TABLE paises (
     id SERIAL PRIMARY KEY,
@@ -77,7 +77,7 @@ CREATE TABLE posicoes (
 -- 2. Clubes
 
 CREATE TABLE clubes (
-    id INT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     pais_id SMALLINT NOT NULL,
     fundacao SMALLINT,

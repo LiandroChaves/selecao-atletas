@@ -9,7 +9,7 @@ import cidadesRoutes from "./routes/cidades.js";
 import posicoesRoutes from "./routes/posicoes.js";
 import loginRoutes from "./routes/login.js";
 import usuariosRoutes from "./routes/usuarios.js";
-
+import clubesRoutes from "./routes/clubes.js";
 
 
 const app = express();
@@ -31,6 +31,7 @@ app.use("/api/cidades", cidadesRoutes); // Rota de cidades
 app.use("/api/posicoes", posicoesRoutes); // Rota de posições
 app.use("/api/login", loginRoutes); // Rota de login
 app.use("/api/usuarios", usuariosRoutes); // Rota de usuários
+app.use("/api/clubes", clubesRoutes);
 
 // Rota padrão
 app.get("/", (req, res) => {

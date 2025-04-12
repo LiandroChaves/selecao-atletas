@@ -21,7 +21,7 @@ export default function CadastroCidades() {
     const router = useRouter();
     const { isDarkMode } = useTheme();
     const { setIsLoading } = useLoading();
-    
+
     useEffect(() => {
         setIsLoading(false);
     }, []);
@@ -64,17 +64,17 @@ export default function CadastroCidades() {
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-    
+
         if (!nome.trim() || !paisId || !estadoId) {
             setErro("⚠️ Preencha todos os campos.");
             setTimeout(() => setErro(""), 3000);
             return;
         }
-    
+
         if (!verificarTokenValido()) return;
-    
+
         const token = localStorage.getItem("token");
-    
+
         const nomeFormatado = nome
             .toLowerCase()
             .split(" ")
@@ -86,7 +86,7 @@ export default function CadastroCidades() {
                 return palavra;
             })
             .join(" ");
-    
+
         try {
             const res = await fetch("http://localhost:3001/api/cidades/inserirCidade", {
                 method: "POST",
@@ -100,9 +100,9 @@ export default function CadastroCidades() {
                     estado_id: parseInt(estadoId),
                 }),
             });
-    
+
             const data = await res.json();
-    
+
             if (res.ok) {
                 setNome("");
                 setPaisId("");
@@ -183,20 +183,27 @@ export default function CadastroCidades() {
                     </button>
                 </form>
                 <ul className="space-y-2 text-left">
-                    {cidades.map((cidade) => (
-                        <li
-                            key={cidade.id}
-                            className={`p-2 rounded transition-all ${isDarkMode ? "bg-teal-600 text-white" : "bg-white text-black border border-gray-300"}`}
-                        >
-                            <span className="font-normal">ID:</span> {cidade.id} - {cidade.nome}
-                            {cidade.estado_id && (
-                                <span className="ml-2 text-sm italic">(Estado ID: {cidade.estado_id})</span>
-                            )}
-                            {cidade.pais_id && (
-                                <span className="ml-2 text-sm italic">(País ID: {cidade.pais_id})</span>
-                            )}
-                        </li>
-                    ))}
+                    {cidades.map((cidade) => {
+                        const estado = estados.find((estado) => estado.id === cidade.estado_id);
+                        const pais = paises.find((pais) => pais.id === cidade.pais_id);
+                        return (
+                            <li
+                                key={cidade.id}
+                                className={`p-2 rounded transition-all ${isDarkMode ? "bg-teal-600 text-white" : "bg-white text-black border border-gray-300"}`}
+                            >
+                                <span className="font-normal">ID:</span> {cidade.id} - {cidade.nome}
+                                <br />
+                                <div className="flex items-center">
+                                    {estado && (
+                                        <span className="ml-2 text-sm italic">(Estado: {estado.nome}) -</span>
+                                    )}
+                                    {pais && (
+                                        <span className="ml-2 text-sm italic">(País: {pais.nome})</span>
+                                    )}
+                                </div>
+                            </li>
+                        );
+                    })}
                 </ul>
             </motion.div>
             <BotaoTema />

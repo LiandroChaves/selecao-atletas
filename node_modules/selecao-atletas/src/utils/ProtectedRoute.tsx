@@ -30,8 +30,23 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
                 const isExpired = decoded.exp * 1000 < Date.now();
                 if (isExpired) {
                     console.warn("⚠️ Token expirado. Redirecionando para login...");
+                    alert("⚠️ Token de autenticação expirado. Redirecionando para login...");
                     localStorage.removeItem("token");
-                    router.push("/routes/login");
+
+                    setTimeout(() => {
+                        router.push("/routes/login");
+                    }, 100); // dá tempo do alert aparecer
+                    return;
+                }
+                else if (token === "undefined") {
+                    console.warn("⚠️ Token inválido. Redirecionando para login...");
+                    alert("⚠️ Token de autenticação inválido. Redirecionando para login...");
+                    localStorage.removeItem("token");
+
+                    setTimeout(() => {
+                        router.push("/routes/login");
+                    }, 100);
+                    return;
                 }
                 else {
                     setHasAccess(true);
@@ -39,8 +54,14 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
             } catch (error) {
                 console.error("Token inválido:", error);
                 localStorage.removeItem("token");
-                router.push("/routes/login");
+                alert("⚠️ Erro ao validar o token. Redirecionando para login...");
+
+                setTimeout(() => {
+                    router.push("/routes/login");
+                }, 100);
+                return;
             }
+
         } else {
             router.push("/routes/login");
         }
