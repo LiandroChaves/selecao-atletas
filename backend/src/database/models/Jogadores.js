@@ -20,7 +20,7 @@ const Jogador = sequelize.define("jogadores", {
         type: DataTypes.STRING(255),
         allowNull: false,
     },
-    nome: {
+    apelido: {
         type: DataTypes.STRING(255),
         allowNull: true,
     },
