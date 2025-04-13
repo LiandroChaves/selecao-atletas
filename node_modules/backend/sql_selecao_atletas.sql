@@ -91,6 +91,9 @@ CREATE TABLE clubes (
 
 -- 3. Jogadores
 
+DELETE FROM jogadores;
+ALTER SEQUENCE jogadores_id_seq RESTART WITH 1;
+
 CREATE TABLE jogadores (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,

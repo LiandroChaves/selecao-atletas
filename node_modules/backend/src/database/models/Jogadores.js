@@ -20,6 +20,10 @@ const Jogador = sequelize.define("jogadores", {
         type: DataTypes.STRING(255),
         allowNull: false,
     },
+    nome: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+    },
     data_nascimento: {
         type: DataTypes.DATEONLY,
         allowNull: false,
@@ -35,7 +39,7 @@ const Jogador = sequelize.define("jogadores", {
     nacionalidade: {
         type: DataTypes.STRING,
         allowNull: true,
-    },    
+    },
     estado_id: {
         type: DataTypes.SMALLINT,
         allowNull: true,

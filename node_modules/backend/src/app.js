@@ -11,6 +11,10 @@ import loginRoutes from "./routes/login.js";
 import usuariosRoutes from "./routes/usuarios.js";
 import clubesRoutes from "./routes/clubes.js";
 import jogadoresRoutes from "./routes/jogadores.js";
+import uploadRouter from './routes/upload.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -19,6 +23,10 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadsPath = path.join(__dirname, '..', 'uploads');
 
 // Testa conexão com o banco
 testConnection();
@@ -33,6 +41,9 @@ app.use("/api/login", loginRoutes); // Rota de login
 app.use("/api/usuarios", usuariosRoutes); // Rota de usuários
 app.use("/api/clubes", clubesRoutes); // Rota de clubes
 app.use("/api/jogadores", jogadoresRoutes); // Rota de jogadores
+app.use('/api/uploads', express.static(uploadsPath));
+app.use("/api/uploads", uploadRouter);
+console.log("Serving static files from:", uploadsPath);
 
 // Rota padrão
 app.get("/", (req, res) => {

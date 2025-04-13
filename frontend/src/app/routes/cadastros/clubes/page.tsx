@@ -152,7 +152,7 @@ export default function CadastroClubes() {
                         ))}
                     </select>
                     <label className="text-sm font-medium text-gray-200">
-                        Início do contrato do clube
+                        Início do contrato do clube (opcional)
                         <input
                             type="date"
                             value={inicioContrato}
@@ -162,7 +162,7 @@ export default function CadastroClubes() {
                     </label>
 
                     <label className="text-sm font-medium text-gray-200">
-                        Fim do contrato do clube
+                        Fim do contrato do clube (opcional)
                         <input
                             type="date"
                             value={fimContrato}

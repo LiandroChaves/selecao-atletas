@@ -8,9 +8,11 @@ import { useTheme } from "@/utils/context/ThemeContext";
 import BotaoTema from "@/utils/utilities/changeTheme";
 import { useLoading } from "@/utils/context/LoadingProvider";
 import { verificarTokenValido } from "@/utils/verificarTokenValido";
+import imagem from "../../../../../../backend/uploads/jogador_1/Liandro.jpg";
 
 export default function CadastroJogadores() {
     const [nome, setNome] = useState("");
+    const [apelido, setApelido] = useState("");
     const [dataNascimento, setDataNascimento] = useState("");
     const [paisId, setPaisId] = useState("");
     const [nacionalidade, setNacionalidade] = useState("");
@@ -24,7 +26,7 @@ export default function CadastroJogadores() {
     const [clubeId, setClubeId] = useState("");
     const [contratoInicio, setContratoInicio] = useState("");
     const [contratoFim, setContratoFim] = useState("");
-    const [foto, setFoto] = useState("");
+    const [foto, setFoto] = useState<string | File>("");
     const [jogadores, setJogadores] = useState<any[]>([]);
     const [erro, setErro] = useState("");
     const [niveis, setNiveis] = useState<{ id: number; descricao: string }[]>([]);
@@ -33,6 +35,7 @@ export default function CadastroJogadores() {
     const [cidades, setCidades] = useState<any[]>([]);
     const [clubes, setClubes] = useState<any[]>([]);
     const [posicoes, setPosicoes] = useState<any[]>([]);
+    const [nomeJogador, setNomeJogador] = useState("");
     const { setIsLoading } = useLoading();
     const { isDarkMode } = useTheme();
     const router = useRouter();
@@ -142,14 +145,62 @@ export default function CadastroJogadores() {
             )
             .join(" ");
 
+        const nomeFormatadoNac = nacionalidade
+            .toLowerCase()
+            .split(" ")
+            .map((palavra, index) =>
+                index === 0 || !["de", "do", "da", "das", "dos", "e", "em", "no", "na", "nos", "nas"].includes(palavra)
+                    ? palavra.charAt(0).toUpperCase() + palavra.slice(1)
+                    : palavra
+            )
+            .join(" ");
+
+        const nomeFormatadoApe = apelido
+            .toLowerCase()
+            .split(" ")
+            .map((palavra, index) =>
+                index === 0 || !["de", "do", "da", "das", "dos", "e", "em", "no", "na", "nos", "nas"].includes(palavra)
+                    ? palavra.charAt(0).toUpperCase() + palavra.slice(1)
+                    : palavra
+            )
+            .join(" ");
+
+        let nomeArquivoFoto = "";
+
         try {
+            // 🔽 Upload da imagem (se existir)
+            if (foto) {
+                const formData = new FormData();
+                formData.append("foto", foto);
+
+                const uploadRes = await fetch("http://localhost:3001/api/uploads/upload-foto", {
+                    method: "POST",
+                    body: formData,
+                });
+                const uploadData = await uploadRes.json();
+
+                if (!uploadData.ok || !uploadData.path) {
+                    setErro("⚠️ Erro ao fazer upload da foto.");
+                    return;
+                }
+
+                nomeArquivoFoto = uploadData.path; // 👈 caminho completo agora
+                console.log("Upload da foto concluído:", uploadData.path);
+
+            }
+
+            const inicioFinal = contratoInicio.trim() === "" ? null : contratoInicio;
+            const fimFinal = contratoFim.trim() === "" ? null : contratoFim;
+
+            // 🔽 Inserção do jogador
             const res = await fetch("http://localhost:3001/api/jogadores/inserirJogador", {
                 method: "POST",
                 body: JSON.stringify({
                     nome: nomeFormatado,
+                    apelido: nomeFormatadoApe,
                     data_nascimento: dataNascimento,
                     pais_id: parseInt(paisId),
-                    nacionalidade,
+                    nacionalidade: nomeFormatadoNac,
                     estado_id: estadoId ? parseInt(estadoId) : null,
                     cidade_id: parseInt(cidadeId),
                     altura: parseFloat(altura),
@@ -158,9 +209,9 @@ export default function CadastroJogadores() {
                     nivel_ambidestria_id: parseInt(nivelAmbidestriaId),
                     posicao_id: parseInt(posicaoId),
                     clube_atual_id: parseInt(clubeId),
-                    contrato_inicio: contratoInicio,
-                    contrato_fim: contratoFim,
-                    foto: foto,
+                    contrato_inicio: inicioFinal,
+                    contrato_fim: fimFinal,
+                    foto: nomeArquivoFoto, // só nome do arquivo
                 }),
                 headers: {
                     "Content-Type": "application/json",
@@ -173,6 +224,7 @@ export default function CadastroJogadores() {
             if (res.ok) {
                 console.log("Jogador inserido com sucesso:", data);
                 setNome("");
+                setApelido("");
                 setDataNascimento("");
                 setPaisId("");
                 setNacionalidade("");
@@ -197,6 +249,13 @@ export default function CadastroJogadores() {
         }
     };
 
+
+    const handleFotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setFoto(e.target.files[0] as File);
+        }
+    };
+
     return (
         <main
             className={`min-h-screen flex items-center justify-center p-4 transition-all duration-500 ${isDarkMode
@@ -208,7 +267,7 @@ export default function CadastroJogadores() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6 }}
-                className={`text-center p-8 rounded-2xl shadow-2xl w-full max-w-md transition-all duration-500 ${isDarkMode ? "bg-teal-800" : "bg-gray-300"}`}
+                className={`text-center p-8 rounded-2xl shadow-2xl w-full max-w-4xl transition-all duration-500 ${isDarkMode ? "bg-teal-800" : "bg-gray-300"}`}
             >
                 <button
                     onClick={() => router.back()}
@@ -225,237 +284,320 @@ export default function CadastroJogadores() {
                     Cadastro de Jogadores
                 </h2>
 
-                <form onSubmit={handleSubmit} className="mb-6 flex flex-col gap-4">
-                    <input
-                        value={nome}
-                        onChange={(e) => setNome(e.target.value)}
-                        placeholder="Nome do jogador"
-                        className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                    />
-                    <label className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
-                        Data de nascimento
-                        <input
-                            value={dataNascimento}
-                            onChange={(e) => setDataNascimento(e.target.value)}
-                            type="date"
-                            className="mt-1 p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white w-full"
-                        />
-                    </label>
-                    <select
-                        value={paisId}
-                        onChange={(e) => setPaisId(e.target.value)}
-                        className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                    >
-                        <option value="">Selecione o país</option>
-                        {paises.map((pais) => (
-                            <option key={pais.id} value={pais.id}>
-                                {pais.nome}
-                            </option>
-                        ))}
-                    </select>
-                    <div className="mb-4">
-                        <label className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Nacionalidade</label>
-                        <input
-                            type="text"
-                            value={nacionalidade}
-                            onChange={(e) => setNacionalidade(e.target.value)}
-                            className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                            placeholder="Ex: Brasileiro"
-                        />
+                <form onSubmit={handleSubmit} className="mb-6">
+                    <div className="flex flex-wrap justify-center gap-4 text-center">
+                        {/* Nome */}
+                        <div className="w-full md:w-[48%] lg:w-[31%]">
+                            <input
+                                value={nome}
+                                onChange={(e) => setNome(e.target.value)}
+                                placeholder="Nome completo do jogador"
+                                className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                            />
+                        </div>
+
+                        {/* Apelido */}
+                        <div className="w-full md:w-[48%] lg:w-[31%]">
+                            <input
+                                value={apelido}
+                                onChange={(e) => setApelido(e.target.value)}
+                                placeholder="Apelido do jogador"
+                                className="mb-1 w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                            />
+                        </div>
+                        {/* Data de Nascimento */}
+                        <div className="w-full -mt-[23px] md:w-[48%] lg:w-[31%]">
+                            <label className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                                Data de nascimento
+                                <input
+                                    value={dataNascimento}
+                                    onChange={(e) => setDataNascimento(e.target.value)}
+                                    type="date"
+                                    className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                                />
+                            </label>
+                        </div>
+
+                        {/* País */}
+                        <div className="w-full md:w-[48%] lg:w-[31%]">
+                            <select
+                                value={paisId}
+                                onChange={(e) => setPaisId(e.target.value)}
+                                className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                            >
+                                <option value="">Selecione o país</option>
+                                {paises.map((pais) => (
+                                    <option key={pais.id} value={pais.id}>{pais.nome}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Nacionalidade */}
+                        <div className="w-full md:w-[48%] lg:w-[31%]">
+                            <input
+                                type="text"
+                                value={nacionalidade}
+                                onChange={(e) => setNacionalidade(e.target.value)}
+                                className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                                placeholder="Ex: Brasileiro"
+                            />
+                        </div>
+
+                        {/* Estado */}
+                        <div className="w-full md:w-[48%] lg:w-[31%]">
+                            <select
+                                value={estadoId}
+                                onChange={(e) => setEstadoId(e.target.value)}
+                                className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                            >
+                                <option value="">Selecione o estado</option>
+                                {estados.map((estado) => (
+                                    <option key={estado.id} value={estado.id}>{estado.nome}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Cidade */}
+                        <div className="w-full md:w-[48%] lg:w-[31%]">
+                            <select
+                                value={cidadeId}
+                                onChange={(e) => setCidadeId(e.target.value)}
+                                className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                            >
+                                <option value="">Selecione a cidade</option>
+                                {cidades.map((cidade) => (
+                                    <option key={cidade.id} value={cidade.id}>{cidade.nome}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Altura */}
+                        <div className="w-full md:w-[48%] lg:w-[31%]">
+                            <input
+                                value={altura}
+                                onChange={(e) => setAltura(e.target.value)}
+                                placeholder="Altura"
+                                type="number"
+                                className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                            />
+                        </div>
+
+                        {/* Peso */}
+                        <div className="w-full md:w-[48%] lg:w-[31%]">
+                            <input
+                                value={peso}
+                                onChange={(e) => setPeso(e.target.value)}
+                                placeholder="Peso"
+                                type="number"
+                                className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                            />
+                        </div>
+
+                        {/* Pé dominante */}
+                        <div className="w-full md:w-[48%] lg:w-[31%]">
+                            <select
+                                value={peDominante}
+                                onChange={(e) => setPeDominante(e.target.value)}
+                                className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                            >
+                                <option value="">Selecione o pé dominante</option>
+                                <option value="D">Direito</option>
+                                <option value="E">Esquerdo</option>
+                                <option value="A">Ambidestro</option>
+                            </select>
+                        </div>
+
+                        {/* Nível de ambidestria */}
+                        <div className="w-full md:w-[48%] lg:w-[31%]">
+                            <select
+                                value={nivelAmbidestriaId}
+                                onChange={(e) => setNivelAmbidestriaId(e.target.value)}
+                                className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                            >
+                                <option value="">Selecione o nível de ambidestria</option>
+                                {niveis.map((nivel) => (
+                                    <option key={nivel.id} value={nivel.id}>{nivel.descricao}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Posição */}
+                        <div className="w-full md:w-[48%] lg:w-[31%]">
+                            <select
+                                value={posicaoId}
+                                onChange={(e) => setPosicaoId(e.target.value)}
+                                className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                            >
+                                <option value="">Selecione a posição</option>
+                                {posicoes.map((posicao) => (
+                                    <option key={posicao.id} value={posicao.id}>{posicao.nome}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Clube */}
+                        <div className="w-full md:w-[48%] lg:w-[31%]">
+                            <select
+                                value={clubeId}
+                                onChange={(e) => setClubeId(e.target.value)}
+                                className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                            >
+                                <option value="">Selecione o clube</option>
+                                {clubes.map((clube) => (
+                                    <option key={clube.id} value={clube.id}>{clube.nome}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Contrato início */}
+                        <div className="w-full md:w-[48%] lg:w-[31%]">
+                            <label className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                                <input
+                                    value={contratoInicio}
+                                    onChange={(e) => setContratoInicio(e.target.value)}
+                                    type="date"
+                                    className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                                />
+                                Início do contrato do atleta
+                            </label>
+                        </div>
+
+                        {/* Contrato fim */}
+                        <div className="w-full md:w-[48%] lg:w-[31%]">
+                            <label className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                                <input
+                                    value={contratoFim}
+                                    onChange={(e) => setContratoFim(e.target.value)}
+                                    type="date"
+                                    className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                                />
+                                Fim do contrato do atleta
+                            </label>
+                        </div>
+
+                        {/* Foto */}
+                        <div className="w-full md:w-[48%] lg:w-[31%]">
+                            <label className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                                Foto do jogador
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => setFoto(e.target.files?.[0] || "")}
+                                    className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                                />
+                            </label>
+                        </div>
                     </div>
-                    <select
-                        value={estadoId}
-                        onChange={(e) => setEstadoId(e.target.value)}
-                        className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                    >
-                        <option value="">Selecione o estado</option>
-                        {estados.map((estado) => (
-                            <option key={estado.id} value={estado.id}>
-                                {estado.nome}
-                            </option>
-                        ))}
-                    </select>
-                    <select
-                        value={cidadeId}
-                        onChange={(e) => setCidadeId(e.target.value)}
-                        className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                    >
-                        <option value="">Selecione a cidade</option>
-                        {cidades.map((cidade) => (
-                            <option key={cidade.id} value={cidade.id}>
-                                {cidade.nome}
-                            </option>
-                        ))}
-                    </select>
-                    <input
-                        value={altura}
-                        onChange={(e) => setAltura(e.target.value)}
-                        placeholder="Altura"
-                        type="number"
-                        className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                    />
-                    <input
-                        value={peso}
-                        onChange={(e) => setPeso(e.target.value)}
-                        placeholder="Peso"
-                        type="number"
-                        className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                    />
-                    <select
-                        value={peDominante}
-                        onChange={(e) => setPeDominante(e.target.value)}
-                        className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                    >
-                        <option value="">Selecione o pé dominante</option>
-                        <option value="D">Direito</option>
-                        <option value="E">Esquerdo</option>
-                        <option value="A">Ambidestro</option>
-                    </select>
-                    <select
-                        value={nivelAmbidestriaId}
-                        onChange={(e) => setNivelAmbidestriaId(e.target.value)}
-                        className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                    >
-                        <option value="">Selecione o nível de ambidestria</option>
-                        {niveis.map((nivel) => (
-                            <option key={nivel.id} value={nivel.id}>
-                                {nivel.descricao}
-                            </option>
-                        ))}
-                    </select>
-                    <select
-                        value={posicaoId}
-                        onChange={(e) => setPosicaoId(e.target.value)}
-                        className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                    >
-                        <option value="">Selecione a posição</option>
-                        {posicoes.map((posicao) => (
-                            <option key={posicao.id} value={posicao.id}>
-                                {posicao.nome}
-                            </option>
-                        ))}
-                    </select>
-                    <select
-                        value={clubeId}
-                        onChange={(e) => setClubeId(e.target.value)}
-                        className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                    >
-                        <option value="">Selecione o clube</option>
-                        {clubes.map((clube) => (
-                            <option key={clube.id} value={clube.id}>
-                                {clube.nome}
-                            </option>
-                        ))}
-                    </select>
-                    <label className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
-                        Início do contrato do atleta
-                        <input
-                            value={contratoInicio}
-                            onChange={(e) => setContratoInicio(e.target.value)}
-                            type="date"
-                            className="mt-1 p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white w-full"
-                        />
-                    </label>
-                    <label className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
-                        Fim do contrato do atleta
-                        <input
-                            value={contratoFim}
-                            onChange={(e) => setContratoFim(e.target.value)}
-                            type="date"
-                            className="mt-1 p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white w-full"
-                        />
-                    </label>
-                    <input
-                        value={foto}
-                        onChange={(e) => setFoto(e.target.value)}
-                        placeholder="URL da foto"
-                        className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                    />
-                    {erro && <p className="text-red-500">{erro}</p>}
-                    <button
-                        type="submit"
-                        className={`px-4 py-2 rounded font-semibold transition duration-300 hover:scale-[1.03] ${isDarkMode ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900" : "bg-gray-600 hover:bg-gray-500 text-white"}`}>
-                        Cadastrar Jogador
-                    </button>
+
+                    {/* Mensagem de erro */}
+                    {erro && <p className="text-red-500 text-center mt-4">{erro}</p>}
+
+                    {/* Botão de envio */}
+                    <div className="flex justify-center mt-6">
+                        <button
+                            type="submit"
+                            className={`px-6 py-2 rounded font-semibold transition duration-300 hover:scale-[1.03] ${isDarkMode ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900" : "bg-gray-600 hover:bg-gray-500 text-white"
+                                }`}
+                        >
+                            Cadastrar Jogador
+                        </button>
+                    </div>
                 </form>
+
                 <ul className="space-y-2 text-left">
                     {jogadores.map((jogador) => {
-                        // Função para calcular a idade com base na data de nascimento
                         const calcularIdade = (dataNascimento: string | Date) => {
                             const hoje = new Date();
                             const nascimento = new Date(dataNascimento);
                             let idade = hoje.getFullYear() - nascimento.getFullYear();
                             const mes = hoje.getMonth();
                             const dia = hoje.getDate();
-
                             if (mes < nascimento.getMonth() || (mes === nascimento.getMonth() && dia < nascimento.getDate())) {
                                 idade--;
                             }
-
                             return idade;
+                        };
+
+                        const obterNomeCurto = (nomeCompleto: string) => {
+                            return nomeCompleto.split(" ")[0];  // Pega o primeiro nome
                         };
 
                         return (
                             <li
                                 key={jogador.id}
-                                className={`p-2 rounded ${isDarkMode
-                                    ? "bg-teal-600 text-white"
-                                    : "bg-white text-black border border-gray-300"
+                                className={`p-4 rounded flex gap-4 items-start ${isDarkMode ? "bg-teal-600 text-white" : "bg-white text-black border border-gray-300"
                                     }`}
                             >
-                                <strong>ID:</strong> {jogador.id} - <strong>{jogador.nome}</strong>
-                                <br />
-                                <div className="text-sm">
-                                    <span>
-                                        Nascimento:{" "}
-                                        {jogador.data_nascimento
-                                            ? new Date(jogador.data_nascimento).toLocaleDateString("pt-BR")
-                                            : "Não informado"}
-                                    </span>
-                                </div>
-                                <div className="text-sm">
-                                    Idade:{" "}
-                                    {jogador.data_nascimento ? calcularIdade(jogador.data_nascimento) : "Não informada"}
-                                </div>
-                                <div className="text-sm">
-                                    Nacionalidade: {jogador.nacionalidade ?? "Não informada"}
-                                </div>
-                                <div className="text-sm">
-                                    Altura: {jogador.altura ? `${jogador.altura} m` : "Não informado"} | Peso:{" "}
-                                    {jogador.peso ? `${jogador.peso} kg` : "Não informado"}
-                                </div>
-                                <div className="text-sm">
-                                    Posição: {jogador.posicao?.nome ?? "Não informada"} | Pé dominante:{" "}
-                                    {jogador.pe_dominante === "D"
-                                        ? "Direito"
-                                        : jogador.pe_dominante === "E"
-                                            ? "Esquerdo"
-                                            : jogador.pe_dominante === "A"
-                                                ? "Ambos"
-                                                : "Não informado"}
-                                </div>
-                                <div className="text-sm">
-                                    Clube atual: {jogador.clube?.nome ?? "Sem clube"}
-                                </div>
-                                {jogador.contrato_inicio && (
-                                    <div className="text-sm">
-                                        Início do contrato:{" "}
-                                        {new Date(jogador.contrato_inicio).toLocaleDateString()}
+                                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-stretch">
+                                    {/* Imagem do jogador */}
+                                    <img
+                                        src={`http://localhost:3001/api/uploads/${jogador.foto}`}
+                                        alt={`Foto de ${jogador.nome}`}
+                                        className="w-full sm:w-64 object-cover rounded-md border h-auto sm:h-full"
+                                    />
+
+                                    {/* Informações do jogador */}
+                                    <div className="flex-1 text-sm text-gray-200">
+                                        <div><strong>ID:</strong> {jogador.id} - <strong>{jogador.nome}</strong></div>
+
+                                        <div className="text-md">
+                                            <strong>Nome Curto:</strong> {obterNomeCurto(jogador.nome)}
+                                        </div>
+
+                                        <div className="text-md">
+                                            <strong>Apelido:</strong> {jogador.apelido ? jogador.apelido : "Apelido não informado"}
+                                        </div>
+
+                                        <div className="text-md">
+                                            <span>Nascimento: {jogador.data_nascimento ? new Date(jogador.data_nascimento).toLocaleDateString("pt-BR") : "Não informado"}</span>
+                                        </div>
+
+                                        <div className="text-md">
+                                            Idade: {jogador.data_nascimento ? calcularIdade(jogador.data_nascimento) : "Não informada"}
+                                        </div>
+
+                                        <div className="text-md">Nacionalidade: {jogador.nacionalidade ?? "Não informada"}</div>
+
+                                        <div className="text-md">
+                                            Altura: {jogador.altura ? `${jogador.altura} m` : "Não informado"} | Peso: {jogador.peso ? `${jogador.peso} kg` : "Não informado"}
+                                        </div>
+
+                                        <div className="text-md">
+                                            Posição: {jogador.posicao?.nome ?? "Não informada"}
+                                        </div>
+
+                                        <div className="text-md">
+                                            Pé dominante:{" "}
+                                            {jogador.pe_dominante === "D"
+                                                ? "Direito"
+                                                : jogador.pe_dominante === "E"
+                                                    ? "Esquerdo"
+                                                    : jogador.pe_dominante === "A"
+                                                        ? "Ambos"
+                                                        : "Não informado"}
+                                        </div>
+
+                                        <div className="text-md">Clube atual: {jogador.clube?.nome ?? "Sem clube"}</div>
+
+                                        {jogador.contrato_inicio && (
+                                            <div className="text-md">
+                                                Início do contrato: {new Date(jogador.contrato_inicio).toLocaleDateString()}
+                                            </div>
+                                        )}
+
+                                        {jogador.contrato_fim && (
+                                            <div className="text-md">
+                                                Fim do contrato: {new Date(jogador.contrato_fim).toLocaleDateString()}
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                                {jogador.contrato_fim && (
-                                    <div className="text-sm">
-                                        Fim do contrato:{" "}
-                                        {new Date(jogador.contrato_fim).toLocaleDateString()}
-                                    </div>
-                                )}
+                                </div>
                             </li>
                         );
                     })}
                 </ul>
-
             </motion.div>
             <BotaoTema />
-        </main>
+        </main >
     );
 };
