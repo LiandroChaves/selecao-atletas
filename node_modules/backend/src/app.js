@@ -14,6 +14,8 @@ import jogadoresRoutes from "./routes/jogadores.js";
 import uploadRouter from './routes/upload.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import estatisticaGeralRoutes from "./routes/estatisticasGerais.js";
+
 
 
 const app = express();
@@ -41,9 +43,10 @@ app.use("/api/login", loginRoutes); // Rota de login
 app.use("/api/usuarios", usuariosRoutes); // Rota de usuários
 app.use("/api/clubes", clubesRoutes); // Rota de clubes
 app.use("/api/jogadores", jogadoresRoutes); // Rota de jogadores
-app.use('/api/uploads', express.static(uploadsPath));
-app.use("/api/uploads", uploadRouter);
-console.log("Serving static files from:", uploadsPath);
+app.use("/api/estatisticas", estatisticaGeralRoutes); // Rota de estatísticas gerais
+
+app.use('/api/uploads', express.static(uploadsPath)); // Serve arquivos estáticos da pasta uploads
+app.use("/api/uploads", uploadRouter); // Rota para upload de arquivos
 
 // Rota padrão
 app.get("/", (req, res) => {

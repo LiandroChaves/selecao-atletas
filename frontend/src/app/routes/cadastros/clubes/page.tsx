@@ -60,24 +60,24 @@ export default function CadastroClubes() {
         }
 
         const nomeFormatado = nome
-        .toLowerCase()
-        .split(" ")
-        .map((palavra, index) =>
-            index === 0 || !["de", "do", "da", "das", "dos", "e", "em", "no", "na", "nos", "nas"].includes(palavra)
-                ? palavra.charAt(0).toUpperCase() + palavra.slice(1)
-                : palavra
-        )
-        .join(" ");
-        
+            .toLowerCase()
+            .split(" ")
+            .map((palavra, index) =>
+                index === 0 || !["de", "do", "da", "das", "dos", "e", "em", "no", "na", "nos", "nas"].includes(palavra)
+                    ? palavra.charAt(0).toUpperCase() + palavra.slice(1)
+                    : palavra
+            )
+            .join(" ");
+
         const nomeFormatado1 = estadio
-        .toLowerCase()
-        .split(" ")
-        .map((palavra, index) =>
-            index === 0 || !["de", "do", "da", "das", "dos", "e", "em", "no", "na", "nos", "nas"].includes(palavra)
-                ? palavra.charAt(0).toUpperCase() + palavra.slice(1)
-                : palavra
-        )
-        .join(" ");
+            .toLowerCase()
+            .split(" ")
+            .map((palavra, index) =>
+                index === 0 || !["de", "do", "da", "das", "dos", "e", "em", "no", "na", "nos", "nas"].includes(palavra)
+                    ? palavra.charAt(0).toUpperCase() + palavra.slice(1)
+                    : palavra
+            )
+            .join(" ");
 
         if (!verificarTokenValido()) return;
         const token = localStorage.getItem("token");
@@ -151,7 +151,7 @@ export default function CadastroClubes() {
                             <option key={pais.id} value={pais.id}>{pais.nome}</option>
                         ))}
                     </select>
-                    <label className="text-sm font-medium text-gray-200">
+                    <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                         Início do contrato do clube (opcional)
                         <input
                             type="date"
@@ -161,7 +161,7 @@ export default function CadastroClubes() {
                         />
                     </label>
 
-                    <label className="text-sm font-medium text-gray-200">
+                    <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                         Fim do contrato do clube (opcional)
                         <input
                             type="date"
@@ -180,7 +180,7 @@ export default function CadastroClubes() {
                     </button>
                 </form>
 
-                <ul className="space-y-2 text-left">
+                <ul className="space-y-2 text-left max-h-72 overflow-y-auto">
                     {clubes.map((clube) => (
                         <li key={clube.id} className={`p-2 rounded ${isDarkMode ? "bg-teal-600 text-white" : "bg-white text-black border border-gray-300"}`}>
                             <strong>ID:</strong> {clube.id} - <strong>{clube.nome}</strong><br />

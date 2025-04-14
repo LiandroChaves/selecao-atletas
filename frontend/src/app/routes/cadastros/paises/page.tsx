@@ -136,7 +136,7 @@ export default function CadastroPaises() {
                     </button>
                 </form>
 
-                <ul className="space-y-2 text-left">
+                <ul className="space-y-2 text-left max-h-72 overflow-y-auto">
                     {paises.map((pais) => (
                         <li
                             key={pais.id}

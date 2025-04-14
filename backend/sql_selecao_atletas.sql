@@ -94,9 +94,12 @@ CREATE TABLE clubes (
 DELETE FROM jogadores;
 ALTER SEQUENCE jogadores_id_seq RESTART WITH 1;
 
+SELECT * FROM jogadores;
+
 CREATE TABLE jogadores (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
+	apelido VARCHAR(255),
     data_nascimento DATE NOT NULL,
     pais_id SMALLINT NOT NULL,
 	nacionalidade VARCHAR(255),

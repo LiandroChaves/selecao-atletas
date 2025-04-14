@@ -504,7 +504,7 @@ export default function CadastroJogadores() {
                     </div>
                 </form>
 
-                <ul className="space-y-2 text-left">
+                <ul className="space-y-2 text-left max-h-72 overflow-y-auto">
                     {jogadores.map((jogador) => {
                         const calcularIdade = (dataNascimento: string | Date) => {
                             const hoje = new Date();

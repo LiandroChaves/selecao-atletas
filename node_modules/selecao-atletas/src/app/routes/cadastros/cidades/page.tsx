@@ -182,7 +182,7 @@ export default function CadastroCidades() {
                         Cadastrar
                     </button>
                 </form>
-                <ul className="space-y-2 text-left">
+                <ul className="space-y-2 text-left max-h-72 overflow-y-auto">
                     {cidades.map((cidade) => {
                         const estado = estados.find((estado) => estado.id === cidade.estado_id);
                         const pais = paises.find((pais) => pais.id === cidade.pais_id);

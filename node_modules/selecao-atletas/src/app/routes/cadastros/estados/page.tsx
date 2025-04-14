@@ -170,7 +170,7 @@ export default function CadastroEstados() {
                     </button>
                 </form>
 
-                <ul className="space-y-2 text-left">
+                <ul className="space-y-2 text-left max-h-72 overflow-y-auto">
                     {estados.map((estado) => (
                         <li
                             key={estado.id}

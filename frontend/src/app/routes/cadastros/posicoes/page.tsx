@@ -130,7 +130,7 @@ export default function CadastroPosicoes() {
                     </button>
                 </form>
 
-                <ul className="space-y-2 text-left">
+                <ul className="space-y-2 text-left max-h-72 overflow-y-auto">
                     {posicoes.map((posicao) => (
                         <li
                             key={posicao.id}
