@@ -142,8 +142,11 @@ CREATE TABLE estatisticas_gerais (
 
 -- 5. Partidas
 
+DELETE FROM partidas;
+ALTER SEQUENCE partidas_id_seq RESTART WITH 1;
+
 CREATE TABLE partidas (
-    id INT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     data DATE NOT NULL,
     campeonato VARCHAR(255),
     estadio VARCHAR(255),
