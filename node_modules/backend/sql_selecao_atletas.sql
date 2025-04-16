@@ -1,25 +1,14 @@
--- SELECTS
-SELECT * FROM paises;
-SELECT * FROM cidades;
-SELECT * FROM niveis_ambidestria;
-SELECT * FROM posicoes;
-SELECT * FROM clubes;
-SELECT * FROM jogadores;
-SELECT * FROM estatisticas_gerais;
-SELECT * FROM partidas;
-SELECT * FROM estatisticas_partidas;
-SELECT * FROM historico_clubes;
-SELECT * FROM historico_lesoes;
-SELECT * FROM titulos;
-SELECT * FROM jogadores_titulos;
-SELECT * FROM usuarios;
-
-
 -- ENUMs
 CREATE TYPE tipo_titulo AS ENUM ('Nacional', 'Internacional', 'Individual');
 CREATE TYPE pe_dominante_enum AS ENUM ('D', 'E', 'A');
 
--- 1. Tabelas básicas de referência
+-- ========================
+-- 1. Tabelas básicas
+-- ========================
+
+-- USUÁRIOS
+SELECT * FROM usuarios;
+-- DELETE FROM usuarios;
 
 CREATE TABLE usuarios (
     id SERIAL PRIMARY KEY,
@@ -29,8 +18,10 @@ CREATE TABLE usuarios (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- insert into usuarios (email, senha) values ('LChaveszzz','Lc+lf@123')
--- delete from usuarios
+-- PAÍSES
+SELECT * FROM paises;
+-- DELETE FROM paises;
+ALTER SEQUENCE paises_id_seq RESTART WITH 1;
 
 CREATE TABLE paises (
     id SERIAL PRIMARY KEY,
@@ -38,6 +29,11 @@ CREATE TABLE paises (
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
+
+-- ESTADOS
+SELECT * FROM estados;
+-- DELETE FROM estados;
+ALTER SEQUENCE estados_id_seq RESTART WITH 1;
 
 CREATE TABLE estados (
     id SERIAL PRIMARY KEY,
@@ -48,6 +44,11 @@ CREATE TABLE estados (
     updated_at TIMESTAMP DEFAULT NOW(),
     CONSTRAINT fkey_estados_pais FOREIGN KEY (pais_id) REFERENCES paises(id) ON DELETE CASCADE
 );
+
+-- CIDADES
+SELECT * FROM cidades;
+-- DELETE FROM cidades;
+ALTER SEQUENCE cidades_id_seq RESTART WITH 1;
 
 CREATE TABLE cidades (
     id SERIAL PRIMARY KEY,
@@ -60,12 +61,22 @@ CREATE TABLE cidades (
     CONSTRAINT fkey_cidades_estado FOREIGN KEY (estado_id) REFERENCES estados(id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
+-- NÍVEIS DE AMBIDESTRIA
+SELECT * FROM niveis_ambidestria;
+-- DELETE FROM niveis_ambidestria;
+ALTER SEQUENCE niveis_ambidestria_id_seq RESTART WITH 1;
+
 CREATE TABLE niveis_ambidestria (
     id SERIAL PRIMARY KEY,
     descricao VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
+
+-- POSIÇÕES
+SELECT * FROM posicoes;
+-- DELETE FROM posicoes;
+ALTER SEQUENCE posicoes_id_seq RESTART WITH 1;
 
 CREATE TABLE posicoes (
     id SERIAL PRIMARY KEY,
@@ -74,7 +85,13 @@ CREATE TABLE posicoes (
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
+-- ========================
 -- 2. Clubes
+-- ========================
+
+SELECT * FROM clubes;
+-- DELETE FROM clubes;
+ALTER SEQUENCE clubes_id_seq RESTART WITH 1;
 
 CREATE TABLE clubes (
     id SERIAL PRIMARY KEY,
@@ -89,33 +106,29 @@ CREATE TABLE clubes (
     CONSTRAINT fkey_clubes_pais FOREIGN KEY (pais_id) REFERENCES paises(id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
+-- ========================
 -- 3. Jogadores
-
-DELETE FROM jogadores;
-ALTER SEQUENCE jogadores_id_seq RESTART WITH 1;
-
-ALTER TABLE jogadores
-ADD COLUMN posicao_secundaria_id SMALLINT,
-ADD CONSTRAINT fkey_jogadores_posicao_secundaria
-FOREIGN KEY (posicao_secundaria_id) REFERENCES posicoes(id);
+-- ========================
 
 SELECT * FROM jogadores;
+-- DELETE FROM jogadores;
+ALTER SEQUENCE jogadores_id_seq RESTART WITH 1;
 
 CREATE TABLE jogadores (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
-	apelido VARCHAR(255),
+    apelido VARCHAR(255),
     data_nascimento DATE NOT NULL,
     pais_id SMALLINT NOT NULL,
-	nacionalidade VARCHAR(255),
-    estado_id SMALLINT, -- ✅ NOVO
+    naturalidade VARCHAR(255),
+    estado_id SMALLINT,
     cidade_id SMALLINT NOT NULL,
     altura DECIMAL(4,2) NOT NULL,
     peso DECIMAL(5,2) NOT NULL,
     pe_dominante pe_dominante_enum NOT NULL,
     nivel_ambidestria_id SMALLINT NOT NULL,
     posicao_id SMALLINT NOT NULL,
-	posicao_secundaria_id,
+    posicao_secundaria_id SMALLINT,
     clube_atual_id INT,
     contrato_inicio DATE,
     contrato_fim DATE,
@@ -127,10 +140,17 @@ CREATE TABLE jogadores (
     CONSTRAINT fkey_jogadores_cidade FOREIGN KEY (cidade_id) REFERENCES cidades(id) ON DELETE SET NULL,
     CONSTRAINT fkey_jogadores_nivel FOREIGN KEY (nivel_ambidestria_id) REFERENCES niveis_ambidestria(id),
     CONSTRAINT fkey_jogadores_posicao FOREIGN KEY (posicao_id) REFERENCES posicoes(id),
+    CONSTRAINT fkey_jogadores_posicao_secundaria FOREIGN KEY (posicao_secundaria_id) REFERENCES posicoes(id),
     CONSTRAINT fkey_jogadores_clube FOREIGN KEY (clube_atual_id) REFERENCES clubes(id)
 );
 
--- Modificar
+-- ========================
+-- 3.1 Características principais
+-- ========================
+
+SELECT * FROM caracteristicas_principais;
+-- DELETE FROM caracteristicas_principais;
+ALTER SEQUENCE caracteristicas_principais_id_seq RESTART WITH 1;
 
 CREATE TABLE caracteristicas_principais (
     id SERIAL PRIMARY KEY,
@@ -141,7 +161,12 @@ CREATE TABLE caracteristicas_principais (
     FOREIGN KEY (jogador_id) REFERENCES jogadores(id) ON DELETE CASCADE
 );
 
--- 4. Estatísticas
+-- ========================
+-- 4. Estatísticas Gerais
+-- ========================
+
+SELECT * FROM estatisticas_gerais;
+-- DELETE FROM estatisticas_gerais;
 
 CREATE TABLE estatisticas_gerais (
     jogador_id INT PRIMARY KEY,
@@ -157,9 +182,12 @@ CREATE TABLE estatisticas_gerais (
     CONSTRAINT fkey_estatisticas_jogador FOREIGN KEY (jogador_id) REFERENCES jogadores(id) ON DELETE CASCADE
 );
 
+-- ========================
 -- 5. Partidas
+-- ========================
 
-DELETE FROM partidas;
+SELECT * FROM partidas;
+-- DELETE FROM partidas;
 ALTER SEQUENCE partidas_id_seq RESTART WITH 1;
 
 CREATE TABLE partidas (
@@ -176,6 +204,13 @@ CREATE TABLE partidas (
     CONSTRAINT fkey_partidas_clube_casa FOREIGN KEY (clube_casa_id) REFERENCES clubes(id),
     CONSTRAINT fkey_partidas_clube_fora FOREIGN KEY (clube_fora_id) REFERENCES clubes(id)
 );
+
+-- ========================
+-- Estatísticas por Partida
+-- ========================
+
+SELECT * FROM estatisticas_partidas;
+-- DELETE FROM estatisticas_partidas;
 
 CREATE TABLE estatisticas_partidas (
     id INT PRIMARY KEY,
@@ -197,7 +232,12 @@ CREATE TABLE estatisticas_partidas (
     CONSTRAINT fkey_estatisticas_partida_partida FOREIGN KEY (partida_id) REFERENCES partidas(id) ON DELETE CASCADE
 );
 
--- 6. Histórico
+-- ========================
+-- 6. Histórico de Clubes
+-- ========================
+
+SELECT * FROM historico_clubes;
+-- DELETE FROM historico_clubes;
 
 CREATE TABLE historico_clubes (
     id INT PRIMARY KEY,
@@ -211,6 +251,13 @@ CREATE TABLE historico_clubes (
     CONSTRAINT fkey_historico_clube FOREIGN KEY (clube_id) REFERENCES clubes(id)
 );
 
+-- ========================
+-- Histórico de Lesões
+-- ========================
+
+SELECT * FROM historico_lesoes;
+-- DELETE FROM historico_lesoes;
+
 CREATE TABLE historico_lesoes (
     id INT PRIMARY KEY,
     jogador_id INT NOT NULL,
@@ -223,7 +270,12 @@ CREATE TABLE historico_lesoes (
     CONSTRAINT fkey_lesoes_jogador FOREIGN KEY (jogador_id) REFERENCES jogadores(id) ON DELETE CASCADE
 );
 
+-- ========================
 -- 7. Títulos
+-- ========================
+
+SELECT * FROM titulos;
+-- DELETE FROM titulos;
 
 CREATE TABLE titulos (
     id INT PRIMARY KEY,
@@ -232,6 +284,9 @@ CREATE TABLE titulos (
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
+
+SELECT * FROM jogadores_titulos;
+-- DELETE FROM jogadores_titulos;
 
 CREATE TABLE jogadores_titulos (
     jogador_id INT NOT NULL,
@@ -245,6 +300,7 @@ CREATE TABLE jogadores_titulos (
     CONSTRAINT fkey_titulos_titulo FOREIGN KEY (titulo_id) REFERENCES titulos(id),
     CONSTRAINT fkey_titulos_clube FOREIGN KEY (clube_id) REFERENCES clubes(id)
 );
+
 
 -- 8. Índices
 

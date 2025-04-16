@@ -36,7 +36,7 @@ const Jogador = sequelize.define("jogadores", {
             key: "id",
         },
     },
-    nacionalidade: {
+    naturalidade: {
         type: DataTypes.STRING,
         allowNull: true,
     },

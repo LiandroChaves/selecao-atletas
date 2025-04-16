@@ -8,13 +8,14 @@ import { useTheme } from "@/utils/context/ThemeContext";
 import BotaoTema from "@/utils/utilities/changeTheme";
 import { useLoading } from "@/utils/context/LoadingProvider";
 import { verificarTokenValido } from "@/utils/verificarTokenValido";
+import dayjs from "dayjs";
 
 export default function CadastroJogadores() {
     const [nome, setNome] = useState("");
     const [apelido, setApelido] = useState("");
     const [dataNascimento, setDataNascimento] = useState("");
     const [paisId, setPaisId] = useState("");
-    const [nacionalidade, setNacionalidade] = useState("");
+    const [naturalidade, setNaturalidade] = useState("");
     const [estadoId, setEstadoId] = useState("");
     const [cidadeId, setCidadeId] = useState("");
     const [altura, setAltura] = useState("");
@@ -125,7 +126,7 @@ export default function CadastroJogadores() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!nome.trim() || !dataNascimento.trim() || !paisId || !cidadeId || !altura.trim() || !peso.trim() || !peDominante || !nivelAmbidestriaId || !posicaoId || !clubeId || !posicaoSecundariaId) {
+        if (!nome.trim() || !dataNascimento.trim() || !paisId || !cidadeId || !altura.trim() || !peso.trim() || !peDominante || !nivelAmbidestriaId || !posicaoId || !clubeId) {
             setErro("⚠️ Todos os campos são obrigatórios.");
             setTimeout(() => setErro(""), 3000);
             return;
@@ -144,7 +145,7 @@ export default function CadastroJogadores() {
             )
             .join(" ");
 
-        const nomeFormatadoNac = nacionalidade
+        const nomeFormatadoNac = naturalidade
             .toLowerCase()
             .split(" ")
             .map((palavra, index) =>
@@ -199,7 +200,7 @@ export default function CadastroJogadores() {
                     apelido: nomeFormatadoApe,
                     data_nascimento: dataNascimento,
                     pais_id: parseInt(paisId),
-                    nacionalidade: nomeFormatadoNac,
+                    naturalidade: nomeFormatadoNac,
                     estado_id: estadoId ? parseInt(estadoId) : null,
                     cidade_id: parseInt(cidadeId),
                     altura: parseFloat(altura),
@@ -227,7 +228,7 @@ export default function CadastroJogadores() {
                 setApelido("");
                 setDataNascimento("");
                 setPaisId("");
-                setNacionalidade("");
+                setNaturalidade("");
                 setEstadoId("");
                 setCidadeId("");
                 setAltura("");
@@ -256,6 +257,25 @@ export default function CadastroJogadores() {
             setFoto(e.target.files[0] as File);
         }
     };
+
+    // Função para validar altura
+    const handleAlturaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        // Verifica se a entrada está em um formato válido para altura (1 digito à esquerda, 2 à direita)
+        if (value === '' || /^[0-9]{1}(\.[0-9]{0,2})?$/.test(value)) {
+            setAltura(value);
+        }
+    };
+
+    // Função para validar peso
+    const handlePesoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        // Verifica se a entrada está em um formato válido para peso (1-3 dígitos à esquerda, 2 à direita)
+        if (value === '' || /^[0-9]{1,3}(\.[0-9]{0,2})?$/.test(value)) {
+            setPeso(value);
+        }
+    };
+
 
     return (
         <main
@@ -333,15 +353,27 @@ export default function CadastroJogadores() {
                             </select>
                         </div>
 
-                        {/* Nacionalidade */}
+                        {/* naturalidade */}
                         <div className="w-full md:w-[48%] lg:w-[31%]">
                             <input
                                 type="text"
-                                value={nacionalidade}
-                                onChange={(e) => setNacionalidade(e.target.value)}
+                                value={naturalidade}
+                                onChange={(e) => setNaturalidade(e.target.value)}
                                 className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                                placeholder="Ex: Brasileiro"
+                                placeholder="Naturalidade"
                             />
+                            {/* <select
+                                value={naturalidade}
+                                onChange={(e) => setNaturalidade(e.target.value)}
+                                className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                            >
+                                <option value="">Selecione a cidade de naturalidade</option>
+                                {cidades.map((cidade) => (
+                                    <option key={cidade.id} value={cidade.nome}>
+                                        {cidade.nome}
+                                    </option>
+                                ))}
+                            </select> */}
                         </div>
 
                         {/* Estado */}
@@ -376,9 +408,10 @@ export default function CadastroJogadores() {
                         <div className="w-full md:w-[48%] lg:w-[31%]">
                             <input
                                 value={altura}
-                                onChange={(e) => setAltura(e.target.value)}
+                                onChange={handleAlturaChange}
                                 placeholder="Altura"
                                 type="number"
+                                step={0.01}
                                 className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
                             />
                         </div>
@@ -387,9 +420,10 @@ export default function CadastroJogadores() {
                         <div className="w-full md:w-[48%] lg:w-[31%]">
                             <input
                                 value={peso}
-                                onChange={(e) => setPeso(e.target.value)}
+                                onChange={handlePesoChange}
                                 placeholder="Peso"
                                 type="number"
+                                step="0.01"
                                 className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
                             />
                         </div>
@@ -471,14 +505,14 @@ export default function CadastroJogadores() {
                                     type="date"
                                     className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
                                 />
-                                Início do contrato do atleta
+                                Início do contrato do atleta (opcional)
                             </label>
                         </div>
 
                         {/* Contrato fim */}
                         <div className="w-full md:w-[48%] lg:w-[31%]">
                             <label className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
-                                Fim do contrato do atleta
+                                Fim do contrato do atleta (opcional)
                                 <input
                                     value={contratoFim}
                                     onChange={(e) => setContratoFim(e.target.value)}
@@ -550,41 +584,41 @@ export default function CadastroJogadores() {
                                     />
 
                                     {/* Informações do jogador */}
-                                    <div className="flex-1 text-sm text-gray-200">
+                                    <div className={`flex-1 text-sm ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                                         <div><strong>ID:</strong> {jogador.id} - <strong>{jogador.nome}</strong></div>
 
-                                        <div className="text-md">
+                                        <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                                             <strong>Nome Curto:</strong> {obterNomeCurto(jogador.nome)}
                                         </div>
 
-                                        <div className="text-md">
+                                        <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                                             <strong>Apelido:</strong> {jogador.apelido ? jogador.apelido : "Apelido não informado"}
                                         </div>
 
-                                        <div className="text-md">
-                                            <span>Nascimento: {jogador.data_nascimento ? new Date(jogador.data_nascimento).toLocaleDateString("pt-BR") : "Não informado"}</span>
-                                        </div>
+                                        <span>
+                                            Nascimento: {jogador.data_nascimento ? dayjs(jogador.data_nascimento).format("DD/MM/YYYY") : "Não informado"}
+                                        </span>
 
-                                        <div className="text-md">
+                                        <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                                             Idade: {jogador.data_nascimento ? calcularIdade(jogador.data_nascimento) : "Não informada"}
                                         </div>
 
-                                        <div className="text-md">Nacionalidade: {jogador.nacionalidade ?? "Não informada"}</div>
+                                        <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Naturalidade: {jogador.naturalidade ?? "Não informada"}</div>
 
-                                        <div className="text-md">
+                                        <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                                             Altura: {jogador.altura ? `${jogador.altura} m` : "Não informado"} | Peso: {jogador.peso ? `${jogador.peso} kg` : "Não informado"}
                                         </div>
 
-                                        <div className="text-md">
+                                        <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                                             Posição: {jogador.posicao?.nome ?? "Não informada"}
                                         </div>
 
-                                        <div className="text-md">
+                                        <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                                             Posição secundária: {jogador.posicao_secundaria?.nome ?? "Não informada"}
                                         </div>
 
 
-                                        <div className="text-md">
+                                        <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                                             Pé dominante:{" "}
                                             {jogador.pe_dominante === "D"
                                                 ? "Direito"
@@ -595,17 +629,16 @@ export default function CadastroJogadores() {
                                                         : "Não informado"}
                                         </div>
 
-                                        <div className="text-md">Clube atual: {jogador.clube?.nome ?? "Sem clube"}</div>
-
+                                        <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Clube atual: {jogador.clube?.nome ?? "Sem clube"}</div>
                                         {jogador.contrato_inicio && (
-                                            <div className="text-md">
-                                                Início do contrato: {new Date(jogador.contrato_inicio).toLocaleDateString()}
+                                            <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                                                Início do contrato: {dayjs(jogador.contrato_inicio).format("DD/MM/YYYY")}
                                             </div>
                                         )}
 
                                         {jogador.contrato_fim && (
-                                            <div className="text-md">
-                                                Fim do contrato: {new Date(jogador.contrato_fim).toLocaleDateString()}
+                                            <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                                                Fim do contrato: {dayjs(jogador.contrato_fim).format("DD/MM/YYYY")}
                                             </div>
                                         )}
                                     </div>

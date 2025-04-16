@@ -43,7 +43,11 @@ export default function CadastroEstatisticasGerais() {
     });
 
     const handleChange = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
-        setForm((prev) => ({ ...prev, [field]: parseInt(e.target.value) || 0 }));
+        const value = e.target.value;
+        setForm((prev) => ({
+            ...prev,
+            [field]: value === '' ? 0 : parseInt(value),
+        }));
     };
 
     useEffect(() => {
@@ -169,7 +173,7 @@ export default function CadastroEstatisticasGerais() {
                         <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Partidas jogadas</label>
                         <input
                             type="number"
-                            value={form.partidas_jogadas}
+                            value={form.partidas_jogadas === 0 ? '' : form.partidas_jogadas}
                             onChange={handleChange("partidas_jogadas")}
                             className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                         />
@@ -177,7 +181,7 @@ export default function CadastroEstatisticasGerais() {
                         <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Gols</label>
                         <input
                             type="number"
-                            value={form.gols}
+                            value={form.gols === 0 ? '' : form.gols}
                             onChange={handleChange("gols")}
                             className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                         />
@@ -185,7 +189,7 @@ export default function CadastroEstatisticasGerais() {
                         <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Assistências</label>
                         <input
                             type="number"
-                            value={form.assistencias}
+                            value={form.assistencias === 0 ? '' : form.assistencias}
                             onChange={handleChange("assistencias")}
                             className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                         />
@@ -193,7 +197,7 @@ export default function CadastroEstatisticasGerais() {
                         <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Títulos</label>
                         <input
                             type="number"
-                            value={form.titulos}
+                            value={form.titulos === 0 ? '' : form.titulos}
                             onChange={handleChange("titulos")}
                             className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                         />
@@ -201,7 +205,7 @@ export default function CadastroEstatisticasGerais() {
                         <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Faltas cometidas</label>
                         <input
                             type="number"
-                            value={form.faltas_cometidas}
+                            value={form.faltas_cometidas === 0 ? '' : form.faltas_cometidas}
                             onChange={handleChange("faltas_cometidas")}
                             className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                         />
@@ -209,7 +213,7 @@ export default function CadastroEstatisticasGerais() {
                         <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Cartões amarelos</label>
                         <input
                             type="number"
-                            value={form.cartoes_amarelos}
+                            value={form.cartoes_amarelos === 0 ? '' : form.cartoes_amarelos}
                             onChange={handleChange("cartoes_amarelos")}
                             className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                         />
@@ -217,7 +221,7 @@ export default function CadastroEstatisticasGerais() {
                         <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Cartões vermelhos</label>
                         <input
                             type="number"
-                            value={form.cartoes_vermelhos}
+                            value={form.cartoes_vermelhos === 0 ? '' : form.cartoes_vermelhos}
                             onChange={handleChange("cartoes_vermelhos")}
                             className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
                         />
