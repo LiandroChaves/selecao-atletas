@@ -9,7 +9,7 @@ const Partidas = sequelize.define("Partida", {
         autoIncrement: true,
     },
     data: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
         allowNull: false,
     },
     campeonato: {

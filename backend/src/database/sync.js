@@ -2,6 +2,7 @@ import sequelize from './db.js';
 import Clubes from './models/Clubes.js';
 import models from './models/index.js';
 import Jogador from './models/Jogadores.js';
+import Partidas from './models/Partidas.js';
 import dayjs from 'dayjs';
 
 const {
@@ -11,6 +12,7 @@ const {
     NivelAmbidestria,
     Usuarios,
     Posicoes,
+    // Partidas,
 } = models;
 
 const seedData = async () => {
@@ -108,25 +110,17 @@ const seedData = async () => {
         { nome: 'Vasco', cidade_id: 2, pais_id: brasil.id },
     ]);
 
-    // await Jogador.bulkCreate([{
-    //     nome: 'Liandro da Silva Chaves',
-    //     apelido: 'Chavinho',
-    //     data_nascimento: dayjs('10/06/2004', 'DD/MM/YYYY').format('YYYY-MM-DD'),
-    //     pais_id: brasil.id,
-    //     naturalidade: 'Brasileiro',
-    //     estado_id: ce.id,
-    //     cidade_id: 1,
-    //     altura: 1.75,
-    //     peso: 82.66,
-    //     pe_dominante: 'D',
-    //     nivel_ambidestria_id: 4,
-    //     posicao_id: 1,
-    //     posicao_secundaria_id: 2,
-    //     clube_atual_id: 1,
-    //     contrato_inicio: dayjs('01/01/2023', 'DD/MM/YYYY').format('YYYY-MM-DD'),
-    //     contrato_fim: dayjs('01/01/2025', 'DD/MM/YYYY').format('YYYY-MM-DD'),
-
-    // }]);;
+    await Partidas.bulkCreate([
+        {
+            data: "2025-04-10",
+            campeonato: 'Jecep',
+            estadio: 'Ginásio de Tabuleiro do Norte',
+            clube_casa_id: 1,
+            clube_fora_id: 2,
+            gols_casa: 25,
+            gols_fora: 34,
+        },
+    ])
 };
 
 const syncDatabase = async () => {

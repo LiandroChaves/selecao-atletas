@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { FaArrowLeft } from "react-icons/fa";
@@ -15,7 +15,6 @@ export default function CadastroJogadores() {
     const [apelido, setApelido] = useState("");
     const [dataNascimento, setDataNascimento] = useState("");
     const [paisId, setPaisId] = useState("");
-    const [naturalidade, setNaturalidade] = useState("");
     const [estadoId, setEstadoId] = useState("");
     const [cidadeId, setCidadeId] = useState("");
     const [altura, setAltura] = useState("");
@@ -36,6 +35,7 @@ export default function CadastroJogadores() {
     const [cidades, setCidades] = useState<any[]>([]);
     const [clubes, setClubes] = useState<any[]>([]);
     const [posicoes, setPosicoes] = useState<any[]>([]);
+    const fileInputRef = useRef<HTMLInputElement | null>(null); // Referência para o input de arquivo
     const { setIsLoading } = useLoading();
     const { isDarkMode } = useTheme();
     const router = useRouter();
@@ -145,16 +145,6 @@ export default function CadastroJogadores() {
             )
             .join(" ");
 
-        const nomeFormatadoNac = naturalidade
-            .toLowerCase()
-            .split(" ")
-            .map((palavra, index) =>
-                index === 0 || !["de", "do", "da", "das", "dos", "e", "em", "no", "na", "nos", "nas"].includes(palavra)
-                    ? palavra.charAt(0).toUpperCase() + palavra.slice(1)
-                    : palavra
-            )
-            .join(" ");
-
         const nomeFormatadoApe = apelido
             .toLowerCase()
             .split(" ")
@@ -200,7 +190,6 @@ export default function CadastroJogadores() {
                     apelido: nomeFormatadoApe,
                     data_nascimento: dataNascimento,
                     pais_id: parseInt(paisId),
-                    naturalidade: nomeFormatadoNac,
                     estado_id: estadoId ? parseInt(estadoId) : null,
                     cidade_id: parseInt(cidadeId),
                     altura: parseFloat(altura),
@@ -228,7 +217,6 @@ export default function CadastroJogadores() {
                 setApelido("");
                 setDataNascimento("");
                 setPaisId("");
-                setNaturalidade("");
                 setEstadoId("");
                 setCidadeId("");
                 setAltura("");
@@ -241,6 +229,9 @@ export default function CadastroJogadores() {
                 setContratoInicio("");
                 setContratoFim("");
                 setFoto("");
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = "";
+                }
                 fetchJogadores();
             } else {
                 setErro("⚠️ " + (data.error || "Erro ao inserir jogador."));
@@ -352,30 +343,6 @@ export default function CadastroJogadores() {
                                 ))}
                             </select>
                         </div>
-
-                        {/* naturalidade */}
-                        <div className="w-full md:w-[48%] lg:w-[31%]">
-                            <input
-                                type="text"
-                                value={naturalidade}
-                                onChange={(e) => setNaturalidade(e.target.value)}
-                                className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                                placeholder="Naturalidade"
-                            />
-                            {/* <select
-                                value={naturalidade}
-                                onChange={(e) => setNaturalidade(e.target.value)}
-                                className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
-                            >
-                                <option value="">Selecione a cidade de naturalidade</option>
-                                {cidades.map((cidade) => (
-                                    <option key={cidade.id} value={cidade.nome}>
-                                        {cidade.nome}
-                                    </option>
-                                ))}
-                            </select> */}
-                        </div>
-
                         {/* Estado */}
                         <div className="w-full md:w-[48%] lg:w-[31%]">
                             <select
@@ -512,13 +479,13 @@ export default function CadastroJogadores() {
                         {/* Contrato fim */}
                         <div className="w-full md:w-[48%] lg:w-[31%]">
                             <label className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
-                                Fim do contrato do atleta (opcional)
                                 <input
                                     value={contratoFim}
                                     onChange={(e) => setContratoFim(e.target.value)}
                                     type="date"
                                     className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
                                 />
+                                Fim do contrato do atleta (opcional)
                             </label>
                         </div>
 
@@ -527,6 +494,7 @@ export default function CadastroJogadores() {
                             <label className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                                 Foto do jogador
                                 <input
+                                    ref={fileInputRef}
                                     type="file"
                                     accept="image/*"
                                     onChange={(e) => setFoto(e.target.files?.[0] || "")}
@@ -603,7 +571,7 @@ export default function CadastroJogadores() {
                                             Idade: {jogador.data_nascimento ? calcularIdade(jogador.data_nascimento) : "Não informada"}
                                         </div>
 
-                                        <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Naturalidade: {jogador.naturalidade ?? "Não informada"}</div>
+                                        <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Naturalidade | Cidade: {jogador.cidade?.nome ?? "Não informada"}</div>
 
                                         <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                                             Altura: {jogador.altura ? `${jogador.altura} m` : "Não informado"} | Peso: {jogador.peso ? `${jogador.peso} kg` : "Não informado"}

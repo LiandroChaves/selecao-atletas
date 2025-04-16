@@ -120,7 +120,6 @@ CREATE TABLE jogadores (
     apelido VARCHAR(255),
     data_nascimento DATE NOT NULL,
     pais_id SMALLINT NOT NULL,
-    naturalidade VARCHAR(255),
     estado_id SMALLINT,
     cidade_id SMALLINT NOT NULL,
     altura DECIMAL(4,2) NOT NULL,
@@ -213,7 +212,7 @@ SELECT * FROM estatisticas_partidas;
 -- DELETE FROM estatisticas_partidas;
 
 CREATE TABLE estatisticas_partidas (
-    id INT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     jogador_id INT NOT NULL,
     partida_id INT NOT NULL,
     minutos_jogados SMALLINT DEFAULT 0,

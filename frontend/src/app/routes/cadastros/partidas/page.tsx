@@ -8,6 +8,8 @@ import { useTheme } from "@/utils/context/ThemeContext";
 import BotaoTema from "@/utils/utilities/changeTheme";
 import { useLoading } from "../../../../utils/context/LoadingProvider";
 import { verificarTokenValido } from "@/utils/verificarTokenValido";
+import dayjs from "dayjs";
+
 
 export default function CadastroPartidas() {
     const [data, setData] = useState("");
@@ -191,7 +193,7 @@ export default function CadastroPartidas() {
                         className="p-2 rounded text-black bg-white"
                     />
                     <input
-                        placeholder="Estádio"
+                        placeholder="Local da partida"
                         value={estadio}
                         onChange={(e) => setEstadio(e.target.value)}
                         className="p-2 rounded text-black bg-white"
@@ -247,7 +249,7 @@ export default function CadastroPartidas() {
                             className={`p-2 rounded ${isDarkMode ? "bg-teal-600 text-white" : "bg-white text-black border border-gray-300"}`}
                         >
                             <strong>ID:</strong> {partida.id} -{" "}
-                            <strong>{new Date(partida.data).toLocaleDateString()}</strong>
+                            <strong>{dayjs(partida.data).format("DD/MM/YYYY")}</strong>
                             <br />
                             <span className="text-sm">
                                 <strong>Clube Casa:</strong> {partida.clubeCasa?.nome ?? "Não informado"}
@@ -269,7 +271,7 @@ export default function CadastroPartidas() {
                             )}
                             {partida.estadio && (
                                 <div className="text-sm">
-                                    <strong>Estádio:</strong> {partida.estadio}
+                                    <strong>Local da partida:</strong> {partida.estadio}
                                 </div>
                             )}
                         </li>

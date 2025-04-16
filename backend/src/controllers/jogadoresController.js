@@ -51,7 +51,6 @@ export const listarJogadores = async (req, res) => {
                 "contrato_inicio",
                 "contrato_fim",
                 "foto", // 👈 garante que venha
-                "naturalidade"
             ],
             include: [
                 { model: Paises, as: "pais" },

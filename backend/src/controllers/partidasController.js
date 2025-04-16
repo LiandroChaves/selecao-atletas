@@ -2,6 +2,8 @@ import Partidas from "../database/models/Partidas.js";
 import Clubes from "../database/models/Clubes.js";
 
 // 🔍 Buscar todas as partidas
+import dayjs from "dayjs"; // instale se ainda não tiver: npm install dayjs
+
 export const pegarPartidas = async (req, res) => {
     try {
         const partidas = await Partidas.findAll({
@@ -10,14 +12,23 @@ export const pegarPartidas = async (req, res) => {
                 { model: Clubes, as: "clubeFora", attributes: ["nome"] }
             ],
             order: [["data", "DESC"]],
+            raw: true,
+            nest: true,
         });
 
-        res.json(partidas);
+        // Corrigir formatação da data manualmente
+        const partidasFormatadas = partidas.map(p => ({
+            ...p,
+            data: dayjs(p.data).format("YYYY-MM-DD") // ou "DD/MM/YYYY" se preferir
+        }));
+
+        res.json(partidasFormatadas);
     } catch (error) {
         console.error("Erro ao buscar partidas:", error.message);
         res.status(500).json({ error: "Erro ao buscar partidas" });
     }
 };
+
 
 // ➕ Inserir nova partida
 export const inserirPartida = async (req, res) => {
