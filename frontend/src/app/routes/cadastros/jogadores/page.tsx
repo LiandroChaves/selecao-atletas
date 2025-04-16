@@ -8,7 +8,6 @@ import { useTheme } from "@/utils/context/ThemeContext";
 import BotaoTema from "@/utils/utilities/changeTheme";
 import { useLoading } from "@/utils/context/LoadingProvider";
 import { verificarTokenValido } from "@/utils/verificarTokenValido";
-import imagem from "../../../../../../backend/uploads/jogador_1/Liandro.jpg";
 
 export default function CadastroJogadores() {
     const [nome, setNome] = useState("");
@@ -23,6 +22,7 @@ export default function CadastroJogadores() {
     const [peDominante, setPeDominante] = useState("");
     const [nivelAmbidestriaId, setNivelAmbidestriaId] = useState("");
     const [posicaoId, setPosicaoId] = useState("");
+    const [posicaoSecundariaId, setPosicaoSecundariaId] = useState("");
     const [clubeId, setClubeId] = useState("");
     const [contratoInicio, setContratoInicio] = useState("");
     const [contratoFim, setContratoFim] = useState("");
@@ -35,7 +35,6 @@ export default function CadastroJogadores() {
     const [cidades, setCidades] = useState<any[]>([]);
     const [clubes, setClubes] = useState<any[]>([]);
     const [posicoes, setPosicoes] = useState<any[]>([]);
-    const [nomeJogador, setNomeJogador] = useState("");
     const { setIsLoading } = useLoading();
     const { isDarkMode } = useTheme();
     const router = useRouter();
@@ -126,7 +125,7 @@ export default function CadastroJogadores() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!nome.trim() || !dataNascimento.trim() || !paisId || !cidadeId || !altura.trim() || !peso.trim() || !peDominante || !nivelAmbidestriaId || !posicaoId || !clubeId) {
+        if (!nome.trim() || !dataNascimento.trim() || !paisId || !cidadeId || !altura.trim() || !peso.trim() || !peDominante || !nivelAmbidestriaId || !posicaoId || !clubeId || !posicaoSecundariaId) {
             setErro("⚠️ Todos os campos são obrigatórios.");
             setTimeout(() => setErro(""), 3000);
             return;
@@ -208,6 +207,7 @@ export default function CadastroJogadores() {
                     pe_dominante: peDominante,
                     nivel_ambidestria_id: parseInt(nivelAmbidestriaId),
                     posicao_id: parseInt(posicaoId),
+                    posicao_secundaria_id: parseInt(posicaoSecundariaId),
                     clube_atual_id: parseInt(clubeId),
                     contrato_inicio: inicioFinal,
                     contrato_fim: fimFinal,
@@ -235,6 +235,7 @@ export default function CadastroJogadores() {
                 setPeDominante("");
                 setNivelAmbidestriaId("");
                 setPosicaoId("");
+                setPosicaoSecundariaId("");
                 setClubeId("");
                 setContratoInicio("");
                 setContratoFim("");
@@ -434,6 +435,18 @@ export default function CadastroJogadores() {
                                 ))}
                             </select>
                         </div>
+                        <div className="w-full md:w-[48%] lg:w-[31%]">
+                            <select
+                                value={posicaoSecundariaId}
+                                onChange={(e) => setPosicaoSecundariaId(e.target.value)}
+                                className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                            >
+                                <option value="">Selecione a posição secundária</option>
+                                {posicoes.map((posicao) => (
+                                    <option key={posicao.id} value={posicao.id}>{posicao.nome}</option>
+                                ))}
+                            </select>
+                        </div>
 
                         {/* Clube */}
                         <div className="w-full md:w-[48%] lg:w-[31%]">
@@ -465,13 +478,13 @@ export default function CadastroJogadores() {
                         {/* Contrato fim */}
                         <div className="w-full md:w-[48%] lg:w-[31%]">
                             <label className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                                Fim do contrato do atleta
                                 <input
                                     value={contratoFim}
                                     onChange={(e) => setContratoFim(e.target.value)}
                                     type="date"
                                     className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
                                 />
-                                Fim do contrato do atleta
                             </label>
                         </div>
 
@@ -565,6 +578,11 @@ export default function CadastroJogadores() {
                                         <div className="text-md">
                                             Posição: {jogador.posicao?.nome ?? "Não informada"}
                                         </div>
+
+                                        <div className="text-md">
+                                            Posição secundária: {jogador.posicao_secundaria?.nome ?? "Não informada"}
+                                        </div>
+
 
                                         <div className="text-md">
                                             Pé dominante:{" "}

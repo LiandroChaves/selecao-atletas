@@ -94,6 +94,11 @@ CREATE TABLE clubes (
 DELETE FROM jogadores;
 ALTER SEQUENCE jogadores_id_seq RESTART WITH 1;
 
+ALTER TABLE jogadores
+ADD COLUMN posicao_secundaria_id SMALLINT,
+ADD CONSTRAINT fkey_jogadores_posicao_secundaria
+FOREIGN KEY (posicao_secundaria_id) REFERENCES posicoes(id);
+
 SELECT * FROM jogadores;
 
 CREATE TABLE jogadores (
@@ -110,6 +115,7 @@ CREATE TABLE jogadores (
     pe_dominante pe_dominante_enum NOT NULL,
     nivel_ambidestria_id SMALLINT NOT NULL,
     posicao_id SMALLINT NOT NULL,
+	posicao_secundaria_id,
     clube_atual_id INT,
     contrato_inicio DATE,
     contrato_fim DATE,
@@ -122,6 +128,17 @@ CREATE TABLE jogadores (
     CONSTRAINT fkey_jogadores_nivel FOREIGN KEY (nivel_ambidestria_id) REFERENCES niveis_ambidestria(id),
     CONSTRAINT fkey_jogadores_posicao FOREIGN KEY (posicao_id) REFERENCES posicoes(id),
     CONSTRAINT fkey_jogadores_clube FOREIGN KEY (clube_atual_id) REFERENCES clubes(id)
+);
+
+-- Modificar
+
+CREATE TABLE caracteristicas_principais (
+    id SERIAL PRIMARY KEY,
+    jogador_id INT NOT NULL,
+    descricao VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (jogador_id) REFERENCES jogadores(id) ON DELETE CASCADE
 );
 
 -- 4. Estatísticas

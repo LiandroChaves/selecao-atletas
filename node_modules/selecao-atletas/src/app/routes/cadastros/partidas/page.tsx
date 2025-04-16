@@ -130,13 +130,13 @@ export default function CadastroPartidas() {
                 setClubeForaId(null);
                 setGolsCasa(null);
                 setGolsFora(null);
+                buscarPartidas();
             } else {
                 console.warn("⚠️ Erro ao cadastrar:", resultado.error);
             }
         } catch (error) {
             console.error("❌ Erro na requisição:", error);
         }
-        buscarPartidas();
     }
 
     return (

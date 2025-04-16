@@ -84,6 +84,14 @@ const Jogador = sequelize.define("jogadores", {
             key: "id",
         },
     },
+    posicao_secundaria_id: {
+        type: DataTypes.SMALLINT,
+        allowNull: true,
+        references: {
+            model: "posicoes",
+            key: "id",
+        },
+    },
     clube_atual_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
@@ -117,5 +125,6 @@ Jogador.belongsTo(Estado, { as: 'estado', foreignKey: 'estado_id' });
 Jogador.belongsTo(Cidade, { as: 'cidade', foreignKey: 'cidade_id' });
 Jogador.belongsTo(Clubes, { as: 'clube', foreignKey: 'clube_atual_id' });
 Jogador.belongsTo(NivelAmbidestria, { as: 'nivel_ambidestria', foreignKey: 'nivel_ambidestria_id' });
+Jogador.belongsTo(Posicao, { as: 'posicao_secundaria', foreignKey: 'posicao_secundaria_id' });
 
 export default Jogador;

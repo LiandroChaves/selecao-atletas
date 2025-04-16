@@ -12,9 +12,11 @@ export const criarJogador = async (req, res) => {
         // Trata os campos de data antes de criar o jogador
         const contrato_inicio = req.body.contrato_inicio === "data não informada" ? null : req.body.contrato_inicio;
         const contrato_fim = req.body.contrato_fim === "data não informada" ? null : req.body.contrato_fim;
+        const posicao_secundaria_id = req.body.posicao_secundaria_id === "não informado" ? null : req.body.posicao_secundaria_id;
 
         const novoJogador = await Jogador.create({
             ...req.body,
+            posicao_secundaria_id,
             contrato_inicio,
             contrato_fim,
         });
@@ -44,6 +46,7 @@ export const listarJogadores = async (req, res) => {
                 "pe_dominante",
                 "nivel_ambidestria_id",
                 "posicao_id",
+                "posicao_secundaria_id",
                 "clube_atual_id",
                 "contrato_inicio",
                 "contrato_fim",
@@ -57,6 +60,7 @@ export const listarJogadores = async (req, res) => {
                 { model: Posicao, as: "posicao" },
                 { model: Clubes, as: "clube" },
                 { model: NivelAmbidestria, as: "nivel_ambidestria" },
+                { model: Posicao, as: 'posicao_secundaria' },
             ],
             order: [["id", "ASC"]],
         });
