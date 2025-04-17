@@ -3,6 +3,10 @@ import Clubes from './models/Clubes.js';
 import models from './models/index.js';
 import Jogador from './models/Jogadores.js';
 import Partidas from './models/Partidas.js';
+import EstatisticaGeral from './models/EstatisticasGerais.js';
+import EstatisticasPartidas from './models/EstatisticasPartidas.js';
+import HistoricoClubes from './models/HistoricoClubes.js';
+import HistoricoLesoes from './models/HistoricoLesoes.js';
 import dayjs from 'dayjs';
 
 const {
@@ -121,6 +125,73 @@ const seedData = async () => {
             gols_fora: 34,
         },
     ])
+
+    await Jogador.bulkCreate([
+        {
+            nome: 'Liandro da Silva Chaves',
+            apelido: 'LChaves',
+            data_nascimento: dayjs('2004-06-10').format('YYYY-MM-DD'),
+            pais_id: brasil.id,
+            estado_id: estadosCadastrados.find(e => e.uf === 'CE').id,
+            cidade_id: 1,
+            altura: 1.80,
+            peso: 75.0,
+            pe_dominante: 'D',
+            nivel_ambidestria_id: 1,
+            posicao_id: 1,
+            posicao_secundaria_id: 2,
+            clube_atual_id: 1,
+            contrato_inicio: dayjs('2025-01-01').format('YYYY-MM-DD'),
+            contrato_fim: dayjs('2025-12-31').format('YYYY-MM-DD'),
+        }]);
+
+    await EstatisticaGeral.bulkCreate([
+        {
+            jogador_id: 1,
+            partidas_jogadas: 2,
+            gols: 1,
+            assistencias: 0,
+            titulos: 3,
+            faltas_cometidas: 1,
+            cartoes_amarelos: 1,
+            cartoes_vermelhos: 0,
+        }]);
+
+    await EstatisticasPartidas.bulkCreate([
+        {
+            jogador_id: 1,
+            partida_id: 1,
+            minutos_jogados: 90,
+            gols: 1,
+            assistencias: 0,
+            passes_certos: 20,
+            finalizacoes: 5,
+            finalizacoes_no_alvo: 3,
+            desarmes: 2,
+            faltas_cometidas: 1,
+            cartoes_amarelos: 0,
+            cartoes_vermelhos: 0,
+        },
+    ]);
+
+    await HistoricoClubes.bulkCreate([
+        {
+            jogador_id: 1,
+            clube_id: 1,
+            data_entrada: dayjs('2025-01-01').format('YYYY-MM-DD'),
+            data_saida: dayjs('2025-12-31').format('YYYY-MM-DD'),
+        },
+    ]);
+
+    await HistoricoLesoes.bulkCreate([
+        {
+            jogador_id: 1,
+            tipo_lesao: 'Lesão no joelho',
+            data_inicio: dayjs('2025-01-01').format('YYYY-MM-DD'),
+            data_retorno: dayjs('2025-02-01').format('YYYY-MM-DD'),
+            descricao: 'Lesão leve no joelho direito.',
+        },
+    ]);
 };
 
 const syncDatabase = async () => {
