@@ -24,8 +24,16 @@ export default function Home() {
                     setIsLoading(false); // Opcional, pois pode ser desativado no useEffect da página de destino
                 }, 200); // pequeno delay só para a animação aparecer
             },
-        },        
-        { label: "Busca e Edição", icon: <FaSearch />, onClick: () => alert("Indo para Busca e Edição") },
+        },
+        {
+            label: "Busca e Edição", icon: <FaSearch />, onClick: () => {
+                setIsLoading(true); // Ativa carregamento
+                setTimeout(() => {
+                    router.push("/routes/buscaEedicao");
+                    setIsLoading(false); // Opcional, pois pode ser desativado no useEffect da página de destino
+                }, 200); // pequeno delay só para a animação aparecer
+            },
+        },
         { label: "Banco de Dados", icon: <FaDatabase />, onClick: () => alert("Indo para Banco de Dados") },
         { label: "Instruções", icon: <FaInfoCircle />, onClick: () => alert("Indo para Instruções") },
     ];
