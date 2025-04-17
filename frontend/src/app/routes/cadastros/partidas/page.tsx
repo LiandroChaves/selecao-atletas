@@ -277,8 +277,8 @@ export default function CadastroPartidas() {
                         </li>
                     ))}
                 </ul>
-                <BotaoTema />
             </motion.div>
+                <BotaoTema />
         </main>
     );
 }

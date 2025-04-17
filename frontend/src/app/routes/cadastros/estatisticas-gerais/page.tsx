@@ -151,7 +151,7 @@ export default function CadastroEstatisticasGerais() {
                     <span>Voltar</span>
                 </button>
 
-                <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? "text-white" : "text-gray-700"}`}>
+                <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? "text-lime-200" : "text-gray-700"}`}>
                     Estatísticas Gerais
                 </h2>
 

@@ -27,7 +27,7 @@ export const inserirHistorico = async (req, res) => {
             jogador_id,
             clube_id,
             data_entrada,
-            data_saida,
+            data_saida: data_saida || null,
         });
 
         res.status(201).json({ mensagem: "Histórico adicionado com sucesso", historico: novo });

@@ -27,7 +27,7 @@ export const inserirLesao = async (req, res) => {
             jogador_id,
             tipo_lesao,
             data_inicio,
-            data_retorno,
+            data_retorno: data_retorno ? data_retorno : null,
             descricao
         });
 

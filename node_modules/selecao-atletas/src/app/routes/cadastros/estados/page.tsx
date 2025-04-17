@@ -127,7 +127,7 @@ export default function CadastroEstados() {
                     Voltar
                 </button>
 
-                <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? "text-white" : "text-gray-700"}`}>
+                <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? "text-lime-200" : "text-gray-700"}`}>
                     Cadastro de Estados
                 </h2>
 

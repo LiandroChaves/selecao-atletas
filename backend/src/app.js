@@ -17,7 +17,8 @@ import partidasRoutes from "./routes/partidas.js";
 import estatisticasPartidasRoutes from "./routes/estatisticasPartidas.js";
 import historicoClubesRoutes from "./routes/historicoClubes.js";
 import historicoLesoesRoutes from "./routes/historicoLesoes.js";
-
+import titulosRoutes from "./routes/titulos.js";
+import jogadoresTitulosRoute from "./routes/jogadoresTitulos.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -53,6 +54,8 @@ app.use("/api/partidas", partidasRoutes); // Rota de partidas
 app.use("/api/estatisticas-partidas", estatisticasPartidasRoutes); // Rota de estatísticas de partidas
 app.use("/api/historico-clubes", historicoClubesRoutes); // Rota de histórico de clubes
 app.use("/api/historico-lesoes", historicoLesoesRoutes); // Rota de histórico de lesões
+app.use("/api/titulos", titulosRoutes); // Rota de títulos
+app.use("/api/jogadores-titulos", jogadoresTitulosRoute); // Rota de jogadores e títulos
 
 app.use('/api/uploads', express.static(uploadsPath)); // Serve arquivos estáticos da pasta uploads
 app.use("/api/uploads", uploadRouter); // Rota para upload de arquivos

@@ -7,6 +7,8 @@ import EstatisticaGeral from './models/EstatisticasGerais.js';
 import EstatisticasPartidas from './models/EstatisticasPartidas.js';
 import HistoricoClubes from './models/HistoricoClubes.js';
 import HistoricoLesoes from './models/HistoricoLesoes.js';
+import Titulos from './models/Titulos.js';
+import JogadoresTitulos from './models/JogadoresTitulos.js';
 import dayjs from 'dayjs';
 
 const {
@@ -190,6 +192,23 @@ const seedData = async () => {
             data_inicio: dayjs('2025-01-01').format('YYYY-MM-DD'),
             data_retorno: dayjs('2025-02-01').format('YYYY-MM-DD'),
             descricao: 'Lesão leve no joelho direito.',
+        },
+    ]);
+
+    await Titulos.bulkCreate([
+        {
+            jogador_id: 1,
+            nome: 'Campeão Cearense',
+            tipo: 'Nacional',
+            data_conquista: dayjs('2025-12-31').format('YYYY-MM-DD'),
+        }])
+
+    await JogadoresTitulos.bulkCreate([
+        {
+            jogador_id: 1,
+            titulo_id: 1,
+            ano: 2025,
+            clube_id: 1,
         },
     ]);
 };

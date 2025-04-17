@@ -151,7 +151,7 @@ export default function CadastroEstatisticasPartidas() {
                 </button>
 
                 <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? "text-lime-200" : "text-gray-700"}`}>
-                    Cadastro de Estatísticas
+                    Cadastro de Estatísticas por partida
                 </h2>
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-3 mb-6">
@@ -227,11 +227,11 @@ export default function CadastroEstatisticasPartidas() {
                             <br />
                             Gols marcados: {e.gols}
                             <br />
+                            Minutos jogados: {e.minutos_jogados} minutos
+                            <br />
                             Assistências feitas: {e.assistencias} | Passes certos: {e.passes_certos}
                             <br />
                             Finalizações: {e.finalizacoes} | Finalizações no alvo: {e.finalizacoes_no_alvo}
-                            <br />
-                            Minutos jogados: {e.minutos_jogados} minutos
                             <br />
                             Desarmes: {e.desarmes} | Faltas cometidas: {e.faltas_cometidas}
                             <br />
@@ -239,8 +239,8 @@ export default function CadastroEstatisticasPartidas() {
                         </li>
                     ))}
                 </ul>
-                <BotaoTema />
             </motion.div>
+            <BotaoTema />
         </main>
 
     );

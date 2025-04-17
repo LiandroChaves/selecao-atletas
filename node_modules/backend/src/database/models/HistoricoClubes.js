@@ -23,7 +23,7 @@ const HistoricoClubes = sequelize.define("historico_clubes", {
     },
     data_saida: {
         type: DataTypes.DATEONLY,
-        allowNull: false,
+        allowNull: true,
     },
     created_at: {
         type: DataTypes.DATE,

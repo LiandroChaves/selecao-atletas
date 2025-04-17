@@ -95,7 +95,7 @@ CREATE TABLE posicoes (
 -- 2. Clubes
 -- ========================
 
--- SELECT * FROM clubes;
+SELECT * FROM clubes;
 -- -- DELETE FROM clubes;
 -- ALTER SEQUENCE clubes_id_seq RESTART WITH 1;
 
@@ -249,7 +249,7 @@ CREATE TABLE historico_clubes (
     jogador_id INT NOT NULL,
     clube_id INT NOT NULL,
     data_entrada DATE NOT NULL,
-    data_saida DATE NOT NULL,
+    data_saida DATE,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     CONSTRAINT fkey_historico_jogador FOREIGN KEY (jogador_id) REFERENCES jogadores(id) ON DELETE CASCADE,

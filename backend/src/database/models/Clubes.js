@@ -26,11 +26,11 @@ const Clubes = sequelize.define("clubes", {
         allowNull: true,
     },
     inicio_contrato: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
         allowNull: true,
     },
     fim_contrato: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
         allowNull: true,
     },
 }, {

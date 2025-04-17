@@ -8,19 +8,19 @@ import { useLoading } from "@/utils/context/LoadingProvider";
 import { verificarTokenValido } from "@/utils/verificarTokenValido";
 import BotaoTema from "@/utils/utilities/changeTheme";
 import { motion } from "framer-motion";
-import dayjs from "dayjs";
 
-export default function CadastroHistoricoClubes() {
-    const [historicos, setHistoricos] = useState<any[]>([]);
-    const [jogadores, setJogadores] = useState<any[]>([]);
-    const [clubes, setClubes] = useState<any[]>([]);
+export default function CadastroJogadoresTitulos() {
     const [form, setForm] = useState({
         jogador_id: "",
+        titulo_id: "",
+        ano: "",
         clube_id: "",
-        data_entrada: "",
-        data_saida: "",
     });
     const [erro, setErro] = useState("");
+    const [jogadores, setJogadores] = useState<any[]>([]);
+    const [titulos, setTitulos] = useState<any[]>([]);
+    const [clubes, setClubes] = useState<any[]>([]);
+    const [jogadoresTitulos, setJogadoresTitulos] = useState<any[]>([]);
     const { isDarkMode } = useTheme();
     const { setIsLoading } = useLoading();
     const router = useRouter();
@@ -28,8 +28,9 @@ export default function CadastroHistoricoClubes() {
     useEffect(() => {
         setIsLoading(false);
         fetchJogadores();
+        fetchTitulos();
         fetchClubes();
-        fetchHistoricos();
+        fetchJogadoresTitulos();
     }, []);
 
     const fetchJogadores = async () => {
@@ -38,16 +39,22 @@ export default function CadastroHistoricoClubes() {
         setJogadores(data);
     };
 
+    const fetchTitulos = async () => {
+        const res = await fetch("http://localhost:3001/api/titulos/pegarTitulos");
+        const data = await res.json();
+        setTitulos(data);
+    };
+
     const fetchClubes = async () => {
         const res = await fetch("http://localhost:3001/api/clubes/pegarClubes");
         const data = await res.json();
         setClubes(data);
     };
 
-    const fetchHistoricos = async () => {
-        const res = await fetch("http://localhost:3001/api/historico-clubes/pegarHistorico");
+    const fetchJogadoresTitulos = async () => {
+        const res = await fetch("http://localhost:3001/api/jogadores-titulos/pegarJogadoresTitulos");
         const data = await res.json();
-        setHistoricos(data);
+        setJogadoresTitulos(data);
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -57,8 +64,8 @@ export default function CadastroHistoricoClubes() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!form.jogador_id || !form.clube_id || !form.data_entrada) {
-            setErro("⚠️ Nome do jogador, nome do clube e data de entrada são obrigatórios.");
+        if (!form.jogador_id || !form.titulo_id || !form.ano || !form.clube_id) {
+            setErro("⚠️ Preencha todos os campos.");
             setTimeout(() => setErro(""), 3000);
             return;
         }
@@ -67,7 +74,7 @@ export default function CadastroHistoricoClubes() {
         const token = localStorage.getItem("token");
 
         try {
-            const res = await fetch("http://localhost:3001/api/historico-clubes/inserirHistorico", {
+            const res = await fetch("http://localhost:3001/api/jogadores-titulos/inserirJogadorTitulo", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -75,19 +82,24 @@ export default function CadastroHistoricoClubes() {
                 },
                 body: JSON.stringify({
                     jogador_id: Number(form.jogador_id),
+                    titulo_id: Number(form.titulo_id),
+                    ano: Number(form.ano),
                     clube_id: Number(form.clube_id),
-                    data_entrada: form.data_entrada,
-                    data_saida: form.data_saida || null,
                 }),
             });
 
             const data = await res.json();
 
             if (res.ok) {
-                setForm({ jogador_id: "", clube_id: "", data_entrada: "", data_saida: "" });
-                fetchHistoricos();
+                setForm({
+                    jogador_id: "",
+                    titulo_id: "",
+                    ano: "",
+                    clube_id: "",
+                });
+                fetchJogadoresTitulos();
             } else {
-                setErro(data.error || "Erro ao cadastrar histórico.");
+                setErro(data.error || "Erro ao cadastrar título do jogador.");
                 setTimeout(() => setErro(""), 3000);
             }
         } catch (error) {
@@ -111,14 +123,17 @@ export default function CadastroHistoricoClubes() {
             >
                 <button
                     onClick={() => router.back()}
-                    className={`flex items-center gap-2 mb-4 text-sm font-medium ${isDarkMode ? "text-lime-200 hover:text-lime-100" : "text-gray-700 hover:text-gray-900"}`}
+                    className={`flex items-center gap-2 mb-4 text-sm font-medium transition duration-200 ${isDarkMode
+                        ? "text-lime-200 hover:text-lime-100"
+                        : "text-gray-700 hover:text-gray-900"
+                        }`}
                 >
                     <FaArrowLeft />
                     <span>Voltar</span>
                 </button>
 
                 <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? "text-lime-200" : "text-gray-700"}`}>
-                    Cadastro de Histórico de Clubes
+                    Cadastro de Títulos de Jogadores
                 </h2>
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-3 mb-6">
@@ -135,6 +150,27 @@ export default function CadastroHistoricoClubes() {
                     </select>
 
                     <select
+                        name="titulo_id"
+                        value={form.titulo_id}
+                        onChange={handleChange}
+                        className="p-2 rounded text-black bg-white"
+                    >
+                        <option value="">Selecione o título</option>
+                        {titulos.map((t) => (
+                            <option key={t.id} value={t.id}>{t.nome} ({t.tipo})</option>
+                        ))}
+                    </select>
+
+                    <input
+                        type="number"
+                        name="ano"
+                        placeholder="Ano do título"
+                        value={form.ano}
+                        onChange={handleChange}
+                        className="p-2 rounded text-black bg-white"
+                    />
+
+                    <select
                         name="clube_id"
                         value={form.clube_id}
                         onChange={handleChange}
@@ -145,28 +181,6 @@ export default function CadastroHistoricoClubes() {
                             <option key={c.id} value={c.id}>{c.nome}</option>
                         ))}
                     </select>
-                    <div className="flex flex-col gap-1">
-                        <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Data de entrada no clube</label>
-                        <input
-                            type="date"
-                            name="data_entrada"
-                            value={form.data_entrada}
-                            onChange={handleChange}
-                            className="p-2 rounded text-black bg-white"
-                            placeholder="Data de entrada"
-                        />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                        <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Data de saída do clube</label>
-                        <input
-                            type="date"
-                            name="data_saida"
-                            value={form.data_saida}
-                            onChange={handleChange}
-                            className="p-2 rounded text-black bg-white"
-                            placeholder="Data de saída"
-                        />
-                    </div>
 
                     {erro && <p className="text-red-400 text-sm font-medium">{erro}</p>}
 
@@ -182,15 +196,18 @@ export default function CadastroHistoricoClubes() {
                 </form>
 
                 <ul className="space-y-2 text-left max-h-72 overflow-y-auto">
-                    {historicos.map((h) => (
+                    {jogadoresTitulos.map((jt, index) => (
                         <li
-                            key={h.id}
+                            key={index}
                             className={`p-2 rounded ${isDarkMode ? "bg-teal-600 text-white" : "bg-white text-black border border-gray-300"}`}
                         >
-                            <strong>Jogador:</strong> {h.jogador?.nome ?? "Desconhecido"}<br />
-                            <strong>Clube:</strong> {h.clube?.nome ?? "Desconhecido"}<br />
-                            Entrada no clube: {dayjs(h.data_entrada).format("DD/MM/YYYY")}<br />
-                            Saída do clube: {h.data_saida ? dayjs(h.data_saida).format("DD/MM/YYYY") : "Ainda permanece no clube"}
+                            <strong>Jogador:</strong> {jt.jogador_id ? jogadores.find((j) => j.id === jt.jogador_id)?.nome : "N/A"}
+                            <br />
+                            <strong>Título:</strong> {jt.titulo_id ? titulos.find((t) => t.id === jt.titulo_id)?.nome : "N/A"}
+                            <br />
+                            <strong>Ano:</strong> {jt.ano}
+                            <br />
+                            <strong>Clube:</strong> {jt.clube_id ? clubes.find((c) => c.id === jt.clube_id)?.nome : "N/A"}
                         </li>
                     ))}
                 </ul>

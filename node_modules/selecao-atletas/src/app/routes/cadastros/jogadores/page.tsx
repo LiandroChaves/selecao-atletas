@@ -292,7 +292,7 @@ export default function CadastroJogadores() {
                     <span>Voltar</span>
                 </button>
 
-                <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? "text-white" : "text-gray-700"}`}>
+                <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? "text-lime-200" : "text-gray-700"}`}>
                     Cadastro de Jogadores
                 </h2>
 
@@ -578,7 +578,7 @@ export default function CadastroJogadores() {
                                         </div>
 
                                         <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
-                                            Posição: {jogador.posicao?.nome ?? "Não informada"}
+                                            Posição principal: {jogador.posicao?.nome ?? "Não informada"}
                                         </div>
 
                                         <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>

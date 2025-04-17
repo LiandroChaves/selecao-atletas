@@ -8,6 +8,7 @@ import BotaoTema from "@/utils/utilities/changeTheme";
 import { motion } from "framer-motion";
 import { useLoading } from "@/utils/context/LoadingProvider";
 import { verificarTokenValido } from "@/utils/verificarTokenValido";
+import dayjs from "dayjs";
 
 export default function CadastroClubes() {
     const [id, setId] = useState("");
@@ -139,7 +140,7 @@ export default function CadastroClubes() {
                     <span>Voltar</span>
                 </button>
 
-                <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? "text-white" : "text-gray-700"}`}>
+                <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? "text-lime-200" : "text-gray-700"}`}>
                     Cadastro de Clubes
                 </h2>
 
@@ -171,7 +172,7 @@ export default function CadastroClubes() {
                         />
                     </label>
                     <input type="number" placeholder="Ano de fundação (opcional)" value={fundacao} onChange={(e) => setFundacao(e.target.value)} className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
-                    <input placeholder="Estádio (opcional)" value={estadio} onChange={(e) => setEstadio(e.target.value)} className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
+                    <input placeholder="Local do clube (opcional)" value={estadio} onChange={(e) => setEstadio(e.target.value)} className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
 
                     {erro && <p className="text-red-400 font-medium text-sm">{erro}</p>}
 
@@ -185,10 +186,10 @@ export default function CadastroClubes() {
                         <li key={clube.id} className={`p-2 rounded ${isDarkMode ? "bg-teal-600 text-white" : "bg-white text-black border border-gray-300"}`}>
                             <strong>ID:</strong> {clube.id} - <strong>{clube.nome}</strong><br />
                             <span className="text-sm">País: {clube.pais?.nome ?? "Não informado"}</span>
-                            {clube.inicio_contrato && <div className="text-sm">Início: {new Date(clube.inicio_contrato).toLocaleDateString()}</div>}
-                            {clube.fim_contrato && <div className="text-sm">Fim: {new Date(clube.fim_contrato).toLocaleDateString()}</div>}
+                            {clube.inicio_contrato && <div className="text-sm">Início: {dayjs(clube.inicio_contrato).format("DD/MM/YYYY")}</div>}
+                            {clube.fim_contrato && <div className="text-sm">Fim: {dayjs(clube.fim_contrato).format("DD/MM/YYYY")}</div>}
                             {clube.fundacao && <div className="text-sm">Fundado em: {clube.fundacao}</div>}
-                            {clube.estadio && <div className="text-sm">Estádio: {clube.estadio}</div>}
+                            {clube.estadio && <div className="text-sm">Local do clube: {clube.estadio}</div>}
                         </li>
                     ))}
                 </ul>

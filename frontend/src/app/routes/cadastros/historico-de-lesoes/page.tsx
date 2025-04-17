@@ -59,6 +59,16 @@ export default function CadastroHistoricoLesoes() {
         if (!verificarTokenValido()) return;
         const token = localStorage.getItem("token");
 
+        const nomeFormatado = form.tipo_lesao
+            .toLowerCase()
+            .split(" ")
+            .map((palavra, index) =>
+                index === 0 || !["de", "do", "da", "das", "dos", "e", "em", "no", "na", "nos", "nas"].includes(palavra)
+                    ? palavra.charAt(0).toUpperCase() + palavra.slice(1)
+                    : palavra
+            )
+            .join(" ");
+
         try {
             const res = await fetch("http://localhost:3001/api/historico-lesoes/inserirLesao", {
                 method: "POST",
@@ -68,6 +78,7 @@ export default function CadastroHistoricoLesoes() {
                 },
                 body: JSON.stringify({
                     ...form,
+                    tipo_lesao: nomeFormatado,
                     jogador_id: Number(form.jogador_id),
                 }),
             });
@@ -145,17 +156,20 @@ export default function CadastroHistoricoLesoes() {
                 <ul className="space-y-2 text-left max-h-72 overflow-y-auto">
                     {lesoes.map((l) => (
                         <li key={l.id} className={`p-2 rounded ${isDarkMode ? "bg-teal-600 text-white" : "bg-white text-black border border-gray-300"}`}>
-                            <strong>Jogador:</strong> {l.jogador?.nome ?? "Desconhecido"}<br />
+                            <strong>Jogador:</strong> {l.jogador?.nome ?? "Desconhecido"}
+                            <br />
                             <strong>Tipo:</strong> {l.tipo_lesao}<br />
-                            Início: {dayjs(l.data_inicio).format("DD/MM/YYYY")}<br />
-                            {l.data_retorno ? <>Retorno: {dayjs(l.data_retorno).format("DD/MM/YYYY")}<br /></> : ""}
+                            Início: {dayjs(l.data_inicio).format("DD/MM/YYYY")}
+                            <br />
+                            {l.data_retorno ? <>Retorno: {dayjs(l.data_retorno).format("DD/MM/YYYY")}
+                                <br /></> : <>{"Data de retorno indefinida"} <br /></>}
                             {l.descricao && <>Descrição: {l.descricao}</>}
                         </li>
                     ))}
                 </ul>
 
-                <BotaoTema />
             </motion.div>
+            <BotaoTema />
         </main>
     );
 }
