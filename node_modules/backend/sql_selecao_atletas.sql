@@ -239,7 +239,7 @@ SELECT * FROM historico_clubes;
 -- DELETE FROM historico_clubes;
 
 CREATE TABLE historico_clubes (
-    id INT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     jogador_id INT NOT NULL,
     clube_id INT NOT NULL,
     data_entrada DATE,
@@ -258,7 +258,7 @@ SELECT * FROM historico_lesoes;
 -- DELETE FROM historico_lesoes;
 
 CREATE TABLE historico_lesoes (
-    id INT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     jogador_id INT NOT NULL,
     tipo_lesao VARCHAR(255) NOT NULL,
     data_inicio DATE NOT NULL,

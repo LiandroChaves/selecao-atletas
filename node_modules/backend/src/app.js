@@ -15,6 +15,8 @@ import uploadRouter from './routes/upload.js';
 import estatisticaGeralRoutes from "./routes/estatisticasGerais.js";
 import partidasRoutes from "./routes/partidas.js";
 import estatisticasPartidasRoutes from "./routes/estatisticasPartidas.js";
+import historicoClubesRoutes from "./routes/historicoClubes.js";
+
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -49,6 +51,7 @@ app.use("/api/jogadores", jogadoresRoutes); // Rota de jogadores
 app.use("/api/estatisticas", estatisticaGeralRoutes); // Rota de estatísticas gerais
 app.use("/api/partidas", partidasRoutes); // Rota de partidas
 app.use("/api/estatisticas-partidas", estatisticasPartidasRoutes); // Rota de estatísticas de partidas
+app.use("/api/historico-clubes", historicoClubesRoutes); // Rota de histórico de clubes
 
 app.use('/api/uploads', express.static(uploadsPath)); // Serve arquivos estáticos da pasta uploads
 app.use("/api/uploads", uploadRouter); // Rota para upload de arquivos
