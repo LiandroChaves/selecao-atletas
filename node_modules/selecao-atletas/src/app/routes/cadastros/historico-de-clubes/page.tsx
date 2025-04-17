@@ -57,8 +57,8 @@ export default function CadastroHistoricoClubes() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!form.jogador_id || !form.clube_id || !form.data_entrada) {
-            setErro("⚠️ Jogador, clube e data de entrada são obrigatórios.");
+        if (!form.jogador_id || !form.clube_id || !form.data_entrada || !form.data_saida) {
+            setErro("⚠️ Todos os campos são obrigatórios.");
             setTimeout(() => setErro(""), 3000);
             return;
         }
