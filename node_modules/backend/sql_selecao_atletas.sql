@@ -7,8 +7,9 @@ CREATE TYPE pe_dominante_enum AS ENUM ('D', 'E', 'A');
 -- ========================
 
 -- USUÁRIOS
-SELECT * FROM usuarios;
--- DELETE FROM usuarios;
+
+-- SELECT * FROM usuarios;
+-- -- DELETE FROM usuarios;
 
 CREATE TABLE usuarios (
     id SERIAL PRIMARY KEY,
@@ -19,9 +20,10 @@ CREATE TABLE usuarios (
 );
 
 -- PAÍSES
-SELECT * FROM paises;
--- DELETE FROM paises;
-ALTER SEQUENCE paises_id_seq RESTART WITH 1;
+
+-- SELECT * FROM paises;
+-- -- DELETE FROM paises;
+-- ALTER SEQUENCE paises_id_seq RESTART WITH 1;
 
 CREATE TABLE paises (
     id SERIAL PRIMARY KEY,
@@ -31,9 +33,10 @@ CREATE TABLE paises (
 );
 
 -- ESTADOS
-SELECT * FROM estados;
--- DELETE FROM estados;
-ALTER SEQUENCE estados_id_seq RESTART WITH 1;
+
+-- SELECT * FROM estados;
+-- -- DELETE FROM estados;
+-- ALTER SEQUENCE estados_id_seq RESTART WITH 1;
 
 CREATE TABLE estados (
     id SERIAL PRIMARY KEY,
@@ -46,9 +49,10 @@ CREATE TABLE estados (
 );
 
 -- CIDADES
-SELECT * FROM cidades;
--- DELETE FROM cidades;
-ALTER SEQUENCE cidades_id_seq RESTART WITH 1;
+
+-- SELECT * FROM cidades;
+-- -- DELETE FROM cidades;
+-- ALTER SEQUENCE cidades_id_seq RESTART WITH 1;
 
 CREATE TABLE cidades (
     id SERIAL PRIMARY KEY,
@@ -62,9 +66,10 @@ CREATE TABLE cidades (
 );
 
 -- NÍVEIS DE AMBIDESTRIA
-SELECT * FROM niveis_ambidestria;
--- DELETE FROM niveis_ambidestria;
-ALTER SEQUENCE niveis_ambidestria_id_seq RESTART WITH 1;
+
+-- SELECT * FROM niveis_ambidestria;
+-- -- DELETE FROM niveis_ambidestria;
+-- ALTER SEQUENCE niveis_ambidestria_id_seq RESTART WITH 1;
 
 CREATE TABLE niveis_ambidestria (
     id SERIAL PRIMARY KEY,
@@ -74,9 +79,10 @@ CREATE TABLE niveis_ambidestria (
 );
 
 -- POSIÇÕES
-SELECT * FROM posicoes;
--- DELETE FROM posicoes;
-ALTER SEQUENCE posicoes_id_seq RESTART WITH 1;
+
+-- SELECT * FROM posicoes;
+-- -- DELETE FROM posicoes;
+-- ALTER SEQUENCE posicoes_id_seq RESTART WITH 1;
 
 CREATE TABLE posicoes (
     id SERIAL PRIMARY KEY,
@@ -89,9 +95,9 @@ CREATE TABLE posicoes (
 -- 2. Clubes
 -- ========================
 
-SELECT * FROM clubes;
--- DELETE FROM clubes;
-ALTER SEQUENCE clubes_id_seq RESTART WITH 1;
+-- SELECT * FROM clubes;
+-- -- DELETE FROM clubes;
+-- ALTER SEQUENCE clubes_id_seq RESTART WITH 1;
 
 CREATE TABLE clubes (
     id SERIAL PRIMARY KEY,
@@ -110,9 +116,9 @@ CREATE TABLE clubes (
 -- 3. Jogadores
 -- ========================
 
-SELECT * FROM jogadores;
--- DELETE FROM jogadores;
-ALTER SEQUENCE jogadores_id_seq RESTART WITH 1;
+-- SELECT * FROM jogadores;
+-- -- DELETE FROM jogadores;
+-- ALTER SEQUENCE jogadores_id_seq RESTART WITH 1;
 
 CREATE TABLE jogadores (
     id SERIAL PRIMARY KEY,
@@ -147,9 +153,9 @@ CREATE TABLE jogadores (
 -- 3.1 Características principais
 -- ========================
 
-SELECT * FROM caracteristicas_principais;
--- DELETE FROM caracteristicas_principais;
-ALTER SEQUENCE caracteristicas_principais_id_seq RESTART WITH 1;
+-- SELECT * FROM caracteristicas_principais;
+-- -- DELETE FROM caracteristicas_principais;
+-- ALTER SEQUENCE caracteristicas_principais_id_seq RESTART WITH 1;
 
 CREATE TABLE caracteristicas_principais (
     id SERIAL PRIMARY KEY,
@@ -164,8 +170,8 @@ CREATE TABLE caracteristicas_principais (
 -- 4. Estatísticas Gerais
 -- ========================
 
-SELECT * FROM estatisticas_gerais;
--- DELETE FROM estatisticas_gerais;
+-- SELECT * FROM estatisticas_gerais;
+-- -- DELETE FROM estatisticas_gerais;
 
 CREATE TABLE estatisticas_gerais (
     jogador_id INT PRIMARY KEY,
@@ -185,9 +191,9 @@ CREATE TABLE estatisticas_gerais (
 -- 5. Partidas
 -- ========================
 
-SELECT * FROM partidas;
--- DELETE FROM partidas;
-ALTER SEQUENCE partidas_id_seq RESTART WITH 1;
+-- SELECT * FROM partidas;
+-- -- DELETE FROM partidas;
+-- ALTER SEQUENCE partidas_id_seq RESTART WITH 1;
 
 CREATE TABLE partidas (
     id SERIAL PRIMARY KEY,
@@ -208,8 +214,8 @@ CREATE TABLE partidas (
 -- Estatísticas por Partida
 -- ========================
 
-SELECT * FROM estatisticas_partidas;
--- DELETE FROM estatisticas_partidas;
+-- SELECT * FROM estatisticas_partidas;
+-- -- DELETE FROM estatisticas_partidas;
 
 CREATE TABLE estatisticas_partidas (
     id SERIAL PRIMARY KEY,
@@ -235,8 +241,8 @@ CREATE TABLE estatisticas_partidas (
 -- 6. Histórico de Clubes
 -- ========================
 
-SELECT * FROM historico_clubes;
--- DELETE FROM historico_clubes;
+-- SELECT * FROM historico_clubes;
+-- -- DELETE FROM historico_clubes;
 
 CREATE TABLE historico_clubes (
     id SERIAL PRIMARY KEY,
@@ -254,8 +260,8 @@ CREATE TABLE historico_clubes (
 -- Histórico de Lesões
 -- ========================
 
-SELECT * FROM historico_lesoes;
--- DELETE FROM historico_lesoes;
+-- SELECT * FROM historico_lesoes;
+-- -- DELETE FROM historico_lesoes;
 
 CREATE TABLE historico_lesoes (
     id SERIAL PRIMARY KEY,
@@ -273,19 +279,19 @@ CREATE TABLE historico_lesoes (
 -- 7. Títulos
 -- ========================
 
-SELECT * FROM titulos;
--- DELETE FROM titulos;
+-- SELECT * FROM titulos;
+-- -- DELETE FROM titulos;
 
 CREATE TABLE titulos (
-    id INT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     tipo tipo_titulo NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
-SELECT * FROM jogadores_titulos;
--- DELETE FROM jogadores_titulos;
+-- SELECT * FROM jogadores_titulos;
+-- -- DELETE FROM jogadores_titulos;
 
 CREATE TABLE jogadores_titulos (
     jogador_id INT NOT NULL,
