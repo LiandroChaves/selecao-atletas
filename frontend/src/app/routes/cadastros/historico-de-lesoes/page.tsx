@@ -93,7 +93,7 @@ export default function CadastroHistoricoLesoes() {
                     data_retorno: "",
                     descricao: "",
                 });
-                fetchLesoes();
+                await fetchLesoes();
             } else {
                 setErro(data.error || "Erro ao cadastrar lesão.");
                 setTimeout(() => setErro(""), 3000);

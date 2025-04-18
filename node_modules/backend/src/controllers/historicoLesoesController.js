@@ -7,7 +7,7 @@ export const pegarLesoes = async (req, res) => {
             include: [
                 { model: Jogador, as: "jogador", attributes: ["id", "nome", "apelido"] },
             ],
-            order: [["data_inicio", "DESC"]],
+            order: [["data_inicio", "ASC"]],
             raw: true,
             nest: true,
         });

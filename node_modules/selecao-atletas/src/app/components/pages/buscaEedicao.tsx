@@ -6,8 +6,7 @@ import { motion } from "framer-motion";
 import { FaArrowLeft } from "react-icons/fa";
 import { useTheme } from "../../../utils/context/ThemeContext";
 import { useLoading } from "../../../utils/context/LoadingProvider";
-import Modal from "../modals/modalPesquisaeEdicao"; // <-- novo componente Modal
-
+import Modal from "../modals/modalPesquisaeEdicao";
 import {
     FaFlag, FaStarHalfAlt, FaUserTag, FaUsers,
     FaFutbol, FaChartLine, FaHistory,
@@ -15,6 +14,7 @@ import {
     FaEdit
 } from "react-icons/fa";
 import BotaoTema from "../../../utils/utilities/changeTheme";
+import ModalEdicao from "../modals/modalEdicao";
 
 const cadastros = [
     { label: "Países", icon: <FaFlag />, endpoint: "paises/pegarPaises" },
@@ -41,6 +41,9 @@ export default function BuscaEedicao() {
     const [searchTerm, setSearchTerm] = useState("");
     const [modalOpen, setModalOpen] = useState(false);
     const [results, setResults] = useState<any[]>([]);
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [editItem, setEditItem] = useState<any | null>(null);
+
 
     const handleSelect = (item: { label: string; endpoint: string }) => {
         setSelected(prev => (prev?.label === item.label ? null : item));
@@ -148,7 +151,10 @@ export default function BuscaEedicao() {
                                     {item.nome || item.nome_completo || item.descricao || JSON.stringify(item)}
                                 </span>
                                 <button
-                                    onClick={() => console.log("Editar", item)} // aqui você define o que fazer
+                                    onClick={() => {
+                                        setEditItem(item);
+                                        setEditModalOpen(true);
+                                    }}
                                     className={`p-2 rounded-md hover:scale-105 transition ${isDarkMode ? "text-teal-900 hover:bg-teal-100" : "text-gray-800 hover:bg-gray-200"}`}
                                     title="Editar"
                                 >
@@ -161,6 +167,13 @@ export default function BuscaEedicao() {
                     )}
                 </div>
             </Modal>
+            <ModalEdicao
+                isOpen={editModalOpen}
+                onClose={() => setEditModalOpen(false)}
+                item={editItem}
+                endpoint={selected?.endpoint || ""}
+                onSuccess={handleSearch} // Atualiza os dados após edição
+            />
         </main>
 
     );

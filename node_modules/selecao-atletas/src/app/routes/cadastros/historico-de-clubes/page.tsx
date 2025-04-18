@@ -157,7 +157,7 @@ export default function CadastroHistoricoClubes() {
                         />
                     </div>
                     <div className="flex flex-col gap-1">
-                        <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Data de saída do clube</label>
+                        <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Data de saída do clube (opcional)</label>
                         <input
                             type="date"
                             name="data_saida"

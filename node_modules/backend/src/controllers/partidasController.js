@@ -11,7 +11,7 @@ export const pegarPartidas = async (req, res) => {
                 { model: Clubes, as: "clubeCasa", attributes: ["nome"] },
                 { model: Clubes, as: "clubeFora", attributes: ["nome"] }
             ],
-            order: [["data", "DESC"]],
+            order: [["data", "ASC"]],
             raw: true,
             nest: true,
         });
