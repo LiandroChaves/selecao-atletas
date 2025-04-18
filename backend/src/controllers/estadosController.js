@@ -118,3 +118,16 @@ export const editarEstado = async (req, res) => {
         res.status(500).json({ error: "Erro interno ao editar estado." });
     }
 };
+
+export const pegarEstadoPorId = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const estado = await Estados.findByPk(id);
+        if (!estado) return res.status(404).json({ error: "Estado não encontrado" });
+        res.json(estado);
+    } catch (error) {
+        console.error("Erro ao buscar estado por ID:", error);
+        res.status(500).json({ error: "Erro interno" });
+    }
+};

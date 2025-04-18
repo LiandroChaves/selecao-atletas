@@ -55,6 +55,7 @@ export default function BuscaEedicao() {
         try {
             setIsLoading(true);
             const res = await fetch(`http://localhost:3001/api/${selected.endpoint}?search=${searchTerm}`);
+            console.log("Url: ", res);
             const data = await res.json();
             setResults(data);
             setModalOpen(true);

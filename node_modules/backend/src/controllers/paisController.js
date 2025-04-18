@@ -74,3 +74,16 @@ export const editarPais = async (req, res) => {
         res.status(500).json({ error: "Erro ao editar país" });
     }
 };
+
+export const pegarNome = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const pais = await Pais.findByPk(id);
+        if (!pais) return res.status(404).json({ error: "País não encontrado" });
+        res.json(pais);
+    } catch (error) {
+        console.error("Erro ao buscar país por ID:", error);
+        res.status(500).json({ error: "Erro interno" });
+    }
+};

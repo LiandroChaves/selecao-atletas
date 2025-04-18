@@ -14,6 +14,27 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
     const { isDarkMode } = useTheme();
     const [valores, setValores] = useState<{ [key: string]: any }>({});
     const [mensagemSucesso, setMensagemSucesso] = useState("");
+    const [nomesRelacionados, setNomesRelacionados] = useState<{ [chave: string]: string }>({});
+
+    const getEndpoint = (chave: string) => {
+        const mapa = {
+            pais_id: "paises",
+            estado_id: "estados",
+            cidade_id: "cidades",
+            ambidestria_id: "ambidestria",
+            posicao_id: "posicoes",
+            clube_id: "clubes",
+            jogador_id: "jogadores",
+            estatistica_id: "estatisticas",
+            partida_id: "partidas",
+            estatistica_partida_id: "estatisticas-partidas",
+            historico_clube_id: "historico-clubes",
+            historico_lesao_id: "historico-lesoes",
+            titulo_id: "titulos",
+            jogador_titulo_id: "jogadores-titulos"
+        };
+        return mapa[chave as keyof typeof mapa] || chave.replace("_id", "") + "s";
+    };
 
     useEffect(() => {
         if (item) {
@@ -26,6 +47,63 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
             setValores(valoresIniciais);
         }
     }, [item]);
+
+    useEffect(() => {
+        const carregarNomesRelacionados = async () => {
+            const novosNomes: { [chave: string]: string } = {};
+
+            for (const [chave, valor] of Object.entries(valores)) {
+                if (chave.endsWith("_id") && typeof valor === "number") {
+                    const entidade = getEndpoint(chave);
+                    const url = `http://localhost:3001/api/${entidade}/pegar${capitalize(getSingular(entidade))}/${valor}`;
+
+                    console.log("URL da requisição:", url); // Adicione esse log para ver a URL gerada
+
+                    try {
+                        const res = await fetch(url);
+                        const dados = await res.json();
+
+                        // A lógica de atribuição de nomes relacionada pode ser mantida como está
+                        if (Array.isArray(dados) && dados.length > 0) {
+                            novosNomes[chave] = dados[0].nome || `ID ${valor}`;
+                        } else if (dados.nome) {
+                            novosNomes[chave] = dados.nome;
+                        } else if (dados.descricao) {
+                            novosNomes[chave] = dados.descricao;
+                        } else if (dados.titulo) {
+                            novosNomes[chave] = dados.titulo;
+                        }
+                        else if (dados.jogador) {
+                            novosNomes[chave] = dados.jogador;
+                        } else if (dados.clube) {
+                            novosNomes[chave] = dados.clube;
+                        } else if (dados.posicao) {
+                            novosNomes[chave] = dados.posicao;
+                        } else if (dados.ambidestria) {
+                            novosNomes[chave] = dados.ambidestria;
+                        } else if (dados.estado) {
+                            novosNomes[chave] = dados.estado;
+                        } else if (dados.cidade) {
+                            novosNomes[chave] = dados.cidade;
+                        } else {
+                            novosNomes[chave] = `Não encontrado para ID ${valor}`;
+                        }
+
+                        console.log(`Nome relacionado para ${chave}:`, novosNomes[chave]);
+                    } catch (error) {
+                        console.error("Erro ao buscar nome relacionado:", error);
+                    }
+                }
+            }
+
+            setNomesRelacionados(novosNomes);
+        };
+
+        if (Object.keys(valores).length > 0) {
+            carregarNomesRelacionados();
+        }
+    }, [valores]);
+
 
     const getSingular = (endpoint: string) => {
         const mapa = {
@@ -137,7 +215,7 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                 <div className="text-inherit overflow-y-auto max-h-[60vh] pr-2">
                     <h2 className="text-2xl font-bold mb-4 text-center">Editar Registro</h2>
                     {Object.entries(valores)
-                        .filter(([chave]) => !["createdAt", "updatedAt", "deletedAt", "created_at", "updated_at", "deleted_at"].includes(chave)) // 👈 Oculta os timestamps
+                        .filter(([chave]) => !["createdAt", "updatedAt", "deletedAt", "created_at", "updated_at", "deleted_at"].includes(chave))
                         .map(([chave, valor]) => {
                             const tipo = detectarTipoInput(chave, valor);
                             const isReadOnly = chave === "id";
@@ -169,6 +247,9 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                                             readOnly={isReadOnly}
                                             className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 text-gray-500" : "bg-white text-gray-700"}`}
                                         />
+                                    )}
+                                    {nomesRelacionados[chave] && (
+                                        <p className="text-xs text-gray-300 mt-1">Relacionado: {nomesRelacionados[chave]}</p>
                                     )}
                                 </div>
                             );
