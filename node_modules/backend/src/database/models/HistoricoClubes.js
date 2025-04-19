@@ -37,7 +37,7 @@ const HistoricoClubes = sequelize.define("historico_clubes", {
     timestamps: false,
 });
 
-HistoricoClubes.belongsTo(Jogador, { foreignKey: "jogador_id", as: "jogador" });
+HistoricoClubes.belongsTo(Jogador, { foreignKey: "jogador_id", as: "jogador", onDelete: "CASCADE" });
 HistoricoClubes.belongsTo(Clubes, { foreignKey: "clube_id", as: "clube" });
 
 

@@ -34,7 +34,7 @@ const JogadoresTitulos = sequelize.define("JogadoresTitulos", {
     timestamps: false,
 });
 
-JogadoresTitulos.belongsTo(Jogador, { foreignKey: "jogador_id", as: "jogador" });
+JogadoresTitulos.belongsTo(Jogador, { foreignKey: "jogador_id", as: "jogador", onDelete: "CASCADE" });
 JogadoresTitulos.belongsTo(Titulos, { foreignKey: "titulo_id", as: "titulo" });
 JogadoresTitulos.belongsTo(Clubes, { foreignKey: "clube_id", as: "clube" });
 

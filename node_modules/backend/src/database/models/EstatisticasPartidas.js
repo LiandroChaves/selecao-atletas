@@ -73,7 +73,7 @@ const EstatisticasPartidas = sequelize.define("estatisticas_partidas", {
 });
 
 // Associações
-EstatisticasPartidas.belongsTo(Jogador, { foreignKey: "jogador_id", as: "jogador" });
+EstatisticasPartidas.belongsTo(Jogador, { foreignKey: "jogador_id", as: "jogador", onDelete: "CASCADE" });
 EstatisticasPartidas.belongsTo(Partidas, { foreignKey: "partida_id", as: "partida" });
 
 export default EstatisticasPartidas;

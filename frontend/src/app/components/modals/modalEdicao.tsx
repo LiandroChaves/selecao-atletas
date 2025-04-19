@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTheme } from "../../../utils/context/ThemeContext";
+import { useRef } from 'react';
 
 interface ModalEdicaoProps {
     isOpen: boolean;
@@ -15,6 +16,7 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
     const [valores, setValores] = useState<{ [key: string]: any }>({});
     const [mensagemSucesso, setMensagemSucesso] = useState("");
     const [nomesRelacionados, setNomesRelacionados] = useState<{ [chave: string]: string }>({});
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const getEndpoint = (chave: string) => {
         const mapa = {
@@ -66,27 +68,47 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                         // A lógica de atribuição de nomes relacionada pode ser mantida como está
                         if (Array.isArray(dados) && dados.length > 0) {
                             novosNomes[chave] = dados[0].nome || `ID ${valor}`;
-                        } else if (dados.nome) {
+                            console.log(`Nome relacionado para ${chave}:`, novosNomes[chave]);
+                        }
+                        else if (dados.nome) {
                             novosNomes[chave] = dados.nome;
-                        } else if (dados.descricao) {
+                            console.log(`Nome relacionado para ${chave}:`, novosNomes[chave]);
+                        }
+                        else if (dados.descricao) {
                             novosNomes[chave] = dados.descricao;
-                        } else if (dados.titulo) {
+                            console.log(`Nome relacionado para ${chave}:`, novosNomes[chave]);
+                        }
+                        else if (dados.titulo) {
                             novosNomes[chave] = dados.titulo;
+                            console.log(`Nome relacionado para ${chave}:`, novosNomes[chave]);
                         }
                         else if (dados.jogador) {
                             novosNomes[chave] = dados.jogador;
-                        } else if (dados.clube) {
+                            console.log(`Nome relacionado para ${chave}:`, novosNomes[chave]);
+                        }
+                        else if (dados.clube) {
                             novosNomes[chave] = dados.clube;
-                        } else if (dados.posicao) {
+                            console.log(`Nome relacionado para ${chave}:`, novosNomes[chave]);
+                        }
+                        else if (dados.posicao) {
                             novosNomes[chave] = dados.posicao;
-                        } else if (dados.ambidestria) {
+                            console.log(`Nome relacionado para ${chave}:`, novosNomes[chave]);
+                        }
+                        else if (dados.ambidestria) {
                             novosNomes[chave] = dados.ambidestria;
-                        } else if (dados.estado) {
+                            console.log(`Nome relacionado para ${chave}:`, novosNomes[chave]);
+                        }
+                        else if (dados.estado) {
                             novosNomes[chave] = dados.estado;
-                        } else if (dados.cidade) {
+                            console.log(`Nome relacionado para ${chave}:`, novosNomes[chave]);
+                        }
+                        else if (dados.cidade) {
                             novosNomes[chave] = dados.cidade;
-                        } else {
+                            console.log(`Nome relacionado para ${chave}:`, novosNomes[chave]);
+                        }
+                        else {
                             novosNomes[chave] = `Não encontrado para ID ${valor}`;
+                            console.log(`Nome relacionado para ${chave}:`, novosNomes[chave]);
                         }
 
                         console.log(`Nome relacionado para ${chave}:`, novosNomes[chave]);
@@ -136,10 +158,15 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
     const detectarTipoInput = (chave: string, valor: any) => {
         if (chave.toLowerCase().includes("imagem")) return "file";
         if (typeof valor === "number") return "number";
-        if (typeof valor === "string" && /^\d{4}-\d{2}-\d{2}/.test(valor)) return "date";
+        if (typeof valor === "string") {
+            if (/^\d{4}-\d{2}-\d{2}$/.test(valor) || /^\d{2}\/\d{2}\/\d{4}$/.test(valor)) {
+                return "date";
+            }
+        }
         if (chave.toLowerCase().includes("descricao") || chave.toLowerCase().includes("mensagem")) return "textarea";
         return "text";
     };
+
 
     const nomeFormatado = (str: string) =>
         str
@@ -189,6 +216,25 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
 
     if (!isOpen || !item) return null;
 
+    const formatarData = (valor: string) => {
+        let apenasNumeros = valor.replace(/\D/g, '');
+        if (apenasNumeros.length > 8) apenasNumeros = apenasNumeros.slice(0, 8);
+
+        const dia = apenasNumeros.slice(0, 2);
+        const mes = apenasNumeros.slice(2, 4);
+        const ano = apenasNumeros.slice(4, 8);
+
+        let resultado = dia;
+        if (mes) resultado += `-${mes}`;
+        if (ano) resultado += `-${ano}`;
+
+        alert(`Data formatada: ${resultado}`);
+        console.log("Data formatada:", resultado);
+
+        return resultado;
+    };
+
+
     return (
         <div
             className={`fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 ${isDarkMode
@@ -228,6 +274,21 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                                             value={valor}
                                             onChange={(e) => handleChange(chave, e.target.value)}
                                             readOnly={isReadOnly}
+                                            className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 text-gray-500" : "bg-white text-gray-700"}`}
+                                        />
+                                    ) : tipo === "date" ? (
+                                        <input
+                                            ref={inputRef}
+                                            type="text"
+                                            value={valores[chave] || ""}
+                                            onFocus={() => {
+                                                handleChange(chave, "");
+                                                setTimeout(() => {
+                                                    inputRef.current?.setSelectionRange(0, 0);
+                                                }, 0);
+                                            }}
+                                            onChange={(e) => handleChange(chave, formatarData(e.target.value))}
+                                            placeholder="dd-mm-yyyy"
                                             className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 text-gray-500" : "bg-white text-gray-700"}`}
                                         />
                                     ) : tipo === "file" ? (

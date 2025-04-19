@@ -56,6 +56,9 @@ app.use("/api/historico-clubes", historicoClubesRoutes); // Rota de histórico d
 app.use("/api/historico-lesoes", historicoLesoesRoutes); // Rota de histórico de lesões
 app.use("/api/titulos", titulosRoutes); // Rota de títulos
 app.use("/api/jogadores-titulos", jogadoresTitulosRoute); // Rota de jogadores e títulos
+app.use("/api/posicao_secundarias", posicoesRoutes);
+app.use("/api/clube_atuals", clubesRoutes); // Rota de clubes atuais
+app.use("/api/nivel_ambidestrias", ambidestriaRoutes); // Rota de níveis de ambidestria
 
 app.use('/api/uploads', express.static(uploadsPath)); // Serve arquivos estáticos da pasta uploads
 app.use("/api/uploads", uploadRouter); // Rota para upload de arquivos

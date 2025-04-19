@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post("/inserirCidade", inserirCidades);
 router.get("/pegarCidades", pegarCidades);
-router.get("/pegarCidadePorId/:id", pegarCidadePorId);
+router.get("/pegarCidade/:id", pegarCidadePorId);
 router.put("/editarCidade/:id", editarCidades);
 router.delete("/deletarCidade/:id", deletarCidades);
 

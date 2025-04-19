@@ -5,7 +5,7 @@ import Cidade from "../database/models/Cidades.js";
 import Posicao from "../database/models/Posicoes.js";
 import Clubes from "../database/models/Clubes.js";
 import NivelAmbidestria from "../database/models/Ambidestria.js";
-
+import { Op } from "sequelize";
 
 export const criarJogador = async (req, res) => {
     try {
@@ -28,10 +28,26 @@ export const criarJogador = async (req, res) => {
     }
 };
 
-
-
 export const listarJogadores = async (req, res) => {
     try {
+        const { search } = req.query;
+
+        let where = {};
+
+        if (search) {
+            const conditions = [
+                { nome: { [Op.iLike]: `%${search}%` } },
+                { apelido: { [Op.iLike]: `%${search}%` } },
+            ];
+
+            // Só adiciona a busca por ID se for um número
+            if (!isNaN(search)) {
+                conditions.push({ id: Number(search) });
+            }
+
+            where = { [Op.or]: conditions };
+        }
+
         const jogadores = await Jogador.findAll({
             attributes: [
                 "id",
@@ -50,7 +66,7 @@ export const listarJogadores = async (req, res) => {
                 "clube_atual_id",
                 "contrato_inicio",
                 "contrato_fim",
-                "foto", // 👈 garante que venha
+                "foto",
             ],
             include: [
                 { model: Paises, as: "pais" },
@@ -59,13 +75,52 @@ export const listarJogadores = async (req, res) => {
                 { model: Posicao, as: "posicao" },
                 { model: Clubes, as: "clube" },
                 { model: NivelAmbidestria, as: "nivel_ambidestria" },
-                { model: Posicao, as: 'posicao_secundaria' },
+                { model: Posicao, as: "posicao_secundaria" },
             ],
+            where,
             order: [["id", "ASC"]],
         });
+
         res.status(200).json(jogadores);
     } catch (error) {
         console.error("Erro ao listar jogadores:", error);
         res.status(500).json({ message: "Erro ao buscar jogadores" });
+    }
+};
+
+export const editarJogador = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const jogador = await Jogador.findByPk(id);
+
+        if (!jogador) {
+            return res.status(404).json({ message: "Jogador não encontrado" });
+        }
+
+        // Atualiza os campos do jogador
+        await jogador.update(req.body);
+
+        return res.status(200).json(jogador);
+    } catch (error) {
+        console.error("Erro ao editar jogador:", error);
+        return res.status(500).json({ erro: "Erro ao editar jogador." });
+    }
+}
+
+export const deletarJogador = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const jogador = await Jogador.findByPk(id);
+
+        if (!jogador) {
+            return res.status(404).json({ message: "Jogador não encontrado" });
+        }
+
+        await jogador.destroy();
+
+        return res.status(200).json({ message: "Jogador deletado com sucesso." });
+    } catch (error) {
+        console.error("Erro ao deletar jogador:", error);
+        return res.status(500).json({ erro: "Erro ao deletar jogador." });
     }
 };

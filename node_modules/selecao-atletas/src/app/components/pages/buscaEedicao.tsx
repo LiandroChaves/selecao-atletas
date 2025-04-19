@@ -164,7 +164,7 @@ export default function BuscaEedicao() {
                                     </button>
                                     <button
                                         onClick={async () => {
-                                            const confirm = window.confirm(`Tem certeza que deseja deletar o item ${item.nome || item.nome_completo || item.descricao}?`);
+                                            const confirm = window.confirm(`Tem certeza que deseja deletar o item: ${item.nome || item.nome_completo || item.descricao}?`);
                                             const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
                                             if (confirm && selected) {
                                                 try {
