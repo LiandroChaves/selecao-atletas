@@ -11,7 +11,7 @@ import {
     FaFlag, FaStarHalfAlt, FaUserTag, FaUsers,
     FaFutbol, FaChartLine, FaHistory,
     FaBriefcaseMedical, FaTrophy, FaCity, FaMapMarkedAlt,
-    FaEdit
+    FaEdit, FaTrash
 } from "react-icons/fa";
 import BotaoTema from "../../../utils/utilities/changeTheme";
 import ModalEdicao from "../modals/modalEdicao";
@@ -151,16 +151,63 @@ export default function BuscaEedicao() {
                                 <span>
                                     {item.nome || item.nome_completo || item.descricao || JSON.stringify(item)}
                                 </span>
-                                <button
-                                    onClick={() => {
-                                        setEditItem(item);
-                                        setEditModalOpen(true);
-                                    }}
-                                    className={`p-2 rounded-md hover:scale-105 transition ${isDarkMode ? "text-teal-900 hover:bg-teal-100" : "text-gray-800 hover:bg-gray-200"}`}
-                                    title="Editar"
-                                >
-                                    <FaEdit />
-                                </button>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => {
+                                            setEditItem(item);
+                                            setEditModalOpen(true);
+                                        }}
+                                        className={`p-2 rounded-md hover:scale-105 transition ${isDarkMode ? "text-teal-900 hover:bg-teal-100" : "text-gray-800 hover:bg-gray-200"}`}
+                                        title="Editar"
+                                    >
+                                        <FaEdit />
+                                    </button>
+                                    <button
+                                        onClick={async () => {
+                                            const confirm = window.confirm(`Tem certeza que deseja deletar o item ${item.nome || item.nome_completo || item.descricao}?`);
+                                            const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+                                            if (confirm && selected) {
+                                                try {
+                                                    const endpointMap: Record<string, string> = {
+                                                        "paises/pegarPaises": "paises/deletarPais",
+                                                        "estados/pegarEstados": "estados/deletarEstado",
+                                                        "cidades/pegarCidades": "cidades/deletarCidade",
+                                                        "ambidestria/pegarAmbidestria": "ambidestria/deletarAmbidestria",
+                                                        "posicoes/pegarPosicoes": "posicoes/deletarPosicao",
+                                                        "clubes/pegarClubes": "clubes/deletarClube",
+                                                        "jogadores/pegarJogadores": "jogadores/deletarJogador",
+                                                        "estatisticas/pegarEstatisticasGerais": "estatisticas/deletarEstatisticaGeral",
+                                                        "partidas/pegarPartidas": "partidas/deletarPartida",
+                                                        "estatisticas-partidas/pegarEstatisticasPartida": "estatisticas-partidas/deletarEstatisticaPartida",
+                                                        "historico-clubes/pegarHistoricoClubes": "historico-clubes/deletarHistoricoClube",
+                                                        "historico-lesoes/pegarHistoricoLesoes": "historico-lesoes/deletarHistoricoLesao",
+                                                        "titulos/pegarTitulos": "titulos/deletarTitulo",
+                                                        "jogadores-titulos/pegarJogadoresTitulos": "jogadores-titulos/deletarJogadorTitulo",
+                                                    };
+
+                                                    const deleteEndpoint = endpointMap[selected.endpoint];
+
+                                                    if (!deleteEndpoint) {
+                                                        console.error("Endpoint de deleção não mapeado:", selected.endpoint);
+                                                        return;
+                                                    }
+
+                                                    await fetch(`http://localhost:3001/api/${deleteEndpoint}/${item.id}`, {
+                                                        method: "DELETE",
+                                                    });
+
+                                                    handleSearch(); // Atualiza os resultados após deletar
+                                                } catch (error) {
+                                                    console.error("Erro ao deletar:", error);
+                                                }
+                                            }
+                                        }}
+                                        className={`p-2 rounded-md hover:scale-105 transition ${isDarkMode ? "text-red-300 hover:bg-red-100" : "text-red-700 hover:bg-red-200"}`}
+                                        title="Deletar"
+                                    >
+                                        <FaTrash />
+                                    </button>
+                                </div>
                             </div>
                         ))
                     ) : (

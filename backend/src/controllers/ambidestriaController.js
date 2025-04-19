@@ -87,6 +87,8 @@ export const editarNivel = async (req, res) => {
             return res.status(400).json({ error: "Descrição é obrigatória." });
         }
 
+        // Lista de palavras que geralmente ficam minúsculas no meio da frase
+        const palavrasMinusculas = ["de", "do", "da", "dos", "das", "em", "com", "sem", "e", "a", "o", "as", "os"];
 
         const descricaoFormatada = descricao
             .toLowerCase()
@@ -110,6 +112,7 @@ export const editarNivel = async (req, res) => {
     }
 }
 
+
 export const pegarAmbidestriaPorId = async (req, res) => {
     try {
         const { id } = req.params;
@@ -123,5 +126,23 @@ export const pegarAmbidestriaPorId = async (req, res) => {
     } catch (error) {
         console.error("❌ Erro ao buscar nível:", error);
         res.status(500).json({ error: "Erro ao buscar nível." });
+    }
+}
+
+export const deletarAmbidestria = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!id) return res.status(400).json({ error: "ID do nível é obrigatório." });
+
+        const nivel = await NivelAmbidestria.findByPk(id);
+        if (!nivel) return res.status(404).json({ error: "Nível não encontrado." });
+
+        await nivel.destroy();
+
+        res.json({ mensagem: "Nível deletado com sucesso!" });
+    } catch (error) {
+        console.error("❌ Erro ao deletar nível:", error);
+        res.status(500).json({ error: "Erro ao deletar nível." });
     }
 }

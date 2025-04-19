@@ -131,3 +131,19 @@ export const pegarEstadoPorId = async (req, res) => {
         res.status(500).json({ error: "Erro interno" });
     }
 };
+
+export const deletarEstado = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!id) return res.status(400).json({ error: "ID do estado é obrigatório." });
+
+        const estado = await Estados.findByPk(id);
+        if (!estado) return res.status(404).json({ error: "Estado não encontrado." });
+
+        await estado.destroy();
+        res.status(200).json({ mensagem: "Estado deletado com sucesso!" });
+    } catch (error) {
+        console.error("❌ Erro ao deletar estado:", error);
+        res.status(500).json({ error: "Erro interno ao deletar estado." });
+    }
+};

@@ -117,3 +117,20 @@ export const pegarCidadePorId = async (req, res) => {
         res.status(500).json({ error: "Erro ao buscar cidade." });
     }
 }
+
+export const deletarCidades = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const cidade = await Cidades.findByPk(id);
+
+        if (!cidade) {
+            return res.status(404).json({ error: "Cidade não encontrada." });
+        }
+
+        await cidade.destroy();
+        res.json({ mensagem: "Cidade deletada com sucesso!" });
+    } catch (error) {
+        console.error("❌ Erro ao deletar cidade:", error);
+        res.status(500).json({ error: "Erro ao deletar cidade." });
+    }
+};
