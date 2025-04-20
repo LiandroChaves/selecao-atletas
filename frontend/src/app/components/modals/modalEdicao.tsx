@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTheme } from "../../../utils/context/ThemeContext";
 import { useRef } from 'react';
+// import InputMask from "react-input-mask-next";
+import { InputMask } from '@react-input/mask';
+
 
 interface ModalEdicaoProps {
     isOpen: boolean;
@@ -217,21 +220,29 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
     if (!isOpen || !item) return null;
 
     const formatarData = (valor: string) => {
-        let apenasNumeros = valor.replace(/\D/g, '');
-        if (apenasNumeros.length > 8) apenasNumeros = apenasNumeros.slice(0, 8);
+        let apenasNumeros = valor.replace(/\D/g, '').slice(0, 8);
 
-        const dia = apenasNumeros.slice(0, 2);
-        const mes = apenasNumeros.slice(2, 4);
-        const ano = apenasNumeros.slice(4, 8);
-
-        let resultado = dia;
-        if (mes) resultado += `-${mes}`;
-        if (ano) resultado += `-${ano}`;
-
-        alert(`Data formatada: ${resultado}`);
-        console.log("Data formatada:", resultado);
+        let resultado = '';
+        if (apenasNumeros.length > 0) {
+            resultado = apenasNumeros.slice(0, 2);
+        }
+        if (apenasNumeros.length >= 3) {
+            resultado += '-' + apenasNumeros.slice(2, 4);
+        }
+        if (apenasNumeros.length >= 5) {
+            resultado += '-' + apenasNumeros.slice(4, 8);
+        }
 
         return resultado;
+    };
+
+    const formatarParaInput = (valor: string) => {
+        if (!valor) return "";
+        if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+            const [ano, mes, dia] = valor.split("-");
+            return `${dia}-${mes}-${ano}`;
+        }
+        return valor;
     };
 
 
@@ -277,19 +288,15 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                                             className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 text-gray-500" : "bg-white text-gray-700"}`}
                                         />
                                     ) : tipo === "date" ? (
-                                        <input
-                                            ref={inputRef}
-                                            type="text"
-                                            value={valores[chave] || ""}
-                                            onFocus={() => {
-                                                handleChange(chave, "");
-                                                setTimeout(() => {
-                                                    inputRef.current?.setSelectionRange(0, 0);
-                                                }, 0);
-                                            }}
-                                            onChange={(e) => handleChange(chave, formatarData(e.target.value))}
-                                            placeholder="dd-mm-yyyy"
+                                        <InputMask
+                                            mask="dd-mm-yyyy"
+                                            replacement={{ d: /\d/, m: /\d/, y: /\d/ }}
+                                            showMask
+                                            separate
                                             className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 text-gray-500" : "bg-white text-gray-700"}`}
+                                            value={formatarParaInput(valor)} // 👈 aqui formatado antes de jogar no input
+                                            onChange={(e) => handleChange(chave, e.target.value)}
+                                            disabled={isReadOnly}
                                         />
                                     ) : tipo === "file" ? (
                                         <input
