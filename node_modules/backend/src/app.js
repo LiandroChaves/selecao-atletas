@@ -48,6 +48,7 @@ app.use("/api/posicoes", posicoesRoutes); // Rota de posições
 app.use("/api/login", loginRoutes); // Rota de login
 app.use("/api/usuarios", usuariosRoutes); // Rota de usuários
 app.use("/api/clubes", clubesRoutes); // Rota de clubes
+app.use("/api/clubes", clubesRoutes); // Rota de clubes fora e casa
 app.use("/api/jogadores", jogadoresRoutes); // Rota de jogadores
 app.use("/api/estatisticas", estatisticaGeralRoutes); // Rota de estatísticas gerais
 app.use("/api/partidas", partidasRoutes); // Rota de partidas

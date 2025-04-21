@@ -149,7 +149,7 @@ export default function BuscaEedicao() {
                                 className={`flex items-center justify-between p-2 rounded-md shadow-md ${isDarkMode ? "bg-white text-gray-700" : "bg-white text-gray-700"}`}
                             >
                                 <span>
-                                    {item.nome || item.nome_completo || item.descricao || item.jogador_id || JSON.stringify(item)}
+                                    {item.nome || item.nome_completo || item.descricao || item.jogador_id || item.id || JSON.stringify(item)}
                                 </span>
                                 <div className="flex gap-2">
                                     <button
@@ -165,7 +165,7 @@ export default function BuscaEedicao() {
                                     <button
                                         onClick={async () => {
                                             const confirm = window.confirm(
-                                                `Tem certeza que deseja deletar o item: ${item.nome || item.nome_completo || item.descricao || item.jogador_id}?`
+                                                `Tem certeza que deseja deletar o item: ${item.nome || item.nome_completo || item.descricao || item.jogador_id || item.id}?`
                                             );
                                             const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 

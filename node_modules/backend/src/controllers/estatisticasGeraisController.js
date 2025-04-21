@@ -5,14 +5,14 @@ import { Op } from "sequelize";
 // 🔍 Buscar todas as estatísticas gerais
 export const pegarEstatisticasGerais = async (req, res) => {
     try {
-        const { jogador_id } = req.query;
+        const { jogador_id, search } = req.query;
         let where = {};
 
-        if (jogador_id) {
+        const idBusca = Number(search || jogador_id);
+
+        if (!isNaN(idBusca)) {
             where = {
-                nome: {
-                    [Op.iLike]: `%${jogador_id}%`, // busca insensível a maiúsculas/minúsculas
-                },
+                jogador_id: idBusca
             };
         }
 
@@ -26,7 +26,7 @@ export const pegarEstatisticasGerais = async (req, res) => {
             order: [["jogador_id", "ASC"]],
         });
 
-        res.status(200).json(estatisticas);  // Retorna as estatísticas como um array
+        res.status(200).json(estatisticas);
     } catch (error) {
         console.error("Erro ao buscar estatísticas:", error);
         res.status(500).json({ error: "Erro ao buscar estatísticas" });

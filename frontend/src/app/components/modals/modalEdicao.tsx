@@ -36,7 +36,10 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
             historico_clube_id: "historico-clubes",
             historico_lesao_id: "historico-lesoes",
             titulo_id: "titulos",
-            jogador_titulo_id: "jogadores-titulos"
+            jogador_titulo_id: "jogadores-titulos",
+            clube_casa_id: "clubes",
+            clube_fora_id: "clubes",
+
         };
         return mapa[chave as keyof typeof mapa] || chave.replace("_id", "") + "s";
     };
@@ -106,6 +109,14 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                         else if (dados.cidade) {
                             novosNomes[chave] = dados.cidade;
                             console.log(`Nome relacionado para ${chave}:`, novosNomes[chave]);
+                        }
+                        else if (dados.id) {
+                            novosNomes[chave] = dados.id;
+                            console.log(`Nome relacionado para ${chave}:`, novosNomes[chave])
+                        }
+                        else if (dados.partida && dados.partida.data) {
+                            novosNomes[chave] = dados.partida.data;
+                            console.log(`Data relacionada para ${chave}:`, novosNomes[chave]);
                         }
                         else {
                             novosNomes[chave] = `Não encontrado para ID ${valor}`;
@@ -230,7 +241,9 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
 
             console.log("Dados formatados:", dadosFormatados);
 
-            const id = item.jogador_id ?? item.id;
+            // const id = item.jogador_id ?? item.id;
+            
+            const id = item?.id || Object.entries(item).find(([chave]) => chave.endsWith('_id'))?.[1];
             console.log("ID determinado:", id);
 
             if (!id) {

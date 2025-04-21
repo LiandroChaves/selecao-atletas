@@ -53,6 +53,24 @@ export const pegarClubes = async (_req, res) => {
     }
 };
 
+export const pegarClube = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const clube = await Clubes.findByPk(id, {
+            attributes: ["id", "nome"]
+        });
+
+        if (!clube) {
+            return res.status(404).json({ error: "Clube não encontrado" });
+        }
+
+        res.json(clube);
+    } catch (error) {
+        console.error("Erro ao buscar clube:", error);
+        res.status(500).json({ error: "Erro ao buscar clube", details: error.message });
+    }
+};
+
 export const editarClube = async (req, res) => {
     try {
         const { id } = req.params;
