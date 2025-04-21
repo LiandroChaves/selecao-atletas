@@ -4,7 +4,7 @@ import { useTheme } from "../../../utils/context/ThemeContext";
 import { useRef } from 'react';
 // import InputMask from "react-input-mask-next";
 import { InputMask } from '@react-input/mask';
-
+import { DateInput } from "./input";
 
 interface ModalEdicaoProps {
     isOpen: boolean;
@@ -67,8 +67,6 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                     try {
                         const res = await fetch(url);
                         const dados = await res.json();
-
-                        // A lógica de atribuição de nomes relacionada pode ser mantida como está
                         if (Array.isArray(dados) && dados.length > 0) {
                             novosNomes[chave] = dados[0].nome || `ID ${valor}`;
                             console.log(`Nome relacionado para ${chave}:`, novosNomes[chave]);
@@ -154,19 +152,49 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
 
     const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
-    const handleChange = (chave: string, valor: any) => {
-        setValores(prev => ({ ...prev, [chave]: valor }));
+    const handleChange = async (chave: string, valor: any) => {
+        if (valor instanceof File) {
+            try {
+                const formData = new FormData();
+                formData.append("foto", valor);
+
+                const uploadRes = await fetch("http://localhost:3001/api/uploads/upload-foto", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const uploadData = await uploadRes.json();
+
+                if (!uploadData.ok || !uploadData.path) {
+                    console.error("Erro ao fazer upload da foto");
+                    return;
+                }
+
+                const novoCaminho = uploadData.path; // exemplo: jogador_7/foto.jpg
+
+                setValores((prev) => ({
+                    ...prev,
+                    [chave]: novoCaminho,
+                }));
+            } catch (error) {
+                console.error("Erro ao fazer upload:", error);
+            }
+        } else {
+            setValores((prev) => ({
+                ...prev,
+                [chave]: valor,
+            }));
+        }
     };
+
 
     const detectarTipoInput = (chave: string, valor: any) => {
         if (chave.toLowerCase().includes("imagem")) return "file";
+        if (chave.toLowerCase().includes("foto")) return "file";
         if (typeof valor === "number") return "number";
-        if (typeof valor === "string") {
-            if (/^\d{4}-\d{2}-\d{2}$/.test(valor) || /^\d{2}\/\d{2}\/\d{4}$/.test(valor)) {
-                return "date";
-            }
-        }
         if (chave.toLowerCase().includes("descricao") || chave.toLowerCase().includes("mensagem")) return "textarea";
+        if (chave.toLowerCase().includes("data") || chave.toLowerCase().includes("date")) return "date";
+        if (chave.toLowerCase().includes("contrato") || chave.toLowerCase().includes("contrato")) return "date";
         return "text";
     };
 
@@ -219,33 +247,6 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
 
     if (!isOpen || !item) return null;
 
-    const formatarData = (valor: string) => {
-        let apenasNumeros = valor.replace(/\D/g, '').slice(0, 8);
-
-        let resultado = '';
-        if (apenasNumeros.length > 0) {
-            resultado = apenasNumeros.slice(0, 2);
-        }
-        if (apenasNumeros.length >= 3) {
-            resultado += '-' + apenasNumeros.slice(2, 4);
-        }
-        if (apenasNumeros.length >= 5) {
-            resultado += '-' + apenasNumeros.slice(4, 8);
-        }
-
-        return resultado;
-    };
-
-    const formatarParaInput = (valor: string) => {
-        if (!valor) return "";
-        if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
-            const [ano, mes, dia] = valor.split("-");
-            return `${dia}-${mes}-${ano}`;
-        }
-        return valor;
-    };
-
-
     return (
         <div
             className={`fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 ${isDarkMode
@@ -282,40 +283,46 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                                     <label className="block text-sm mb-1 font-medium">{chave}</label>
                                     {tipo === "textarea" ? (
                                         <textarea
-                                            value={valor}
+                                            value={valor ?? ""}
                                             onChange={(e) => handleChange(chave, e.target.value)}
-                                            readOnly={isReadOnly}
+                                            readOnly={true}
                                             className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 text-gray-500" : "bg-white text-gray-700"}`}
                                         />
-                                    ) : tipo === "date" ? (
-                                        <InputMask
-                                            mask="dd-mm-yyyy"
-                                            replacement={{ d: /\d/, m: /\d/, y: /\d/ }}
-                                            showMask
-                                            separate
-                                            className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 text-gray-500" : "bg-white text-gray-700"}`}
-                                            value={formatarParaInput(valor)} // 👈 aqui formatado antes de jogar no input
-                                            onChange={(e) => handleChange(chave, e.target.value)}
-                                            disabled={isReadOnly}
-                                        />
-                                    ) : tipo === "file" ? (
-                                        <input
-                                            type="file"
-                                            onChange={(e) => handleChange(chave, e.target.files?.[0] || "")}
-                                            disabled={isReadOnly}
-                                            className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 cursor-not-allowed" : "bg-white text-gray-700"}`}
-                                        />
-                                    ) : (
-                                        <input
-                                            type={tipo}
-                                            value={valor}
-                                            onChange={(e) =>
-                                                handleChange(chave, tipo === "number" ? Number(e.target.value) : e.target.value)
-                                            }
-                                            readOnly={isReadOnly}
-                                            className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 text-gray-500" : "bg-white text-gray-700"}`}
-                                        />
-                                    )}
+                                    )
+                                        : tipo === "date" ? (
+                                            <DateInput
+                                                value={valor}
+                                                onChange={(newValue: string) => handleChange(chave, newValue)}
+                                            />
+                                        )
+                                            : tipo === "file" ? (
+                                                <div className="flex flex-col gap-2">
+                                                    {valor && typeof valor === "string" && (
+                                                        <div className="flex flex-col items-center">
+                                                            <img
+                                                                src={`http://localhost:3001/api/uploads/${valor}`}
+                                                                alt="Imagem atual"
+                                                                className="max-w-[200px] max-h-[200px] object-cover rounded"
+                                                            />
+                                                            <p className="text-sm text-gray-400 mt-2">Imagem atual</p>
+                                                        </div>
+                                                    )}
+                                                    <input
+                                                        type="file"
+                                                        onChange={(e) => handleChange(chave, e.target.files?.[0] || "")}
+                                                        disabled={isReadOnly}
+                                                        className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 cursor-not-allowed" : "bg-white text-gray-700"}`}
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <input
+                                                    type={tipo}
+                                                    value={tipo === "number" ? valor ?? 0 : valor ?? ""}
+                                                    onChange={(e) => handleChange(chave, tipo === "number" ? Number(e.target.value) : e.target.value)}
+                                                    readOnly={isReadOnly}
+                                                    className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 text-gray-500" : "bg-white text-gray-700"}`}
+                                                />
+                                            )}
                                     {nomesRelacionados[chave] && (
                                         <p className="text-xs text-gray-300 mt-1">Relacionado: {nomesRelacionados[chave]}</p>
                                     )}
