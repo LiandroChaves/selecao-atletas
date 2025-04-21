@@ -212,9 +212,15 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
 
     const handleSubmit = async () => {
         try {
+            console.log("Valores recebidos:", valores);
+            console.log("Item recebido:", item);
+            console.log("Endpoint:", endpoint);
+            console.log("Singular:", singular);
+
             const dadosFormatados: any = {};
             for (const chave in valores) {
                 const valor = valores[chave];
+                if (["created_at", "updated_at", "jogadores"].includes(chave)) continue;
                 if (typeof valor === "string") {
                     dadosFormatados[chave] = nomeFormatado(valor);
                 } else {
@@ -222,7 +228,22 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                 }
             }
 
-            const res = await fetch(`http://localhost:3001/api/${endpoint.split("/")[0]}/editar${capitalize(singular)}/${item.id}`, {
+            console.log("Dados formatados:", dadosFormatados);
+
+            const id = item.jogador_id ?? item.id;
+            console.log("ID determinado:", id);
+
+            if (!id) {
+                console.error("ID do item está indefinido!");
+                return;
+            }
+
+            const url = `http://localhost:3001/api/${endpoint.split("/")[0]}/editar${capitalize(singular)}/${id}`;
+            console.log("URL da requisição:", url);
+            console.log("Body JSON:", JSON.stringify(dadosFormatados, null, 2));
+            console.log("URL da requisição:", url);
+
+            const res = await fetch(url, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -231,6 +252,7 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
             });
 
             if (res.ok) {
+                console.log("Resposta OK");
                 setMensagemSucesso("Alterações salvas com sucesso!");
                 setTimeout(() => {
                     setMensagemSucesso("");
@@ -238,7 +260,8 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                     onClose();
                 }, 3000);
             } else {
-                console.error("Erro ao atualizar:", await res.json());
+                const erro = await res.json();
+                console.error("Erro ao atualizar:", erro);
             }
         } catch (error) {
             console.error("Erro ao atualizar item:", error);

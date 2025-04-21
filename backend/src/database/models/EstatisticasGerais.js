@@ -56,5 +56,4 @@ EstatisticaGeral.belongsTo(Jogador, {
     as: 'jogadores',
 });
 
-
 export default EstatisticaGeral;

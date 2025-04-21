@@ -124,3 +124,29 @@ export const deletarJogador = async (req, res) => {
         return res.status(500).json({ erro: "Erro ao deletar jogador." });
     }
 };
+
+export const pegarJogadorPorId = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const jogador = await Jogador.findByPk(id, {
+            include: [
+                { model: Paises, as: "pais" },
+                { model: Estado, as: "estado" },
+                { model: Cidade, as: "cidade" },
+                { model: Posicao, as: "posicao" },
+                { model: Clubes, as: "clube" },
+                { model: NivelAmbidestria, as: "nivel_ambidestria" },
+                { model: Posicao, as: "posicao_secundaria" },
+            ],
+        });
+
+        if (!jogador) {
+            return res.status(404).json({ message: "Jogador não encontrado" });
+        }
+
+        return res.status(200).json(jogador);
+    } catch (error) {
+        console.error("Erro ao buscar jogador:", error);
+        return res.status(500).json({ erro: "Erro ao buscar jogador." });
+    }
+}

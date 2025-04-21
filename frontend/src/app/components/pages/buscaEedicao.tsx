@@ -149,7 +149,7 @@ export default function BuscaEedicao() {
                                 className={`flex items-center justify-between p-2 rounded-md shadow-md ${isDarkMode ? "bg-white text-gray-700" : "bg-white text-gray-700"}`}
                             >
                                 <span>
-                                    {item.nome || item.nome_completo || item.descricao || JSON.stringify(item)}
+                                    {item.nome || item.nome_completo || item.descricao || item.jogador_id || JSON.stringify(item)}
                                 </span>
                                 <div className="flex gap-2">
                                     <button
@@ -164,8 +164,11 @@ export default function BuscaEedicao() {
                                     </button>
                                     <button
                                         onClick={async () => {
-                                            const confirm = window.confirm(`Tem certeza que deseja deletar o item: ${item.nome || item.nome_completo || item.descricao}?`);
+                                            const confirm = window.confirm(
+                                                `Tem certeza que deseja deletar o item: ${item.nome || item.nome_completo || item.descricao || item.jogador_id}?`
+                                            );
                                             const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
                                             if (confirm && selected) {
                                                 try {
                                                     const endpointMap: Record<string, string> = {
@@ -192,7 +195,15 @@ export default function BuscaEedicao() {
                                                         return;
                                                     }
 
-                                                    await fetch(`http://localhost:3001/api/${deleteEndpoint}/${item.id}`, {
+                                                    // Detectar o campo de ID dinamicamente
+                                                    const id = item.id ?? item.jogador_id
+
+                                                    if (!id) {
+                                                        console.error("ID do item não encontrado para deletar:", item);
+                                                        return;
+                                                    }
+
+                                                    await fetch(`http://localhost:3001/api/${deleteEndpoint}/${id}`, {
                                                         method: "DELETE",
                                                     });
 
