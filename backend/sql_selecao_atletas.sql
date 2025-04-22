@@ -8,7 +8,7 @@ CREATE TYPE pe_dominante_enum AS ENUM ('D', 'E', 'A');
 
 -- USUÁRIOS
 
--- SELECT * FROM usuarios;
+SELECT * FROM usuarios;
 -- -- DELETE FROM usuarios;
 
 CREATE TABLE usuarios (
@@ -21,7 +21,7 @@ CREATE TABLE usuarios (
 
 -- PAÍSES
 
--- SELECT * FROM paises;
+SELECT * FROM paises;
 -- -- DELETE FROM paises;
 -- ALTER SEQUENCE paises_id_seq RESTART WITH 1;
 
@@ -34,7 +34,7 @@ CREATE TABLE paises (
 
 -- ESTADOS
 
--- SELECT * FROM estados;
+SELECT * FROM estados;
 -- -- DELETE FROM estados;
 -- ALTER SEQUENCE estados_id_seq RESTART WITH 1;
 
@@ -50,7 +50,7 @@ CREATE TABLE estados (
 
 -- CIDADES
 
--- SELECT * FROM cidades;
+SELECT * FROM cidades;
 -- -- DELETE FROM cidades;
 -- ALTER SEQUENCE cidades_id_seq RESTART WITH 1;
 
@@ -67,7 +67,7 @@ CREATE TABLE cidades (
 
 -- NÍVEIS DE AMBIDESTRIA
 
--- SELECT * FROM niveis_ambidestria;
+SELECT * FROM niveis_ambidestria;
 -- -- DELETE FROM niveis_ambidestria;
 -- ALTER SEQUENCE niveis_ambidestria_id_seq RESTART WITH 1;
 
@@ -80,7 +80,7 @@ CREATE TABLE niveis_ambidestria (
 
 -- POSIÇÕES
 
--- SELECT * FROM posicoes;
+SELECT * FROM posicoes;
 -- -- DELETE FROM posicoes;
 -- ALTER SEQUENCE posicoes_id_seq RESTART WITH 1;
 
@@ -153,7 +153,7 @@ CREATE TABLE jogadores (
 -- 3.1 Características principais
 -- ========================
 
--- SELECT * FROM caracteristicas_principais;
+SELECT * FROM caracteristicas_principais;
 -- -- DELETE FROM caracteristicas_principais;
 -- ALTER SEQUENCE caracteristicas_principais_id_seq RESTART WITH 1;
 
@@ -279,7 +279,7 @@ CREATE TABLE historico_lesoes (
 -- 7. Títulos
 -- ========================
 
--- SELECT * FROM titulos;
+SELECT * FROM titulos;
 -- -- DELETE FROM titulos;
 
 CREATE TABLE titulos (
@@ -290,20 +290,21 @@ CREATE TABLE titulos (
 	updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- SELECT * FROM jogadores_titulos;
+SELECT * FROM jogadores_titulos;
 -- -- DELETE FROM jogadores_titulos;
 
 CREATE TABLE jogadores_titulos (
-	jogador_id INT NOT NULL,
-	titulo_id INT NOT NULL,
-	ano SMALLINT NOT NULL,
-	clube_id INT NOT NULL,
-	created_at TIMESTAMP DEFAULT NOW(),
-	updated_at TIMESTAMP DEFAULT NOW(),
-	PRIMARY KEY (jogador_id, titulo_id),
-	CONSTRAINT fkey_titulos_jogador FOREIGN KEY (jogador_id) REFERENCES jogadores(id) ON DELETE CASCADE,
-	CONSTRAINT fkey_titulos_titulo FOREIGN KEY (titulo_id) REFERENCES titulos(id),
-	CONSTRAINT fkey_titulos_clube FOREIGN KEY (clube_id) REFERENCES clubes(id)
+    id SERIAL PRIMARY KEY,
+    jogador_id INT NOT NULL,
+    titulo_id INT NOT NULL,
+    ano SMALLINT NOT NULL,
+    clube_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    CONSTRAINT fkey_titulos_jogador FOREIGN KEY (jogador_id) REFERENCES jogadores(id) ON DELETE CASCADE,
+    CONSTRAINT fkey_titulos_titulo FOREIGN KEY (titulo_id) REFERENCES titulos(id),
+    CONSTRAINT fkey_titulos_clube FOREIGN KEY (clube_id) REFERENCES clubes(id),
+    CONSTRAINT unique_jogador_titulo UNIQUE (jogador_id, titulo_id)
 );
 
 
