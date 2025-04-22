@@ -172,8 +172,12 @@ export default function BuscaEedicao() {
                                 // 📅 Se tiver só data
                                 if (item.data) return item.data;
 
+                                
+                                if (item.titulo?.nome) return item.titulo.nome;
+                                
                                 // 🔢 Se não achar nada, tenta pegar ID
                                 if (item.id) return `ID: ${item.id}`;
+
 
                                 // 📦 Se ainda assim não tiver nada, joga o JSON
                                 return JSON.stringify(item);

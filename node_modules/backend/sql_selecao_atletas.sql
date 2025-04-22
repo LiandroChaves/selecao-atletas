@@ -116,7 +116,7 @@ CREATE TABLE clubes (
 -- 3. Jogadores
 -- ========================
 
--- SELECT * FROM jogadores;
+SELECT * FROM jogadores;
 -- -- DELETE FROM jogadores;
 -- ALTER SEQUENCE jogadores_id_seq RESTART WITH 1;
 
@@ -170,7 +170,7 @@ CREATE TABLE caracteristicas_principais (
 -- 4. Estatísticas Gerais
 -- ========================
 
--- SELECT * FROM estatisticas_gerais;
+SELECT * FROM estatisticas_gerais;
 -- -- DELETE FROM estatisticas_gerais;
 
 CREATE TABLE estatisticas_gerais (
@@ -191,7 +191,7 @@ CREATE TABLE estatisticas_gerais (
 -- 5. Partidas
 -- ========================
 
--- SELECT * FROM partidas;
+SELECT * FROM partidas;
 -- -- DELETE FROM partidas;
 -- ALTER SEQUENCE partidas_id_seq RESTART WITH 1;
 
@@ -214,7 +214,7 @@ CREATE TABLE partidas (
 -- Estatísticas por Partida
 -- ========================
 
--- SELECT * FROM estatisticas_partidas;
+SELECT * FROM estatisticas_partidas;
 -- -- DELETE FROM estatisticas_partidas;
 
 CREATE TABLE estatisticas_partidas (
@@ -241,7 +241,7 @@ CREATE TABLE estatisticas_partidas (
 -- 6. Histórico de Clubes
 -- ========================
 
--- SELECT * FROM historico_clubes;
+SELECT * FROM historico_clubes;
 -- -- DELETE FROM historico_clubes;
 
 CREATE TABLE historico_clubes (
@@ -260,7 +260,7 @@ CREATE TABLE historico_clubes (
 -- Histórico de Lesões
 -- ========================
 
--- SELECT * FROM historico_lesoes;
+SELECT * FROM historico_lesoes;
 -- -- DELETE FROM historico_lesoes;
 
 CREATE TABLE historico_lesoes (

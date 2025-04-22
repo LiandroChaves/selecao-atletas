@@ -5,13 +5,18 @@ import Titulos from "./Titulos.js";
 import Clubes from "./Clubes.js";
 
 const JogadoresTitulos = sequelize.define("JogadoresTitulos", {
-    jogador_id: {
+    id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
+        autoIncrement: true,
+    },
+    jogador_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
     },
     titulo_id: {
         type: DataTypes.INTEGER,
-        primaryKey: true,
+        allowNull: false,
     },
     ano: {
         type: DataTypes.SMALLINT,
@@ -32,8 +37,15 @@ const JogadoresTitulos = sequelize.define("JogadoresTitulos", {
 }, {
     tableName: "jogadores_titulos",
     timestamps: false,
+    indexes: [
+        {
+            unique: true,
+            fields: ["jogador_id", "titulo_id"]
+        }
+    ]
 });
 
+// Relações
 JogadoresTitulos.belongsTo(Jogador, { foreignKey: "jogador_id", as: "jogador", onDelete: "CASCADE" });
 JogadoresTitulos.belongsTo(Titulos, { foreignKey: "titulo_id", as: "titulo" });
 JogadoresTitulos.belongsTo(Clubes, { foreignKey: "clube_id", as: "clube" });
