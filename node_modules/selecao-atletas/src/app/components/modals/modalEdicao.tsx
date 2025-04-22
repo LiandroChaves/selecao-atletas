@@ -242,7 +242,7 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
             console.log("Dados formatados:", dadosFormatados);
 
             // const id = item.jogador_id ?? item.id;
-            
+
             const id = item?.id || Object.entries(item).find(([chave]) => chave.endsWith('_id'))?.[1];
             console.log("ID determinado:", id);
 
@@ -321,7 +321,6 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                                         <textarea
                                             value={valor ?? ""}
                                             onChange={(e) => handleChange(chave, e.target.value)}
-                                            readOnly={true}
                                             className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 text-gray-500" : "bg-white text-gray-700"}`}
                                         />
                                     )

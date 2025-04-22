@@ -11,8 +11,14 @@ export const pegarEstatisticasGerais = async (req, res) => {
         const idBusca = Number(search || jogador_id);
 
         if (!isNaN(idBusca)) {
+            // Se for número, busca por jogador_id
             where = {
                 jogador_id: idBusca
+            };
+        } else if (search) {
+            // Se for texto, busca pelo nome do jogador (ignorando maiúsculas/minúsculas)
+            where = {
+                "$jogadores.nome$": { [Op.iLike]: `%${search}%` }
             };
         }
 
@@ -24,6 +30,8 @@ export const pegarEstatisticasGerais = async (req, res) => {
             }],
             where,
             order: [["jogador_id", "ASC"]],
+            raw: true,
+            nest: true,
         });
 
         res.status(200).json(estatisticas);

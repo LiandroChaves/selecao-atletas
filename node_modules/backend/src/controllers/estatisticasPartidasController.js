@@ -3,6 +3,52 @@
 import EstatisticasPartidas from "../database/models/EstatisticasPartidas.js";
 import Jogador from "../database/models/Jogadores.js";
 import Partidas from "../database/models/Partidas.js";
+import { Op } from "sequelize";
+
+export const buscarEstatisticasPartidas = async (req, res) => {
+    try {
+        const { search } = req.query;
+
+        const includeJogador = {
+            model: Jogador,
+            as: "jogador",
+            attributes: ["id", "nome", "apelido"],
+        };
+
+        if (search) {
+            // Se for número, filtra pelo ID, senão filtra pelo NOME ou APELIDO
+            if (!isNaN(Number(search))) {
+                includeJogador.where = {
+                    id: Number(search),
+                };
+            } else {
+                includeJogador.where = {
+                    [Op.or]: [
+                        { nome: { [Op.iLike]: `%${search}%` } },  // busca no nome
+                        { apelido: { [Op.iLike]: `%${search}%` } } // busca também no apelido
+                    ]
+                };
+            }
+        }
+
+        const estatisticas = await EstatisticasPartidas.findAll({
+            include: [
+                includeJogador,
+                {
+                    model: Partidas,
+                    as: "partida",
+                    attributes: ["id", "data", "estadio"],
+                },
+            ],
+            order: [["id", "ASC"]],
+        });
+
+        res.status(200).json(estatisticas);
+    } catch (error) {
+        console.error("Erro ao buscar estatísticas de partidas:", error);
+        res.status(500).json({ error: "Erro interno ao buscar estatísticas." });
+    }
+};
 
 export const inserirEstatisticaPartida = async (req, res) => {
     try {
@@ -42,69 +88,6 @@ export const inserirEstatisticaPartida = async (req, res) => {
         res.status(500).json({ error: "Erro interno ao inserir estatística." });
     }
 };
-
-export const pegarEstatisticasPartidas = async (_req, res) => {
-    try {
-        const estatisticas = await EstatisticasPartidas.findAll({
-            include: [
-                {
-                    model: Jogador,
-                    as: "jogador",
-                    attributes: ["id", "nome", "apelido"],
-                },
-                {
-                    model: Partidas,
-                    as: "partida",
-                    attributes: ["id", "data", "estadio"],
-                },
-            ],
-            order: [["id", "ASC"]],
-        });
-
-        res.status(200).json(estatisticas);
-    } catch (error) {
-        console.error("Erro ao buscar estatísticas de partidas:", error);
-        res.status(500).json({ error: "Erro interno ao buscar estatísticas." });
-    }
-};
-
-
-export const buscarEstatisticasPartidas = async (req, res) => {
-    try {
-        const { search } = req.query;
-
-        const includeJogador = {
-            model: Jogador,
-            as: "jogador",
-            attributes: ["id", "nome", "apelido"],
-        };
-
-        // Filtra pelo ID do jogador se for passado
-        if (search) {
-            includeJogador.where = {
-                id: Number(search),
-            };
-        }
-
-        const estatisticas = await EstatisticasPartidas.findAll({
-            include: [
-                includeJogador,
-                {
-                    model: Partidas,
-                    as: "partida",
-                    attributes: ["id", "data", "estadio"],
-                },
-            ],
-            order: [["id", "ASC"]],
-        });
-
-        res.status(200).json(estatisticas);
-    } catch (error) {
-        console.error("Erro ao buscar estatísticas de partidas:", error);
-        res.status(500).json({ error: "Erro interno ao buscar estatísticas." });
-    }
-};
-
 
 export const editarEstatisticaPartida = async (req, res) => {
     try {

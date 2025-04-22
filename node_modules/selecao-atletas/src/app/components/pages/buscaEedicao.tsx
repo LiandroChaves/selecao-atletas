@@ -143,88 +143,129 @@ export default function BuscaEedicao() {
                 </h2>
                 <div className="flex flex-col gap-2">
                     {results.length > 0 ? (
-                        results.map((item, idx) => (
-                            <div
-                                key={idx}
-                                className={`flex items-center justify-between p-2 rounded-md shadow-md ${isDarkMode ? "bg-white text-gray-700" : "bg-white text-gray-700"}`}
-                            >
-                                <span>
-                                    {item.nome || item.nome_completo || item.descricao || item.jogador_id || item.id || JSON.stringify(item)}
-                                </span>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => {
-                                            setEditItem(item);
-                                            setEditModalOpen(true);
-                                        }}
-                                        className={`p-2 rounded-md hover:scale-105 transition ${isDarkMode ? "text-teal-900 hover:bg-teal-100" : "text-gray-800 hover:bg-gray-200"}`}
-                                        title="Editar"
-                                    >
-                                        <FaEdit />
-                                    </button>
-                                    <button
-                                        onClick={async () => {
-                                            const confirm = window.confirm(
-                                                `Tem certeza que deseja deletar o item: ${item.nome || item.nome_completo || item.descricao || item.jogador_id || item.id}?`
-                                            );
-                                            const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+                        results.map((item, idx) => {
+                            // Função para detectar o ID de forma inteligente
+                            const getIdFromItem = (item: any) => {
+                                return item?.id || Object.entries(item).find(([key]) => key.endsWith("_id"))?.[1];
+                            };
 
-                                            if (confirm && selected) {
-                                                try {
-                                                    const endpointMap: Record<string, string> = {
-                                                        "paises/pegarPaises": "paises/deletarPais",
-                                                        "estados/pegarEstados": "estados/deletarEstado",
-                                                        "cidades/pegarCidades": "cidades/deletarCidade",
-                                                        "ambidestria/pegarAmbidestria": "ambidestria/deletarAmbidestria",
-                                                        "posicoes/pegarPosicoes": "posicoes/deletarPosicao",
-                                                        "clubes/pegarClubes": "clubes/deletarClube",
-                                                        "jogadores/pegarJogadores": "jogadores/deletarJogador",
-                                                        "estatisticas/pegarEstatisticasGerais": "estatisticas/deletarEstatisticaGeral",
-                                                        "partidas/pegarPartidas": "partidas/deletarPartida",
-                                                        "estatisticas-partidas/pegarEstatisticasPartida": "estatisticas-partidas/deletarEstatisticaPartida",
-                                                        "historico-clubes/pegarHistoricoClubes": "historico-clubes/deletarHistoricoClube",
-                                                        "historico-lesoes/pegarHistoricoLesoes": "historico-lesoes/deletarHistoricoLesao",
-                                                        "titulos/pegarTitulos": "titulos/deletarTitulo",
-                                                        "jogadores-titulos/pegarJogadoresTitulos": "jogadores-titulos/deletarJogadorTitulo",
-                                                    };
+                            const getNomeExibicao = (item: any) => {
+                                if (!item) return "Item desconhecido";
 
-                                                    const deleteEndpoint = endpointMap[selected.endpoint];
+                                // ⚽ Se for partida
+                                if (item.data && (item.gols_casa !== undefined || item.gols_fora !== undefined)) {
+                                    const clubeCasa = item.clubeCasa?.nome || "Casa";
+                                    const clubeFora = item.clubeFora?.nome || "Fora";
+                                    return `${item.data} - ${clubeCasa} ${item.gols_casa} x ${item.gols_fora} ${clubeFora}`;
+                                }
 
-                                                    if (!deleteEndpoint) {
-                                                        console.error("Endpoint de deleção não mapeado:", selected.endpoint);
-                                                        return;
+                                // 👤 Se for jogador relacionado
+                                if (item.nome) return item.nome;
+                                if (item.nome_completo) return item.nome_completo;
+                                if (item.jogadores?.nome) return item.jogadores.nome;
+                                if (item.jogador?.nome) return item.jogador.nome;
+
+                                // 🏥 Se for histórico de lesão
+                                if (item.tipo_lesao) return item.tipo_lesao;
+                                if (item.descricao) return item.descricao;
+
+                                // 📅 Se tiver só data
+                                if (item.data) return item.data;
+
+                                // 🔢 Se não achar nada, tenta pegar ID
+                                if (item.id) return `ID: ${item.id}`;
+
+                                // 📦 Se ainda assim não tiver nada, joga o JSON
+                                return JSON.stringify(item);
+                            };
+
+                            const id = getIdFromItem(item);
+
+                            return (
+                                <div
+                                    key={idx}
+                                    className={`flex items-center justify-between p-2 rounded-md shadow-md ${isDarkMode ? "bg-white text-gray-700" : "bg-white text-gray-700"
+                                        }`}
+                                >
+                                    <span>{getNomeExibicao(item)}</span>
+
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => {
+                                                setEditItem(item);
+                                                setEditModalOpen(true);
+                                            }}
+                                            className={`p-2 rounded-md hover:scale-105 transition ${isDarkMode ? "text-teal-900 hover:bg-teal-100" : "text-gray-800 hover:bg-gray-200"
+                                                }`}
+                                            title="Editar"
+                                        >
+                                            <FaEdit />
+                                        </button>
+                                        <button
+                                            onClick={async () => {
+                                                const confirm = window.confirm(`Tem certeza que deseja deletar o item: ${getNomeExibicao(item)}?`);
+
+                                                const capitalize = (str: string) =>
+                                                    str.charAt(0).toUpperCase() + str.slice(1);
+
+                                                if (confirm && selected) {
+                                                    try {
+                                                        const endpointMap: Record<string, string> = {
+                                                            "paises/pegarPaises": "paises/deletarPais",
+                                                            "estados/pegarEstados": "estados/deletarEstado",
+                                                            "cidades/pegarCidades": "cidades/deletarCidade",
+                                                            "ambidestria/pegarAmbidestria": "ambidestria/deletarAmbidestria",
+                                                            "posicoes/pegarPosicoes": "posicoes/deletarPosicao",
+                                                            "clubes/pegarClubes": "clubes/deletarClube",
+                                                            "jogadores/pegarJogadores": "jogadores/deletarJogador",
+                                                            "estatisticas/pegarEstatisticasGerais": "estatisticas/deletarEstatisticaGeral",
+                                                            "partidas/pegarPartidas": "partidas/deletarPartida",
+                                                            "estatisticas-partidas/pegarEstatisticasPartida": "estatisticas-partidas/deletarEstatisticaPartida",
+                                                            "historico-clubes/pegarHistoricoClubes": "historico-clubes/deletarHistoricoClube",
+                                                            "historico-lesoes/pegarHistoricoLesoes": "historico-lesoes/deletarHistoricoLesao",
+                                                            "titulos/pegarTitulos": "titulos/deletarTitulo",
+                                                            "jogadores-titulos/pegarJogadoresTitulos": "jogadores-titulos/deletarJogadorTitulo",
+                                                        };
+
+                                                        const deleteEndpoint = endpointMap[selected.endpoint];
+
+                                                        if (!deleteEndpoint) {
+                                                            console.error("Endpoint de deleção não mapeado:", selected.endpoint);
+                                                            return;
+                                                        }
+
+                                                        if (!id) {
+                                                            console.error("ID do item não encontrado para deletar:", item);
+                                                            return;
+                                                        }
+
+                                                        await fetch(`http://localhost:3001/api/${deleteEndpoint}/${id}`, {
+                                                            method: "DELETE",
+                                                        });
+
+                                                        handleSearch(); // Atualiza os resultados após deletar
+                                                    } catch (error) {
+                                                        console.error("Erro ao deletar:", error);
                                                     }
-
-                                                    // Detectar o campo de ID dinamicamente
-                                                    const id = item.id ?? item.jogador_id
-
-                                                    if (!id) {
-                                                        console.error("ID do item não encontrado para deletar:", item);
-                                                        return;
-                                                    }
-
-                                                    await fetch(`http://localhost:3001/api/${deleteEndpoint}/${id}`, {
-                                                        method: "DELETE",
-                                                    });
-
-                                                    handleSearch(); // Atualiza os resultados após deletar
-                                                } catch (error) {
-                                                    console.error("Erro ao deletar:", error);
                                                 }
-                                            }
-                                        }}
-                                        className={`p-2 rounded-md hover:scale-105 transition ${isDarkMode ? "text-red-300 hover:bg-red-100" : "text-red-700 hover:bg-red-200"}`}
-                                        title="Deletar"
-                                    >
-                                        <FaTrash />
-                                    </button>
+                                            }}
+                                            className={`p-2 rounded-md hover:scale-105 transition ${isDarkMode ? "text-red-300 hover:bg-red-100" : "text-red-700 hover:bg-red-200"
+                                                }`}
+                                            title="Deletar"
+                                        >
+                                            <FaTrash />
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))
+                            );
+                        })
                     ) : (
-                        <p className="text-center text-gray-600 dark:text-gray-300">Nenhum resultado encontrado.</p>
+                        <p className="text-center text-gray-600 dark:text-gray-300">
+                            Nenhum resultado encontrado.
+                        </p>
                     )}
                 </div>
+
             </Modal>
             <ModalEdicao
                 isOpen={editModalOpen}

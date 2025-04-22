@@ -4,18 +4,40 @@ import dayjs from "dayjs"; // instale se ainda não tiver: npm install dayjs
 import EstatisticasPartidas from "../database/models/EstatisticasPartidas.js";
 import Jogador from "../database/models/Jogadores.js";
 import { Op } from "sequelize";
-
 // 🔍 Buscar todas as partidas
+
 export const pegarPartidas = async (req, res) => {
     try {
         const { id, search } = req.query;
         let where = {};
 
-        // Usa `search` OU `id` como parâmetro para buscar por ID da partida
-        const idBusca = Number(search || id); // tenta converter qualquer um dos dois
+        const idBusca = Number(search || id);
 
         if (!isNaN(idBusca)) {
+            // Busca por ID
             where = { id: idBusca };
+        } else if (search) {
+            let dataFormatada = null;
+
+            // Tenta identificar se search é uma data no formato brasileiro
+            const regexDataBR = /^(\d{2})[-\/](\d{2})[-\/](\d{4})$/; // aceita 23/08/2030 ou 23-08-2030
+            const match = search.match(regexDataBR);
+
+            if (match) {
+                // Se for, converte para formato ISO
+                const [_, dia, mes, ano] = match;
+                dataFormatada = `${ano}-${mes}-${dia}`;
+            }
+
+            if (dataFormatada && dayjs(dataFormatada).isValid()) {
+                // Se conseguiu montar uma data válida, busca por data
+                where = {
+                    data: dataFormatada,
+                };
+            } else {
+                // Se não for número nem data, poderia pesquisar por outra coisa, se quiser (ex: nome de clubes)
+                // Aqui, não faz nada extra por enquanto
+            }
         }
 
         const partidas = await Partidas.findAll({
