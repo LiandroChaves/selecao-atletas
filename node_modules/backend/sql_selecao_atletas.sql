@@ -257,6 +257,9 @@ CREATE TABLE historico_clubes (
 	CONSTRAINT fkey_historico_clube FOREIGN KEY (clube_id) REFERENCES clubes(id)
 );
 
+insert into historico_clubes (jogador_id, clube_id, data_entrada, data_saida)
+values (2,2,'2019-10-22','2023-03-23')
+
 -- ========================
 -- Histórico de Lesões
 -- ========================

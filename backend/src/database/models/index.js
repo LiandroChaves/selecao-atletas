@@ -9,10 +9,10 @@ import Clubes from "../models/Clubes.js";
 import Jogadores from "../models/Jogadores.js";
 import EstatisticaGeral from "../models/EstatisticasGerais.js";
 import Partidas from "../models/Partidas.js";
-
-import { DataTypes } from "sequelize";
+import HistoricoClubes from "./HistoricoClubes.js";
 import Jogador from "../models/Jogadores.js";
 import Caracteristicas from "./Caracteristicas.js";
+import { DataTypes } from "sequelize";
 // ...
 
 const models = {
@@ -27,7 +27,8 @@ const models = {
     EstatisticaGeral,
     Partidas,
     Jogador,
-    Caracteristicas
+    Caracteristicas,
+    HistoricoClubes
 };
 
 Object.values(models).forEach((model) => {

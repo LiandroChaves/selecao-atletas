@@ -12,10 +12,18 @@ const HistoricoClubes = sequelize.define("historico_clubes", {
     jogador_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+            model: "jogadores",
+            key: "id",
+        },
     },
     clube_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+            model: "clubes",
+            key: "id",
+        },
     },
     data_entrada: {
         type: DataTypes.DATEONLY,
@@ -37,8 +45,6 @@ const HistoricoClubes = sequelize.define("historico_clubes", {
     timestamps: false,
 });
 
-HistoricoClubes.belongsTo(Jogador, { foreignKey: "jogador_id", as: "jogador", onDelete: "CASCADE" });
 HistoricoClubes.belongsTo(Clubes, { foreignKey: "clube_id", as: "clube" });
-
 
 export default HistoricoClubes;

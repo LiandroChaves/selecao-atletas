@@ -3,6 +3,9 @@ import express from "express";
 import PDFDocument from "pdfkit";
 import models from "../database/models/index.js"; // ajuste conforme seu setup
 import dayjs from "dayjs";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
 
 const router = express.Router();
 const calcularIdade = (dataNascimento) => {
@@ -17,6 +20,35 @@ const calcularIdade = (dataNascimento) => {
     return idade;
 };
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// raiz = backend/src
+const basePath = path.join(__dirname, "..", "assets", "pdf");
+
+function safeImage(doc, imgPath, x, y, opts = {}) {
+    if (!imgPath) return;                 // valor nulo/undefined
+    if (fs.existsSync(imgPath)) {
+        doc.image(imgPath, x, y, opts);
+    } else {
+        console.warn("Imagem não encontrada:", imgPath);
+    }
+}
+
+
+// caminhos auxiliares -------------------------------------------------------
+const ASSETS = {
+    logo: path.join(basePath, "logo-ecl.png"),
+    pe: {
+        E: path.join(basePath, "pe_esquerdo.png"),
+        D: path.join(basePath, "pe_direito.png"),
+        A: path.join(basePath, "pe_ambos.png"),
+    },
+    campo: pos => path.join(basePath, `campo_${pos}.png`),
+    borda: path.join(basePath, "borda.png")
+};
+
+
 router.get("/gerar-pdf/:id", async (req, res) => {
     try {
         const jogador = await models.Jogador.findByPk(req.params.id, {
@@ -29,61 +61,130 @@ router.get("/gerar-pdf/:id", async (req, res) => {
                 { model: models.Clubes, as: "clube" },
                 { model: models.NivelAmbidestria, as: "nivel_ambidestria" },
                 { model: models.Caracteristicas, as: "caracteristicas" },
+                {
+                    model: models.HistoricoClubes,
+                    as: "historico",                 // alias que usaremos depois
+                    include: [{ model: models.Clubes, as: "clube", attributes: ["nome"] }],
+                    order: [["data_entrada", "ASC"]],  // opcional: cronológico
+                },
             ]
         });
 
 
         if (!jogador) return res.status(404).json({ error: "Jogador não encontrado" });
 
-        const doc = new PDFDocument();
-        res.setHeader("Content-Type", "application/pdf");
-        res.setHeader("Content-Disposition", `inline; filename="${jogador.apelido || jogador.nome}.pdf"`);
+        const filename = `${(jogador.nome || jogador.apelido).replace(/\s+/g, '_')}.pdf`;
+        res.set('Content-Disposition',
+            `inline; filename="${filename}"` +
+            `; filename*=UTF-8''${encodeURIComponent(filename)}`);
 
+        const doc = new PDFDocument({ margin: 40 });
         doc.pipe(res);
 
-        // Título
-        doc.fontSize(16).text("FICHA INDIVIDUAL DO ATLETA", { align: "center" });
-        doc.moveDown();
+        // ---------- cabeçalho ----------
+        doc.image(ASSETS.logo, 40, 40, { width: 90 });
+        doc.image(ASSETS.borda, 410, -60, { width: 250 });
+        doc.fillColor('#2957A4')
+            .font('Helvetica-Bold')        // ← negrito
+            .fontSize(16)
+            .text('ESPORTE CLUBE LIMOEIRO', 0, 50, { align: 'center' });
 
-        // Dados básicos
-        doc.fontSize(12).text(`Nome completo: ${jogador.nome}`);
-        doc.text(`Nome curto: ${jogador.nome.split(" ")[0] || jogador.apelido}`);
-        doc.text(`Naturalidade | Cidade: ${jogador.cidade?.nome ?? "Não informada"}`);
-        doc.text(`Apelido: ${jogador.apelido}`);
-        doc.text(`Data de nascimento: ${dayjs(jogador.data_nascimento).format("DD/MM/YYYY")}`);
-        doc.text(`Idade: ${jogador.data_nascimento ? calcularIdade(jogador.data_nascimento) : "Não informada"}`);
-        doc.text(`Altura: ${jogador.altura} m`);
-        doc.text(`Peso: ${jogador.peso} kg`);
-        doc.moveDown();
+        doc.fontSize(13)
+            .text('Ficha Individual do Atleta – Base', { align: 'center' });
 
-        // Pé e ambidestria
-        doc.text(`Pé dominante: ${jogador.pe_dominante === "E" ? "Esquerdo" : "Direito"}`);
-        doc.text(`Grau de ambidestria: ${jogador.nivel_ambidestria?.descricao || "Não informado"}`);
-        doc.moveDown();
+        // voltar ao estilo normal/preto depois
+        doc.fillColor('black')
+            .font('Helvetica');
 
-        // Posições
-        doc.text(`Posição principal: ${jogador.posicao?.nome || "Não informada"}`);
-        doc.text(`Posição secundária: ${jogador.posicao_secundaria?.nome || "Não informada"}`);
-        doc.moveDown();
 
-        // Características principais
-        doc.text("Características principais:");
-        if (jogador.caracteristicas.length > 0) {
-            jogador.caracteristicas.forEach((c, i) => {
-                doc.text(`• ${c.descricao}`);
-            });
+        // espaço para a foto
+        if (jogador.foto) {
+            doc.image(`uploads/${jogador.foto}`, 480, 110, { width: 100, height: 120, fit: [100, 120] });
         } else {
-            doc.text("Nenhuma característica cadastrada.");
+            doc.rect(430, 120, 100, 120).stroke();
         }
+
+        doc.moveDown(2);
+
+        // ---------- dados básicos ----------
+        doc.fontSize(11)
+
+            // linha 1  – nome completo
+            .text(`Nome completo: ${jogador.nome}`, { align: "center" })
+            .moveDown()
+
+            // linha 2  – nome curto  |  naturalidade
+            .text(
+                `Nome curto: ${jogador.nome.split(" ")[0] || jogador.apelido}    |    ` +
+                `Naturalidade: ${jogador.cidade?.nome ?? "—"}`,
+                { align: "center" }
+            )
+            .moveDown()
+
+            // linha 3  – data nasc.  |  idade
+            .text(
+                `Data nasc.: ${dayjs(jogador.data_nascimento).format("DD/MM/YYYY")}    |    ` +
+                `Idade: ${calcularIdade(jogador.data_nascimento)} anos`,
+                { align: "center" }
+            )
+            .moveDown()
+
+            // linha 4  – altura  |  peso
+            .text(
+                `Altura: ${jogador.altura} m    |    Peso: ${jogador.peso} kg`,
+                { align: "center" }
+            )
+            .moveDown(3);        // espaçamento extra antes do próximo bloco
+
+
+        // ---------- pé dominante ----------
+        doc.text(
+            `Grau de ambidestria: ${jogador.nivel_ambidestria?.descricao ?? "—"}`,
+            { align: "center" }
+        );
+        doc.text(
+            `Pé dominante: ${jogador.pe_dominante === "E"
+                ? "Esquerdo"
+                : jogador.pe_dominante === "D"
+                    ? "Direito"
+                    : jogador.pe_dominante === "A"
+                        ? "Ambos"
+                        : "—"
+            }`,
+            { align: "center" }
+        );
+        doc.moveDown(2);
+        const imgPe = ASSETS.pe[jogador.pe_dominante];
+        safeImage(doc, imgPe, doc.x + 240, doc.y - 15, { width: 100 });
+        doc.moveDown(7);
+
+        // ---------- ambidestria ----------
         doc.moveDown();
 
-        // Espaço para histórico
-        doc.text("Histórico de clubes:", { underline: true });
-        doc.moveDown().moveDown().moveDown().moveDown();
+        // ---------- campos de posição ----------
+        doc.text("Posição principal / secundária:", { align: "center" });
+        doc.moveDown();
+        const yCampos = doc.y + 5;
+        safeImage(doc, ASSETS.campo(jogador.posicao?.id), 140, yCampos, { width: 120 });
+        safeImage(doc, ASSETS.campo(jogador.posicao_secundaria?.id), 340, yCampos, { width: 120 });
+        doc.moveDown(17);
 
-        doc.text("__________________________", { align: "left" });
-        doc.text("__________________________", { align: "left" });
-        doc.text("__________________________", { align: "left" });
+        // ---------- características ----------
+        doc.text("Características principais:", { align: "center" });
+        (jogador.caracteristicas.length
+            ? jogador.caracteristicas
+            : [{ descricao: "Sem características informadas" }])
+            .forEach(c => doc.text(`• ${c.descricao}`, { align: "center" }));
+
+        // ---------- histórico ----------
+        doc.moveDown(2).text("Histórico de clubes:", { underline: true, align: "center" });
+        doc.moveDown();
+        const listaClubes =
+            jogador.historico.length
+                ? jogador.historico.map(h => `${h.clube?.nome}  (${dayjs(h.data_entrada).format("YYYY")}–${h.data_saida ? dayjs(h.data_saida).format("YYYY") : "Atual"})`)
+                : ["Sem histórico informado"];
+
+        listaClubes.forEach(item => doc.text(`• ${item}`, { align: "center" }));
 
         doc.end();
     } catch (err) {
