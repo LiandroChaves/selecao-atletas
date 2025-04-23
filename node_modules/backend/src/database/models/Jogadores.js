@@ -7,6 +7,7 @@ import Estado from "./Estados.js";
 import Cidade from "./Cidades.js";
 import Clubes from "./Clubes.js";
 import NivelAmbidestria from "./Ambidestria.js";
+import Caracteristicas from "./Caracteristicas.js";
 
 const Jogador = sequelize.define("jogadores", {
     id: {
@@ -121,5 +122,7 @@ Jogador.belongsTo(Cidade, { as: 'cidade', foreignKey: 'cidade_id' });
 Jogador.belongsTo(Clubes, { as: 'clube', foreignKey: 'clube_atual_id' });
 Jogador.belongsTo(NivelAmbidestria, { as: 'nivel_ambidestria', foreignKey: 'nivel_ambidestria_id' });
 Jogador.belongsTo(Posicao, { as: 'posicao_secundaria', foreignKey: 'posicao_secundaria_id' });
+
+Jogador.hasMany(Caracteristicas, { as: "caracteristicas", foreignKey: "jogador_id" });
 
 export default Jogador;

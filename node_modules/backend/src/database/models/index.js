@@ -11,6 +11,8 @@ import EstatisticaGeral from "../models/EstatisticasGerais.js";
 import Partidas from "../models/Partidas.js";
 
 import { DataTypes } from "sequelize";
+import Jogador from "../models/Jogadores.js";
+import Caracteristicas from "./Caracteristicas.js";
 // ...
 
 const models = {
@@ -24,6 +26,8 @@ const models = {
     Jogadores,
     EstatisticaGeral,
     Partidas,
+    Jogador,
+    Caracteristicas
 };
 
 Object.values(models).forEach((model) => {

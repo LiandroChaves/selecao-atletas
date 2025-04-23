@@ -1,7 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { FaUserPlus, FaSearch, FaDatabase, FaInfoCircle } from "react-icons/fa";
+import { FaUserPlus, FaSearch, FaDatabase, FaInfoCircle, FaFilePdf } from "react-icons/fa";
 import BotaoTema from "../../../utils/utilities/changeTheme";
 import { useTheme } from "../../../utils/context/ThemeContext";
 import { useLoading } from "../../../utils/context/LoadingProvider";
@@ -35,6 +35,17 @@ export default function Home() {
             },
         },
         { label: "Banco de Dados", icon: <FaDatabase />, onClick: () => alert("Indo para Banco de Dados") },
+
+        {
+            label: "Gerar PDFs", icon: <FaFilePdf />, onClick: () => {
+                setIsLoading(true); // Ativa carregamento
+                setTimeout(() => {
+                    router.push("/routes/pdfsPage");
+                    setIsLoading(false); // Opcional, pois pode ser desativado no useEffect da página de destino
+                }, 200); // pequeno delay só para a animação aparecer
+            },
+        },
+
         { label: "Instruções", icon: <FaInfoCircle />, onClick: () => alert("Indo para Instruções") },
     ];
 

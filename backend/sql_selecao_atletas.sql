@@ -153,11 +153,11 @@ CREATE TABLE jogadores (
 -- 3.1 Características principais
 -- ========================
 
-SELECT * FROM caracteristicas_principais;
--- -- DELETE FROM caracteristicas_principais;
--- ALTER SEQUENCE caracteristicas_principais_id_seq RESTART WITH 1;
+SELECT * FROM caracteristicas;
+-- -- DELETE FROM caracteristicas;
+-- ALTER SEQUENCE caracteristicas_id_seq RESTART WITH 1;
 
-CREATE TABLE caracteristicas_principais (
+CREATE TABLE caracteristicas (
 	id SERIAL PRIMARY KEY,
 	jogador_id INT NOT NULL,
 	descricao VARCHAR(100) NOT NULL,
@@ -166,6 +166,7 @@ CREATE TABLE caracteristicas_principais (
 	FOREIGN KEY (jogador_id) REFERENCES jogadores(id) ON DELETE CASCADE
 );
 
+insert into caracteristicas (jogador_id, descricao) values (2, "Visão de jogo")
 -- ========================
 -- 4. Estatísticas Gerais
 -- ========================
