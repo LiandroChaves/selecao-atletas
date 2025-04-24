@@ -48,7 +48,7 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
         if (item) {
             const valoresIniciais: any = {};
             Object.entries(item).forEach(([chave, valor]) => {
-                if (typeof valor !== "object") {
+                if (typeof valor !== "object" || valor === null) {
                     valoresIniciais[chave] = valor;
                 }
             });
@@ -384,8 +384,8 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                     <button
                         onClick={handleSubmit}
                         className={`w-full py-2 rounded font-semibold transition ${isDarkMode
-                                ? "bg-teal-400 hover:bg-teal-300 text-teal-900"
-                                : "bg-gray-600 hover:bg-gray-500 text-white"
+                            ? "bg-teal-400 hover:bg-teal-300 text-teal-900"
+                            : "bg-gray-600 hover:bg-gray-500 text-white"
                             }`}
                     >
                         Salvar Alterações

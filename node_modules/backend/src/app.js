@@ -20,6 +20,7 @@ import historicoLesoesRoutes from "./routes/historicoLesoes.js";
 import titulosRoutes from "./routes/titulos.js";
 import jogadoresTitulosRoute from "./routes/jogadoresTitulos.js";
 import pdfRoute from "./routes/pdf.js"
+import databaseRoutes from "./routes/database.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -65,6 +66,8 @@ app.use("/api/nivel_ambidestrias", ambidestriaRoutes); // Rota de níveis de amb
 app.use('/api/uploads', express.static(uploadsPath)); // Serve arquivos estáticos da pasta uploads
 app.use("/api/uploads", uploadRouter); // Rota para upload de arquivos
 app.use("/api/pdf", pdfRoute);
+app.use("/api/database", databaseRoutes);
+
 
 // Rota padrão
 app.get("/", (req, res) => {

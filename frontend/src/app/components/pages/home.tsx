@@ -6,8 +6,6 @@ import BotaoTema from "../../../utils/utilities/changeTheme";
 import { useTheme } from "../../../utils/context/ThemeContext";
 import { useLoading } from "../../../utils/context/LoadingProvider";
 
-
-
 export default function Home() {
     const { isDarkMode } = useTheme();
     const { setIsLoading } = useLoading();
@@ -18,35 +16,49 @@ export default function Home() {
             label: "Cadastrar",
             icon: <FaUserPlus />,
             onClick: () => {
-                setIsLoading(true); // Ativa carregamento
+                setIsLoading(true);
                 setTimeout(() => {
                     router.push("/routes/cadastros");
-                    setIsLoading(false); // Opcional, pois pode ser desativado no useEffect da página de destino
-                }, 200); // pequeno delay só para a animação aparecer
+                    setIsLoading(false);
+                }, 200);
             },
         },
         {
             label: "Busca e Edição", icon: <FaSearch />, onClick: () => {
-                setIsLoading(true); // Ativa carregamento
+                setIsLoading(true);
                 setTimeout(() => {
                     router.push("/routes/buscaEedicao");
-                    setIsLoading(false); // Opcional, pois pode ser desativado no useEffect da página de destino
-                }, 200); // pequeno delay só para a animação aparecer
+                    setIsLoading(false);
+                }, 200);
             },
         },
-        { label: "Banco de Dados", icon: <FaDatabase />, onClick: () => alert("Indo para Banco de Dados") },
-
         {
             label: "Gerar PDFs", icon: <FaFilePdf />, onClick: () => {
-                setIsLoading(true); // Ativa carregamento
+                setIsLoading(true);
                 setTimeout(() => {
                     router.push("/routes/pdfsPage");
-                    setIsLoading(false); // Opcional, pois pode ser desativado no useEffect da página de destino
-                }, 200); // pequeno delay só para a animação aparecer
+                    setIsLoading(false);
+                }, 200);
             },
         },
-
-        { label: "Instruções", icon: <FaInfoCircle />, onClick: () => alert("Indo para Instruções") },
+        {
+            label: "Banco de Dados", icon: <FaDatabase />, onClick: () => {
+                setIsLoading(true);
+                setTimeout(() => {
+                    router.push("/routes/banco");
+                    setIsLoading(false);
+                }, 200);
+            },
+        },
+        {
+            label: "Instruções", icon: <FaInfoCircle />, onClick: () => {
+                setIsLoading(true);
+                setTimeout(() => {
+                    router.push("/routes/instrucoes");
+                    setIsLoading(false);
+                }, 200);
+            },
+        },
     ];
 
     return (
@@ -69,7 +81,6 @@ export default function Home() {
                 >
                     Cadastro de Atletas
                 </h1>
-
                 <div className="flex flex-col space-y-4">
                     {buttons.map(({ label, icon, onClick }, idx) => (
                         <motion.button
@@ -104,7 +115,5 @@ export default function Home() {
             </motion.div>
             <BotaoTema />
         </main>
-
-
     );
 }

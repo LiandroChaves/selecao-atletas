@@ -12,6 +12,10 @@ import Partidas from "../models/Partidas.js";
 import HistoricoClubes from "./HistoricoClubes.js";
 import Jogador from "../models/Jogadores.js";
 import Caracteristicas from "./Caracteristicas.js";
+import EstatisticasPartidas from "./EstatisticasPartidas.js";
+import Titulos from "./Titulos.js";
+import HistoricoLesoes from "./HistoricoLesoes.js";
+import JogadoresTitulos from "./JogadoresTitulos.js";
 import { DataTypes } from "sequelize";
 // ...
 
@@ -31,7 +35,11 @@ const models = {
     Partidas,
     Jogador,
     Caracteristicas,
-    HistoricoClubes
+    HistoricoClubes,
+    EstatisticasPartidas,
+    Titulos,
+    HistoricoLesoes,
+    JogadoresTitulos
 };
 
 Object.values(models).forEach((model) => {
