@@ -46,6 +46,14 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.post('/upload-foto', upload.single('foto'), (req, res) => {
+    if (!req.file) {
+        return res.json({
+            ok: true,
+            message: "Nenhuma foto enviada, usando placeholder.",
+            path: "placeholder.jpg" // caminho relativo dentro da pasta de uploads
+        });
+    }
+
     const filePath = `${req.jogadorFolder}/${req.file.originalname}`;
     res.json({
         ok: true,

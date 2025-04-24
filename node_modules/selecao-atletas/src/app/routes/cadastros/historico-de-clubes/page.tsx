@@ -20,17 +20,22 @@ export default function CadastroHistoricoClubes() {
         data_entrada: "",
         data_saida: "",
     });
+    const [atualizarHistorico, setAtualizarHistorico] = useState(0);
     const [erro, setErro] = useState("");
     const { isDarkMode } = useTheme();
     const { setIsLoading } = useLoading();
     const router = useRouter();
 
+
     useEffect(() => {
         setIsLoading(false);
         fetchJogadores();
         fetchClubes();
-        fetchHistoricos();
     }, []);
+
+    useEffect(() => {
+        fetchHistoricos();
+    }, [atualizarHistorico]);
 
     const fetchJogadores = async () => {
         const res = await fetch("http://localhost:3001/api/jogadores/pegarJogadores");
@@ -85,7 +90,7 @@ export default function CadastroHistoricoClubes() {
 
             if (res.ok) {
                 setForm({ jogador_id: "", clube_id: "", data_entrada: "", data_saida: "" });
-                fetchHistoricos();
+                setAtualizarHistorico(prev => prev + 1); // força novo fetch
             } else {
                 setErro(data.error || "Erro ao cadastrar histórico.");
                 setTimeout(() => setErro(""), 3000);
@@ -182,7 +187,7 @@ export default function CadastroHistoricoClubes() {
                 </form>
 
                 <ul className="space-y-2 text-left max-h-72 overflow-y-auto">
-                    {historicos.map((h) => (
+                    {Array.isArray(historicos) && historicos.map((h) => (
                         <li
                             key={h.id}
                             className={`p-2 rounded ${isDarkMode ? "bg-teal-600 text-white" : "bg-white text-black border border-gray-300"}`}

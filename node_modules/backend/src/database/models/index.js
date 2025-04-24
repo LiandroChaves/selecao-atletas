@@ -15,6 +15,9 @@ import Caracteristicas from "./Caracteristicas.js";
 import { DataTypes } from "sequelize";
 // ...
 
+Jogador.hasMany(HistoricoClubes, { as: "historico", foreignKey: "jogador_id" });
+HistoricoClubes.belongsTo(Jogador, { as: "jogador", foreignKey: "jogador_id" });
+
 const models = {
     Pais,
     NivelAmbidestria,

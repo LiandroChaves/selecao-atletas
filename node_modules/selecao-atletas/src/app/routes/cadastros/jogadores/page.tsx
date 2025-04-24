@@ -126,7 +126,10 @@ export default function CadastroJogadores() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!nome.trim() || !dataNascimento.trim() || !paisId || !cidadeId || !altura.trim() || !peso.trim() || !peDominante || !nivelAmbidestriaId || !posicaoId || !clubeId) {
+        if (
+            !nome.trim() || !dataNascimento.trim() || !paisId || !cidadeId || !altura.trim() ||
+            !peso.trim() || !peDominante || !nivelAmbidestriaId || !posicaoId || !clubeId
+        ) {
             setErro("⚠️ Todos os campos são obrigatórios.");
             setTimeout(() => setErro(""), 3000);
             return;
@@ -158,7 +161,8 @@ export default function CadastroJogadores() {
         let nomeArquivoFoto = "";
 
         try {
-            // 🔽 Upload da imagem (se existir)
+            let uploadData;
+
             if (foto) {
                 const formData = new FormData();
                 formData.append("foto", foto);
@@ -167,22 +171,27 @@ export default function CadastroJogadores() {
                     method: "POST",
                     body: formData,
                 });
-                const uploadData = await uploadRes.json();
 
-                if (!uploadData.ok || !uploadData.path) {
-                    setErro("⚠️ Erro ao fazer upload da foto.");
-                    return;
-                }
+                uploadData = await uploadRes.json();
+            } else {
+                const uploadRes = await fetch("http://localhost:3001/api/uploads/upload-foto", {
+                    method: "POST",
+                });
 
-                nomeArquivoFoto = uploadData.path; // 👈 caminho completo agora
-                console.log("Upload da foto concluído:", uploadData.path);
-
+                uploadData = await uploadRes.json();
             }
+
+            if (!uploadData.ok || !uploadData.path) {
+                setErro("⚠️ Erro ao processar a foto.");
+                return;
+            }
+
+            nomeArquivoFoto = uploadData.path;
+            console.log("Foto atribuída:", nomeArquivoFoto);
 
             const inicioFinal = contratoInicio.trim() === "" ? null : contratoInicio;
             const fimFinal = contratoFim.trim() === "" ? null : contratoFim;
 
-            // 🔽 Inserção do jogador
             const res = await fetch("http://localhost:3001/api/jogadores/inserirJogador", {
                 method: "POST",
                 body: JSON.stringify({
@@ -201,7 +210,7 @@ export default function CadastroJogadores() {
                     clube_atual_id: parseInt(clubeId),
                     contrato_inicio: inicioFinal,
                     contrato_fim: fimFinal,
-                    foto: nomeArquivoFoto, // só nome do arquivo
+                    foto: nomeArquivoFoto,
                 }),
                 headers: {
                     "Content-Type": "application/json",
@@ -241,7 +250,6 @@ export default function CadastroJogadores() {
             console.error("Erro ao inserir jogador:", error);
         }
     };
-
 
     const handleFotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -546,11 +554,14 @@ export default function CadastroJogadores() {
                                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-stretch">
                                     {/* Imagem do jogador */}
                                     <img
-                                        src={`http://localhost:3001/api/uploads/${jogador.foto}`}
-                                        alt={`Foto de ${jogador.nome}`}
+                                        src={
+                                            jogador.foto
+                                                ? `http://localhost:3001/api/uploads/${jogador.foto}`
+                                                : "/assets/default-placeholder.jpg"
+                                        }
+                                        alt={jogador.nome}
                                         className="w-full sm:w-64 object-cover rounded-md border h-auto sm:h-full"
                                     />
-
                                     {/* Informações do jogador */}
                                     <div className={`flex-1 text-sm ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                                         <div><strong>ID:</strong> {jogador.id} - <strong>{jogador.nome}</strong></div>

@@ -202,6 +202,7 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
     const detectarTipoInput = (chave: string, valor: any) => {
         if (chave.toLowerCase().includes("imagem")) return "file";
         if (chave.toLowerCase().includes("foto")) return "file";
+        if (chave.toLowerCase().includes("foto") && chave.toLocaleLowerCase().includes("foto") == null) return "file";
         if (typeof valor === "number") return "number";
         if (chave.toLowerCase().includes("descricao") || chave.toLowerCase().includes("mensagem")) return "textarea";
         if (chave.toLowerCase().includes("data") || chave.toLowerCase().includes("date")) return "date";
@@ -309,7 +310,9 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                 <div className="text-inherit overflow-y-auto max-h-[60vh] pr-2">
                     <h2 className="text-2xl font-bold mb-4 text-center">Editar Registro</h2>
                     {Object.entries(valores)
-                        .filter(([chave]) => !["createdAt", "updatedAt", "deletedAt", "created_at", "updated_at", "deleted_at"].includes(chave))
+                        .filter(([chave]) =>
+                            !["createdAt", "updatedAt", "deletedAt", "created_at", "updated_at", "deleted_at"].includes(chave)
+                        )
                         .map(([chave, valor]) => {
                             const tipo = detectarTipoInput(chave, valor);
                             const isReadOnly = chave === "id";
@@ -317,53 +320,63 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                             return (
                                 <div key={chave} className="mb-4">
                                     <label className="block text-sm mb-1 font-medium">{chave}</label>
+
                                     {tipo === "textarea" ? (
                                         <textarea
                                             value={valor ?? ""}
                                             onChange={(e) => handleChange(chave, e.target.value)}
-                                            className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 text-gray-500" : "bg-white text-gray-700"}`}
+                                            className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 text-gray-500" : "bg-white text-gray-700"
+                                                }`}
                                         />
-                                    )
-                                        : tipo === "date" ? (
-                                            <DateInput
-                                                value={valor}
-                                                onChange={(newValue: string) => handleChange(chave, newValue)}
-                                            />
-                                        )
-                                            : tipo === "file" ? (
-                                                <div className="flex flex-col gap-2">
-                                                    {valor && typeof valor === "string" && (
-                                                        <div className="flex flex-col items-center">
-                                                            <img
-                                                                src={`http://localhost:3001/api/uploads/${valor}`}
-                                                                alt="Imagem atual"
-                                                                className="max-w-[200px] max-h-[200px] object-cover rounded"
-                                                            />
-                                                            <p className="text-sm text-gray-400 mt-2">Imagem atual</p>
-                                                        </div>
-                                                    )}
-                                                    <input
-                                                        type="file"
-                                                        onChange={(e) => handleChange(chave, e.target.files?.[0] || "")}
-                                                        disabled={isReadOnly}
-                                                        className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 cursor-not-allowed" : "bg-white text-gray-700"}`}
-                                                    />
-                                                </div>
-                                            ) : (
-                                                <input
-                                                    type={tipo}
-                                                    value={tipo === "number" ? valor ?? 0 : valor ?? ""}
-                                                    onChange={(e) => handleChange(chave, tipo === "number" ? Number(e.target.value) : e.target.value)}
-                                                    readOnly={isReadOnly}
-                                                    className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 text-gray-500" : "bg-white text-gray-700"}`}
+                                    ) : tipo === "date" ? (
+                                        <DateInput
+                                            value={valor}
+                                            onChange={(newValue: string) => handleChange(chave, newValue)}
+                                        />
+                                    ) : tipo === "file" ? (
+                                        <div className="flex flex-col gap-2">
+                                            <div className="flex flex-col items-center">
+                                                <img
+                                                    src={
+                                                        valor && typeof valor === "string"
+                                                            ? `http://localhost:3001/api/uploads/${valor}`
+                                                            : "/assets/default-placeholder.jpg"
+                                                    }
+                                                    alt="Imagem atual"
+                                                    className="max-w-[200px] max-h-[200px] object-cover rounded"
                                                 />
-                                            )}
+                                                <p className="text-sm text-gray-400 mt-2">
+                                                    {valor ? "Imagem atual" : "Nenhuma imagem enviada"}
+                                                </p>
+                                            </div>
+                                            <input
+                                                type="file"
+                                                onChange={(e) => handleChange(chave, e.target.files?.[0] || "")}
+                                                disabled={isReadOnly}
+                                                className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 cursor-not-allowed" : "bg-white text-gray-700"
+                                                    }`}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <input
+                                            type={tipo}
+                                            value={tipo === "number" ? valor ?? 0 : valor ?? ""}
+                                            onChange={(e) =>
+                                                handleChange(chave, tipo === "number" ? Number(e.target.value) : e.target.value)
+                                            }
+                                            readOnly={isReadOnly}
+                                            className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 text-gray-500" : "bg-white text-gray-700"
+                                                }`}
+                                        />
+                                    )}
+
                                     {nomesRelacionados[chave] && (
                                         <p className="text-xs text-gray-300 mt-1">Relacionado: {nomesRelacionados[chave]}</p>
                                     )}
                                 </div>
                             );
                         })}
+
                     {mensagemSucesso && (
                         <div className="text-green-300 text-sm text-center mb-4">{mensagemSucesso}</div>
                     )}
@@ -371,8 +384,8 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                     <button
                         onClick={handleSubmit}
                         className={`w-full py-2 rounded font-semibold transition ${isDarkMode
-                            ? "bg-teal-400 hover:bg-teal-300 text-teal-900"
-                            : "bg-gray-600 hover:bg-gray-500 text-white"
+                                ? "bg-teal-400 hover:bg-teal-300 text-teal-900"
+                                : "bg-gray-600 hover:bg-gray-500 text-white"
                             }`}
                     >
                         Salvar Alterações

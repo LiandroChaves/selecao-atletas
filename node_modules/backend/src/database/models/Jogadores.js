@@ -125,6 +125,6 @@ Jogador.belongsTo(NivelAmbidestria, { as: 'nivel_ambidestria', foreignKey: 'nive
 Jogador.belongsTo(Posicao, { as: 'posicao_secundaria', foreignKey: 'posicao_secundaria_id' });
 
 Jogador.hasMany(Caracteristicas, { as: "caracteristicas", foreignKey: "jogador_id" });
-Jogador.hasMany(HistoricoClubes, { as: "historico", foreignKey: "jogador_id" })
+// Jogador.hasMany(HistoricoClubes, { as: "historico", foreignKey: "jogador_id" })
 
 export default Jogador;
