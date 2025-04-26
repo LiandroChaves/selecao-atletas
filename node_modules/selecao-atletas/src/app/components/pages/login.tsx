@@ -8,6 +8,7 @@ import BotaoTema from "../../../utils/utilities/changeTheme";
 import { FaSignInAlt, FaEye, FaEyeSlash, FaUserPlus } from "react-icons/fa";
 import { AnimatePresence } from "framer-motion";
 import { useLoading } from "@/utils/context/LoadingProvider";
+import { ModalLicencaExpirada } from "../modals/modalLicecaExpirada";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -21,6 +22,7 @@ export default function LoginPage() {
     const [novaSenha, setNovaSenha] = useState("");
     const [mostrarSenhaLogin, setMostrarSenhaLogin] = useState(false);
     const [mostrarSenha, setMostrarSenha] = useState(false);
+    const [modalAberto, setModalAberto] = useState(false);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -36,7 +38,11 @@ export default function LoginPage() {
                 body: JSON.stringify({ email, senha }),
             });
 
-            const data = await response.json();
+            const data = await response.json(); // <- só aqui! (UMA VEZ)
+
+            if (response.status === 403) {
+                throw new Error("Licença expirada. Favor entrar em contato com o desenvolvedor.");
+            }
 
             if (!response.ok) {
                 throw new Error(data.mensagem || "Erro ao autenticar");
@@ -49,13 +55,16 @@ export default function LoginPage() {
 
             router.push("/routes/home");
         } catch (err: any) {
-            setErro(err.message);
+            console.log("Erro no login:", err.message);
+            if (err.message.includes("Licença expirada")) {
+                setModalAberto(true); // abre o modal
+            } else {
+                setErro(err.message || "Erro ao autenticar.");
+            }
         } finally {
-            setIsLoading(false); // esconde a tela de loading
+            setIsLoading(false);
         }
     };
-
-
 
     return (
         <main
@@ -84,6 +93,13 @@ export default function LoginPage() {
                         {erro}
                     </p>
                 )}
+
+                <ModalLicencaExpirada
+                    isOpen={modalAberto}
+                    onClose={() => setModalAberto(false)}
+                    title="Licença Expirada"
+                    message="Sua licença expirou. Por favor, entre em contato com o desenvolvedor para renovação."
+                />
 
                 <div className="mb-4">
                     <label
