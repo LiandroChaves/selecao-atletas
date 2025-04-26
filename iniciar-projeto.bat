@@ -7,7 +7,7 @@ cd backend
 call npm install
 
 echo Iniciando backend...
-start cmd /k "npm start"
+start cmd /k "npm run dev"
 
 cd ..
 echo Instalando dependências do frontend...
