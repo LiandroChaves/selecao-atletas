@@ -1,3 +1,4 @@
+import { verificarLicenca } from './middleware/verificarLicenca.js';
 import express from "express";
 import cors from "cors";
 import testConnection from "./database/seq.js";
@@ -24,8 +25,6 @@ import databaseRoutes from "./routes/database.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-
-
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -40,6 +39,9 @@ const uploadsPath = path.join(__dirname, '..', 'uploads');
 
 // Testa conexão com o banco
 testConnection();
+
+// verificação temporária
+app.use(verificarLicenca);
 
 // Rotas
 app.use("/api/paises", paisesRoutes); // Rota de países

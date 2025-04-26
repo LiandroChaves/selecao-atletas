@@ -13,16 +13,16 @@ export default function PdfsPage() {
     const { isDarkMode } = useTheme();
     const { setIsLoading } = useLoading();
     const [jogadores, setJogadores] = useState<Jogador[]>([]);
-
+    
+    useEffect(() => {
+        setIsLoading(false);
+    }, []);
+    
     interface Jogador {
         id: string | number;
         nome_curto: string;
         nome: string;
     }
-
-    useEffect(() => {
-        setIsLoading(false);
-    }, []);
 
     useEffect(() => {
         const fetchJogadores = async () => {

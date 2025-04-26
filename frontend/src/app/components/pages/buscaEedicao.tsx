@@ -209,9 +209,6 @@ export default function BuscaEedicao() {
                                             onClick={async () => {
                                                 const confirm = window.confirm(`Tem certeza que deseja deletar o item: ${getNomeExibicao(item)}?`);
 
-                                                const capitalize = (str: string) =>
-                                                    str.charAt(0).toUpperCase() + str.slice(1);
-
                                                 if (confirm && selected) {
                                                     try {
                                                         const endpointMap: Record<string, string> = {

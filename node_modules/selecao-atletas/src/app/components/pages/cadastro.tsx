@@ -17,7 +17,6 @@ import {
     FaHistory,
     FaBriefcaseMedical,
     FaTrophy,
-    FaUserShield,
     FaCity,
     FaMapMarkedAlt,
 } from "react-icons/fa";

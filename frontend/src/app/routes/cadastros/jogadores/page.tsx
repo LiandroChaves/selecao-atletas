@@ -9,6 +9,7 @@ import BotaoTema from "@/utils/utilities/changeTheme";
 import { useLoading } from "@/utils/context/LoadingProvider";
 import { verificarTokenValido } from "@/utils/verificarTokenValido";
 import dayjs from "dayjs";
+import Image from "next/image";
 
 export default function CadastroJogadores() {
     const [nome, setNome] = useState("");
@@ -251,12 +252,6 @@ export default function CadastroJogadores() {
         }
     };
 
-    const handleFotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            setFoto(e.target.files[0] as File);
-        }
-    };
-
     // Função para validar altura
     const handleAlturaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -413,7 +408,6 @@ export default function CadastroJogadores() {
                                 <option value="">Selecione o pé dominante</option>
                                 <option value="D">Direito</option>
                                 <option value="E">Esquerdo</option>
-                                <option value="A">Ambidestro</option>
                             </select>
                         </div>
 
@@ -553,7 +547,7 @@ export default function CadastroJogadores() {
                             >
                                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-stretch">
                                     {/* Imagem do jogador */}
-                                    <img
+                                    <Image
                                         src={
                                             jogador.foto
                                                 ? `http://localhost:3001/api/uploads/${jogador.foto}`

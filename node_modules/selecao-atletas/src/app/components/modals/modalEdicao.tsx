@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTheme } from "../../../utils/context/ThemeContext";
-import { useRef } from 'react';
-// import InputMask from "react-input-mask-next";
-import { InputMask } from '@react-input/mask';
 import { DateInput } from "./input";
+import Image from "next/image";
 
 interface ModalEdicaoProps {
     isOpen: boolean;
@@ -19,7 +17,6 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
     const [valores, setValores] = useState<{ [key: string]: any }>({});
     const [mensagemSucesso, setMensagemSucesso] = useState("");
     const [nomesRelacionados, setNomesRelacionados] = useState<{ [chave: string]: string }>({});
-    const inputRef = useRef<HTMLInputElement>(null);
 
     const getEndpoint = (chave: string) => {
         const mapa = {
@@ -336,7 +333,7 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                                     ) : tipo === "file" ? (
                                         <div className="flex flex-col gap-2">
                                             <div className="flex flex-col items-center">
-                                                <img
+                                                <Image
                                                     src={
                                                         valor && typeof valor === "string"
                                                             ? `http://localhost:3001/api/uploads/${valor}`

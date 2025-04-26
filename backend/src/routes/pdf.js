@@ -42,7 +42,6 @@ const ASSETS = {
     pe: {
         E: path.join(basePath, "pe_esquerdo.png"),
         D: path.join(basePath, "pe_direito.png"),
-        A: path.join(basePath, "pe_ambos.png"),
     },
     campo: pos => path.join(basePath, `campo_${pos}.png`),
     borda: path.join(basePath, "borda.png")
