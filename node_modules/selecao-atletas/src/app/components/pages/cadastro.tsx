@@ -30,6 +30,7 @@ const cadastros = [
     { label: "Posições", icon: <FaUserTag /> },
     { label: "Clubes", icon: <FaUsers /> },
     { label: "Jogadores", icon: <FaFutbol /> },
+    { label: "Caracteristica do Jogador", icon: <FaIdBadge /> },
     { label: "Estatísticas Gerais", icon: <FaChartLine /> },
     { label: "Partidas", icon: <FaFutbol /> },
     { label: "Estatísticas por Partida", icon: <FaChartLine /> },
@@ -37,7 +38,6 @@ const cadastros = [
     { label: "Histórico de Lesões", icon: <FaBriefcaseMedical /> },
     { label: "Títulos", icon: <FaTrophy /> },
     { label: "Jogadores - Títulos", icon: <FaTrophy /> },
-    { label: "Caracteristica do Jogador", icon: <FaIdBadge /> },
 ];
 
 function slugify(text: string) {

@@ -24,6 +24,7 @@ const cadastros = [
     { label: "Posições", icon: <FaUserTag />, endpoint: "posicoes/pegarPosicoes" },
     { label: "Clubes", icon: <FaUsers />, endpoint: "clubes/pegarClubes" },
     { label: "Jogadores", icon: <FaFutbol />, endpoint: "jogadores/pegarJogadores" },
+    { label: "Caracteristica do Jogador", icon: <FaIdBadge />, endpoint: "caracteristica-jogadores/pegarCaracteristicas" },
     { label: "Estatísticas Gerais", icon: <FaChartLine />, endpoint: "estatisticas/pegarEstatisticasGerais" },
     { label: "Partidas", icon: <FaFutbol />, endpoint: "partidas/pegarPartidas" },
     { label: "Estatísticas por Partida", icon: <FaChartLine />, endpoint: "estatisticas-partidas/pegarEstatisticasPartida" },
@@ -31,7 +32,6 @@ const cadastros = [
     { label: "Histórico de Lesões", icon: <FaBriefcaseMedical />, endpoint: "historico-lesoes/pegarHistoricoLesoes" },
     { label: "Títulos", icon: <FaTrophy />, endpoint: "titulos/pegarTitulos" },
     { label: "Jogadores - Títulos", icon: <FaTrophy />, endpoint: "jogadores-titulos/pegarJogadoresTitulos" },
-    { label: "Caracteristica do Jogador", icon: <FaIdBadge />, endpoint: "caracteristica-jogadores/pegarCaracteristicas" },
 ];
 
 export default function BuscaEedicao() {
