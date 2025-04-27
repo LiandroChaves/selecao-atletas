@@ -19,7 +19,8 @@ import estatisticasPartidasRoutes from "./routes/estatisticasPartidas.js";
 import historicoClubesRoutes from "./routes/historicoClubes.js";
 import historicoLesoesRoutes from "./routes/historicoLesoes.js";
 import titulosRoutes from "./routes/titulos.js";
-import jogadoresTitulosRoute from "./routes/jogadoresTitulos.js";
+import jogadoresTitulosRoutes from "./routes/jogadoresTitulos.js";
+import caracteristicasJogadoresRoutes from "./routes/caracteristica.js";
 import pdfRoute from "./routes/pdf.js"
 import databaseRoutes from "./routes/database.js";
 import path from 'path';
@@ -60,10 +61,11 @@ app.use("/api/estatisticas-partidas", estatisticasPartidasRoutes); // Rota de es
 app.use("/api/historico-clubes", historicoClubesRoutes); // Rota de histórico de clubes
 app.use("/api/historico-lesoes", historicoLesoesRoutes); // Rota de histórico de lesões
 app.use("/api/titulos", titulosRoutes); // Rota de títulos
-app.use("/api/jogadores-titulos", jogadoresTitulosRoute); // Rota de jogadores e títulos
+app.use("/api/jogadores-titulos", jogadoresTitulosRoutes); // Rota de jogadores e títulos
 app.use("/api/posicao_secundarias", posicoesRoutes);
 app.use("/api/clube_atuals", clubesRoutes); // Rota de clubes atuais
 app.use("/api/nivel_ambidestrias", ambidestriaRoutes); // Rota de níveis de ambidestria
+app.use("/api/caracteristica-jogadores", caracteristicasJogadoresRoutes); // Rota de descricao de jogadores
 
 app.use('/api/uploads', express.static(uploadsPath)); // Serve arquivos estáticos da pasta uploads
 app.use("/api/uploads", uploadRouter); // Rota para upload de arquivos
@@ -81,4 +83,4 @@ app.listen(PORT, () => {
     console.log(`🔥 Servidor rodando em http://localhost:${PORT}`);
 });
 
-// http://localhost:3001/api/   // Rota padrão
+// http://localhost:3001/   // Rota padrão

@@ -36,7 +36,7 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
             jogador_titulo_id: "jogadores-titulos",
             clube_casa_id: "clubes",
             clube_fora_id: "clubes",
-
+            caracteristica: "caracteristica-jogadores"
         };
         return mapa[chave as keyof typeof mapa] || chave.replace("_id", "") + "s";
     };
@@ -151,7 +151,8 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
             "historico-clubes": "historicoClube",
             "historico-lesoes": "historicoLesao",
             "titulos": "titulo",
-            "jogadores-titulos": "jogadorTitulo"
+            "jogadores-titulos": "jogadorTitulo",
+            "caracteristica-jogadores": "caracteristica"
         };
         return mapa[endpoint.split("/")[0] as keyof typeof mapa] || endpoint;
     };

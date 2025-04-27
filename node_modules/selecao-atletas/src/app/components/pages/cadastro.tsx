@@ -19,8 +19,8 @@ import {
     FaTrophy,
     FaCity,
     FaMapMarkedAlt,
+    FaIdBadge
 } from "react-icons/fa";
-
 
 const cadastros = [
     { label: "Países", icon: <FaFlag /> },
@@ -37,6 +37,7 @@ const cadastros = [
     { label: "Histórico de Lesões", icon: <FaBriefcaseMedical /> },
     { label: "Títulos", icon: <FaTrophy /> },
     { label: "Jogadores - Títulos", icon: <FaTrophy /> },
+    { label: "Caracteristica do Jogador", icon: <FaIdBadge /> },
 ];
 
 function slugify(text: string) {

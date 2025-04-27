@@ -11,7 +11,7 @@ import {
     FaFlag, FaStarHalfAlt, FaUserTag, FaUsers,
     FaFutbol, FaChartLine, FaHistory,
     FaBriefcaseMedical, FaTrophy, FaCity, FaMapMarkedAlt,
-    FaEdit, FaTrash
+    FaEdit, FaTrash, FaIdBadge
 } from "react-icons/fa";
 import BotaoTema from "../../../utils/utilities/changeTheme";
 import ModalEdicao from "../modals/modalEdicao";
@@ -31,6 +31,7 @@ const cadastros = [
     { label: "Histórico de Lesões", icon: <FaBriefcaseMedical />, endpoint: "historico-lesoes/pegarHistoricoLesoes" },
     { label: "Títulos", icon: <FaTrophy />, endpoint: "titulos/pegarTitulos" },
     { label: "Jogadores - Títulos", icon: <FaTrophy />, endpoint: "jogadores-titulos/pegarJogadoresTitulos" },
+    { label: "Caracteristica do Jogador", icon: <FaIdBadge />, endpoint: "caracteristica-jogadores/pegarCaracteristicas" },
 ];
 
 export default function BuscaEedicao() {
@@ -172,9 +173,9 @@ export default function BuscaEedicao() {
                                 // 📅 Se tiver só data
                                 if (item.data) return item.data;
 
-                                
+
                                 if (item.titulo?.nome) return item.titulo.nome;
-                                
+
                                 // 🔢 Se não achar nada, tenta pegar ID
                                 if (item.id) return `ID: ${item.id}`;
 
@@ -226,6 +227,7 @@ export default function BuscaEedicao() {
                                                             "historico-lesoes/pegarHistoricoLesoes": "historico-lesoes/deletarHistoricoLesao",
                                                             "titulos/pegarTitulos": "titulos/deletarTitulo",
                                                             "jogadores-titulos/pegarJogadoresTitulos": "jogadores-titulos/deletarJogadorTitulo",
+                                                            "caracteristica-jogadores/pegarCaracteristicas": "caracteristica-jogadores/deletarCaracteristicas"
                                                         };
 
                                                         const deleteEndpoint = endpointMap[selected.endpoint];

@@ -16,11 +16,12 @@ import EstatisticasPartidas from "./EstatisticasPartidas.js";
 import Titulos from "./Titulos.js";
 import HistoricoLesoes from "./HistoricoLesoes.js";
 import JogadoresTitulos from "./JogadoresTitulos.js";
-import { DataTypes } from "sequelize";
-// ...
+import CaracteristicasJogador from "./Caracteristicas.js";
 
 Jogador.hasMany(HistoricoClubes, { as: "historico", foreignKey: "jogador_id" });
+Jogador.hasMany(CaracteristicasJogador, { as: "descricoes", foreignKey: "jogador_id" });
 HistoricoClubes.belongsTo(Jogador, { as: "jogador", foreignKey: "jogador_id" });
+CaracteristicasJogador.belongsTo(Jogador, { as: "jogador", foreignKey: "jogador_id" });
 
 const models = {
     Pais,
