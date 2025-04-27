@@ -1,32 +1,15 @@
 import sequelize from './db.js';
-import Clubes from './models/Clubes.js';
 import models from './models/index.js';
-import Jogador from './models/Jogadores.js';
-import Partidas from './models/Partidas.js';
-import EstatisticaGeral from './models/EstatisticasGerais.js';
-import EstatisticasPartidas from './models/EstatisticasPartidas.js';
-import HistoricoClubes from './models/HistoricoClubes.js';
-import HistoricoLesoes from './models/HistoricoLesoes.js';
-import Titulos from './models/Titulos.js';
-import JogadoresTitulos from './models/JogadoresTitulos.js';
-import dayjs from 'dayjs';
 
 const {
     Pais,
     Estados,
     Cidades,
     NivelAmbidestria,
-    Usuarios,
     Posicoes,
-    // Partidas,
 } = models;
 
 const seedData = async () => {
-    const eu = { email: "LChaveszzz", senha: "$2b$06$TVaT15su2m0no0Lo49hwleZunhF1gR.Vf7keWtl6AFEbhkL7vGkOa" }
-
-    await Usuarios.bulkCreate([
-        { email: eu.email, senha: eu.senha }
-    ]);
 
     const brasil = await Pais.create({ nome: 'Brasil' });
 
