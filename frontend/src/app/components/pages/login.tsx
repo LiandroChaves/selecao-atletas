@@ -111,8 +111,9 @@ export default function LoginPage() {
                     <input
                         type="text"
                         value={email}
+                        placeholder="Digite seu nome de usuário"
                         onChange={(e) => setEmail(e.target.value)}
-                        className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                        className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white w-full"
                         required
                     />
                 </div>
@@ -128,7 +129,7 @@ export default function LoginPage() {
                         type={mostrarSenhaLogin ? "text" : "password"}
                         value={senha}
                         onChange={(e) => setSenha(e.target.value)}
-                        className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                        className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white w-full"
                         placeholder="Digite sua senha"
                         required
                     />
