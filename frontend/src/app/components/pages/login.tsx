@@ -112,7 +112,7 @@ export default function LoginPage() {
                         type="text"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full p-2 rounded-lg border border-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                        className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
                         required
                     />
                 </div>
@@ -128,7 +128,7 @@ export default function LoginPage() {
                         type={mostrarSenhaLogin ? "text" : "password"}
                         value={senha}
                         onChange={(e) => setSenha(e.target.value)}
-                        className="w-full p-2 rounded-lg border border-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                        className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
                         placeholder="Digite sua senha"
                         required
                     />
