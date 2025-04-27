@@ -23,7 +23,13 @@ export default function CadastroNiveisAmbidestria() {
 
     async function fetchNiveis() {
         try {
-            const res = await fetch("http://localhost:3001/api/ambidestria/pegarNiveis");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/ambidestria/pegarNiveis`);
+
             const data = await res.json();
             setNiveis(data);
         } catch (error) {
@@ -51,7 +57,12 @@ export default function CadastroNiveisAmbidestria() {
         try {
             const token = localStorage.getItem("token");
 
-            const res = await fetch("http://localhost:3001/api/ambidestria/inserirNivel", {
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/ambidestria/inserirNivel`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -59,6 +70,7 @@ export default function CadastroNiveisAmbidestria() {
                 },
                 body: JSON.stringify({ descricao: descricaoFormatada }),
             });
+
 
             const data = await res.json();
 

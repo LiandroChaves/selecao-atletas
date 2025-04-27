@@ -54,8 +54,12 @@ export default function CadastroJogadores() {
 
     const fetchPaises = async () => {
         try {
-            const res = await fetch("http://localhost:3001/api/paises/pegarPaises");
-            const data = await res.json();
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/paises/pegarPaises`); const data = await res.json();
             setPaises(data);
         } catch (err) {
             console.error("Erro ao buscar países:", err);
@@ -64,7 +68,12 @@ export default function CadastroJogadores() {
 
     const fetchEstados = async () => {
         try {
-            const res = await fetch("http://localhost:3001/api/estados/pegarEstados");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/estados/pegarEstados`);
             const data = await res.json();
             setEstados(data);
         } catch (err) {
@@ -74,7 +83,12 @@ export default function CadastroJogadores() {
 
     const fetchCidades = async () => {
         try {
-            const res = await fetch("http://localhost:3001/api/cidades/pegarCidades");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/cidades/pegarCidades`);
             const data = await res.json();
             setCidades(data);
         } catch (err) {
@@ -84,7 +98,12 @@ export default function CadastroJogadores() {
 
     const fetchClubes = async () => {
         try {
-            const res = await fetch("http://localhost:3001/api/clubes/pegarClubes");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/clubes/pegarClubes`);
             const data = await res.json();
             setClubes(data);
         } catch (err) {
@@ -94,8 +113,12 @@ export default function CadastroJogadores() {
 
     const fetchPosicoes = async () => {
         try {
-            const res = await fetch("http://localhost:3001/api/posicoes/pegarPosicoes");
-            const data = await res.json();
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/posicoes/pegarPosicoes`); const data = await res.json();
             setPosicoes(data);
         } catch (err) {
             console.error("Erro ao buscar posições:", err);
@@ -104,7 +127,12 @@ export default function CadastroJogadores() {
 
     const fetchNiveis = async () => {
         try {
-            const res = await fetch("http://localhost:3001/api/ambidestria/pegarNiveis");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/ambidestria/pegarNiveis`);
             const data = await res.json();
             setNiveis(data);
         } catch (error) {
@@ -114,7 +142,12 @@ export default function CadastroJogadores() {
 
     const fetchJogadores = async () => {
         try {
-            const res = await fetch("http://localhost:3001/api/jogadores/pegarJogadores");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/jogadores/pegarJogadores`);
             const data = await res.json();
             setJogadores(data);
             setIsLoading(false);
@@ -168,14 +201,24 @@ export default function CadastroJogadores() {
                 const formData = new FormData();
                 formData.append("foto", foto);
 
-                const uploadRes = await fetch("http://localhost:3001/api/uploads/upload-foto", {
+                const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+                const API_URL = isLocalhost
+                    ? 'http://localhost:3001'
+                    : `http://${window.location.hostname}:3001`;
+
+                const uploadRes = await fetch(`${API_URL}/api/uploads/upload-foto`, {
                     method: "POST",
                     body: formData,
                 });
 
                 uploadData = await uploadRes.json();
             } else {
-                const uploadRes = await fetch("http://localhost:3001/api/uploads/upload-foto", {
+                const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+                const API_URL = isLocalhost
+                    ? 'http://localhost:3001'
+                    : `http://${window.location.hostname}:3001`;
+
+                const uploadRes = await fetch(`${API_URL}/api/uploads/upload-foto`, {
                     method: "POST",
                 });
 
@@ -193,7 +236,12 @@ export default function CadastroJogadores() {
             const inicioFinal = contratoInicio.trim() === "" ? null : contratoInicio;
             const fimFinal = contratoFim.trim() === "" ? null : contratoFim;
 
-            const res = await fetch("http://localhost:3001/api/jogadores/inserirJogador", {
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/jogadores/inserirJogador`, {
                 method: "POST",
                 body: JSON.stringify({
                     nome: nomeFormatado,
@@ -218,6 +266,7 @@ export default function CadastroJogadores() {
                     Authorization: `Bearer ${token}`,
                 },
             });
+
 
             const data = await res.json();
 

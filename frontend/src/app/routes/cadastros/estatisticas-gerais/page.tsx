@@ -53,7 +53,12 @@ export default function CadastroEstatisticasGerais() {
     useEffect(() => {
         async function fetchJogadores() {
             try {
-                const res = await fetch("http://localhost:3001/api/jogadores/pegarJogadores");
+                const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+                const API_URL = isLocalhost
+                    ? 'http://localhost:3001'
+                    : `http://${window.location.hostname}:3001`;
+
+                const res = await fetch(`${API_URL}/api/jogadores/pegarJogadores`);
                 const data = await res.json();
                 setJogadores(data);
                 setIsLoading(false);
@@ -68,7 +73,13 @@ export default function CadastroEstatisticasGerais() {
 
     async function fetchEstatisticas() {
         try {
-            const res = await fetch("http://localhost:3001/api/estatisticas/pegarEstatisticasGerais");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/estatisticas/pegarEstatisticasGerais`);
+
             const data = await res.json();
             setEstatisticas(data);
         } catch (error) {
@@ -90,7 +101,12 @@ export default function CadastroEstatisticasGerais() {
         const token = localStorage.getItem("token");
 
         try {
-            const res = await fetch("http://localhost:3001/api/estatisticas/inserirEstatisticaGeral", {
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/estatisticas/inserirEstatisticaGeral`, {
                 method: "POST",
                 body: JSON.stringify({
                     jogador_id: parseInt(jogadorId),
@@ -101,7 +117,6 @@ export default function CadastroEstatisticasGerais() {
                     Authorization: `Bearer ${token}`,
                 },
             });
-
 
             const data = await res.json();
 

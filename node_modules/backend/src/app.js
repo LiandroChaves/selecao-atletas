@@ -25,6 +25,22 @@ import pdfRoute from "./routes/pdf.js"
 import databaseRoutes from "./routes/database.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
+import os from 'os';
+
+// Função para pegar o IP local
+function getLocalIP() {
+    const interfaces = os.networkInterfaces();
+    for (const name of Object.keys(interfaces)) {
+        for (const iface of interfaces[name]) {
+            if (iface.family === 'IPv4' && !iface.internal) {
+                return iface.address;
+            }
+        }
+    }
+    return 'localhost';
+}
+
+const localIP = getLocalIP();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -80,7 +96,10 @@ app.get("/", (req, res) => {
 
 // Inicia o servidor
 app.listen(PORT, () => {
-    console.log(`🔥 Servidor rodando em http://localhost:${PORT}`);
+    console.log(`🔥 Servidor rodando em:`);
+    console.log(`- Localhost: http://localhost:${PORT}`);
+    console.log(`- Network:   http://${localIP}:${PORT}`);
 });
+
 
 // http://localhost:3001/   // Rota padrão

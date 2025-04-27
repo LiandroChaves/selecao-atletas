@@ -27,7 +27,12 @@ export default function CadastroDescricaoJogador() {
 
     async function fetchCaracteristicas() {
         try {
-            const res = await fetch("http://localhost:3001/api/caracteristica-jogadores/pegarCaracteristicas");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/caracteristica-jogadores/pegarCaracteristicas`);
             const data = await res.json();
             setCaracteristicas(data);
         } catch (error) {
@@ -37,7 +42,12 @@ export default function CadastroDescricaoJogador() {
 
     async function fetchJogadores() {
         try {
-            const res = await fetch("http://localhost:3001/api/jogadores/pegarJogadores");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/jogadores/pegarJogadores`);
             const data = await res.json();
             setJogadores(data);
         } catch (error) {
@@ -68,7 +78,12 @@ export default function CadastroDescricaoJogador() {
             .join(" ");
 
         try {
-            const res = await fetch("http://localhost:3001/api/caracteristica-jogadores/inserirCaracteristicas", {
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/caracteristica-jogadores/inserirCaracteristicas`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -41,19 +41,34 @@ export default function CadastroEstatisticasPartidas() {
     }, []);
 
     const fetchJogadores = async () => {
-        const res = await fetch("http://localhost:3001/api/jogadores/pegarJogadores");
+        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+        const API_URL = isLocalhost
+            ? 'http://localhost:3001'
+            : `http://${window.location.hostname}:3001`;
+
+        const res = await fetch(`${API_URL}/api/jogadores/pegarJogadores`);
         const data = await res.json();
         setJogadores(data);
     };
 
     const fetchPartidas = async () => {
-        const res = await fetch("http://localhost:3001/api/partidas/pegarPartidas");
+        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+        const API_URL = isLocalhost
+            ? 'http://localhost:3001'
+            : `http://${window.location.hostname}:3001`;
+
+        const res = await fetch(`${API_URL}/api/partidas/pegarPartidas`);
         const data = await res.json();
         setPartidas(data);
     };
 
     const fetchEstatisticas = async () => {
-        const res = await fetch("http://localhost:3001/api/estatisticas-partidas/pegarEstatisticasPartidas");
+        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+        const API_URL = isLocalhost
+            ? 'http://localhost:3001'
+            : `http://${window.location.hostname}:3001`;
+
+        const res = await fetch(`${API_URL}/api/estatisticas-partidas/pegarEstatisticasPartidas`);
         const data = await res.json();
         setEstatisticas(data);
     };
@@ -75,7 +90,12 @@ export default function CadastroEstatisticasPartidas() {
         const token = localStorage.getItem("token");
 
         try {
-            const res = await fetch("http://localhost:3001/api/estatisticas-partidas/inserirEstatisticaPartida", {
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/estatisticas-partidas/inserirEstatisticaPartida`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

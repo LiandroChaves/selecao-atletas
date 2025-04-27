@@ -34,25 +34,46 @@ export default function CadastroJogadoresTitulos() {
     }, []);
 
     const fetchJogadores = async () => {
-        const res = await fetch("http://localhost:3001/api/jogadores/pegarJogadores");
+        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+        const API_URL = isLocalhost
+            ? 'http://localhost:3001'
+            : `http://${window.location.hostname}:3001`;
+
+        const res = await fetch(`${API_URL}/api/jogadores/pegarJogadores`);
         const data = await res.json();
         setJogadores(data);
     };
 
     const fetchTitulos = async () => {
-        const res = await fetch("http://localhost:3001/api/titulos/pegarTitulos");
+        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+        const API_URL = isLocalhost
+            ? 'http://localhost:3001'
+            : `http://${window.location.hostname}:3001`;
+
+        const res = await fetch(`${API_URL}/api/titulos/pegarTitulos`);
         const data = await res.json();
         setTitulos(data);
     };
 
     const fetchClubes = async () => {
-        const res = await fetch("http://localhost:3001/api/clubes/pegarClubes");
+        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+        const API_URL = isLocalhost
+            ? 'http://localhost:3001'
+            : `http://${window.location.hostname}:3001`;
+
+        const res = await fetch(`${API_URL}/api/clubes/pegarClubes`);
         const data = await res.json();
         setClubes(data);
     };
 
     const fetchJogadoresTitulos = async () => {
-        const res = await fetch("http://localhost:3001/api/jogadores-titulos/pegarJogadoresTitulos");
+        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+        const API_URL = isLocalhost
+            ? 'http://localhost:3001'
+            : `http://${window.location.hostname}:3001`;
+
+        const res = await fetch(`${API_URL}/api/jogadores-titulos/pegarJogadoresTitulos`);
+
         const data = await res.json();
         setJogadoresTitulos(data);
     };
@@ -74,7 +95,12 @@ export default function CadastroJogadoresTitulos() {
         const token = localStorage.getItem("token");
 
         try {
-            const res = await fetch("http://localhost:3001/api/jogadores-titulos/inserirJogadorTitulo", {
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/jogadores-titulos/inserirJogadorTitulo`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

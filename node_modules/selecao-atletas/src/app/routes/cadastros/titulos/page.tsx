@@ -26,7 +26,13 @@ export default function CadastroTitulos() {
     }, []);
 
     const fetchTitulos = async () => {
-        const res = await fetch("http://localhost:3001/api/titulos/pegarTitulos");
+        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+        const API_URL = isLocalhost
+            ? 'http://localhost:3001'
+            : `http://${window.location.hostname}:3001`;
+
+        const res = await fetch(`${API_URL}/api/titulos/pegarTitulos`);
+
         const data = await res.json();
         setTitulos(data);
     };
@@ -59,7 +65,12 @@ export default function CadastroTitulos() {
 
 
         try {
-            const res = await fetch("http://localhost:3001/api/titulos/inserirTitulo", {
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/titulos/inserirTitulo`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

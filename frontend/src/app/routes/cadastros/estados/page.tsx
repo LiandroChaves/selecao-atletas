@@ -32,7 +32,13 @@ export default function CadastroEstados() {
 
     async function fetchPaises() {
         try {
-            const res = await fetch("http://localhost:3001/api/paises/pegarPaises");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/paises/pegarPaises`);
+
             const data = await res.json();
             setPaises(data);
         } catch (err) {
@@ -42,7 +48,13 @@ export default function CadastroEstados() {
 
     async function fetchEstados() {
         try {
-            const res = await fetch("http://localhost:3001/api/estados/pegarEstados");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/estados/pegarEstados`);
+
             const data = await res.json();
             console.log("📦 Estados recebidos:", data);
             setEstados(data);
@@ -74,7 +86,12 @@ export default function CadastroEstados() {
         try {
             const token = localStorage.getItem("token");
 
-            const res = await fetch("http://localhost:3001/api/estados/inserirEstados", {
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/estados/inserirEstados`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -86,6 +103,7 @@ export default function CadastroEstados() {
                     pais_id: parseInt(paisId),
                 }),
             });
+
 
             const data = await res.json();
 

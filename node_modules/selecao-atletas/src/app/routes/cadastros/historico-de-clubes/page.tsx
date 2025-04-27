@@ -38,19 +38,35 @@ export default function CadastroHistoricoClubes() {
     }, [atualizarHistorico]);
 
     const fetchJogadores = async () => {
-        const res = await fetch("http://localhost:3001/api/jogadores/pegarJogadores");
+        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+        const API_URL = isLocalhost
+            ? 'http://localhost:3001'
+            : `http://${window.location.hostname}:3001`;
+
+        const res = await fetch(`${API_URL}/api/jogadores/pegarJogadores`);
         const data = await res.json();
         setJogadores(data);
     };
 
     const fetchClubes = async () => {
-        const res = await fetch("http://localhost:3001/api/clubes/pegarClubes");
+        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+        const API_URL = isLocalhost
+            ? 'http://localhost:3001'
+            : `http://${window.location.hostname}:3001`;
+
+        const res = await fetch(`${API_URL}/api/clubes/pegarClubes`);
         const data = await res.json();
         setClubes(data);
     };
 
     const fetchHistoricos = async () => {
-        const res = await fetch("http://localhost:3001/api/historico-clubes/pegarHistorico");
+        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+        const API_URL = isLocalhost
+            ? 'http://localhost:3001'
+            : `http://${window.location.hostname}:3001`;
+
+        const res = await fetch(`${API_URL}/api/historico-clubes/pegarHistorico`);
+
         const data = await res.json();
         setHistoricos(data);
     };
@@ -72,7 +88,12 @@ export default function CadastroHistoricoClubes() {
         const token = localStorage.getItem("token");
 
         try {
-            const res = await fetch("http://localhost:3001/api/historico-clubes/inserirHistorico", {
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/historico-clubes/inserirHistorico`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

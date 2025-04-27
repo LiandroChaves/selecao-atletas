@@ -33,7 +33,12 @@ export default function CadastroClubes() {
 
     async function fetchPaises() {
         try {
-            const res = await fetch("http://localhost:3001/api/paises/pegarPaises");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/paises/pegarPaises`);
             const data = await res.json();
             setPaises(data);
         } catch (error) {
@@ -43,7 +48,12 @@ export default function CadastroClubes() {
 
     async function fetchClubes() {
         try {
-            const res = await fetch("http://localhost:3001/api/clubes/pegarClubes");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/clubes/pegarClubes`);
             const data = await res.json();
             setClubes(data);
         } catch (error) {
@@ -84,7 +94,12 @@ export default function CadastroClubes() {
         const token = localStorage.getItem("token");
 
         try {
-            const res = await fetch("http://localhost:3001/api/clubes/inserirClube", {
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/clubes/inserirClube`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -48,7 +48,12 @@ export default function CadastroPartidas() {
 
     async function buscarClubes() {
         try {
-            const res = await fetch("http://localhost:3001/api/clubes/pegarClubes");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/clubes/pegarClubes`);
             const data = await res.json();
             setClubes(data);
         } catch (error) {
@@ -58,7 +63,13 @@ export default function CadastroPartidas() {
 
     async function buscarPartidas() {
         try {
-            const res = await fetch("http://localhost:3001/api/partidas/pegarPartidas");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/partidas/pegarPartidas`);
+
             const data = await res.json();
             setPartidas(data);
         } catch (error) {
@@ -103,7 +114,12 @@ export default function CadastroPartidas() {
                 )
                 .join(" ");
 
-            const res = await fetch("http://localhost:3001/api/partidas/inserirPartida", {
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/partidas/inserirPartida`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -117,7 +133,6 @@ export default function CadastroPartidas() {
                     clube_fora_id: clubeForaId,
                     gols_casa: golsCasa,
                     gols_fora: golsFora,
-
                 }),
             });
 
@@ -278,7 +293,7 @@ export default function CadastroPartidas() {
                     ))}
                 </ul>
             </motion.div>
-                <BotaoTema />
+            <BotaoTema />
         </main>
     );
 }

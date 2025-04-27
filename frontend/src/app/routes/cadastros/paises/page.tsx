@@ -23,7 +23,13 @@ export default function CadastroPaises() {
 
     async function fetchPaises() {
         try {
-            const res = await fetch("http://localhost:3001/api/paises/pegarPaises");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/paises/pegarPaises`);
+
             const data = await res.json();
             setPaises(data);
         } catch (error) {
@@ -59,7 +65,12 @@ export default function CadastroPaises() {
             .join(" ");
 
         try {
-            const res = await fetch("http://localhost:3001/api/paises/inserirPaises", {
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/paises/inserirPaises`, {
                 method: "POST",
                 body: JSON.stringify({ nome: nomeFormatado }),
                 headers: {

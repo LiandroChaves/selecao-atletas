@@ -55,7 +55,12 @@ export default function BuscaEedicao() {
         if (!selected) return;
         try {
             setIsLoading(true);
-            const res = await fetch(`http://localhost:3001/api/${selected.endpoint}?search=${searchTerm}`);
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/${selected.endpoint}?search=${searchTerm}`);
             console.log("Url: ", res);
             const data = await res.json();
             setResults(data);
@@ -242,9 +247,15 @@ export default function BuscaEedicao() {
                                                             return;
                                                         }
 
-                                                        await fetch(`http://localhost:3001/api/${deleteEndpoint}/${id}`, {
+                                                        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+                                                        const API_URL = isLocalhost
+                                                            ? 'http://localhost:3001'
+                                                            : `http://${window.location.hostname}:3001`;
+
+                                                        await fetch(`${API_URL}/api/${deleteEndpoint}/${id}`, {
                                                             method: "DELETE",
                                                         });
+
 
                                                         handleSearch(); // Atualiza os resultados após deletar
                                                     } catch (error) {

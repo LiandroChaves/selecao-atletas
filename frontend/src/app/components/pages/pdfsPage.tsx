@@ -7,6 +7,7 @@ import { useTheme } from "../../../utils/context/ThemeContext";
 import { useLoading } from "../../../utils/context/LoadingProvider";
 import BotaoTema from "../../../utils/utilities/changeTheme";
 import { FaFilePdf } from "react-icons/fa";
+import { saveAs } from 'file-saver';
 
 export default function PdfsPage() {
     const router = useRouter();
@@ -27,7 +28,12 @@ export default function PdfsPage() {
     useEffect(() => {
         const fetchJogadores = async () => {
             try {
-                const res = await fetch("http://localhost:3001/api/jogadores/pegarJogadores");
+                const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+                const API_URL = isLocalhost
+                    ? 'http://localhost:3001'
+                    : `http://${window.location.hostname}:3001`;
+
+                const res = await fetch(`${API_URL}/api/jogadores/pegarJogadores`);
                 const data = await res.json();
                 setJogadores(data);
             } catch (err) {
@@ -39,8 +45,30 @@ export default function PdfsPage() {
     }, []);
 
 
-    const gerarPdf = (id: string | number) => {
-        window.open(`http://localhost:3001/api/pdf/gerar-pdf/${id}`, "_blank");
+    const gerarPdf = async (id: string | number, nomeJogador: string) => {
+        // Verificar se o ambiente é local ou produção
+        const isLocalhost = window.location.hostname === 'localhost';
+        const API_URL = isLocalhost ? 'http://localhost:3001' : `http://${window.location.hostname}:3001`;
+
+        // Construir a URL para o endpoint
+        const pdfUrl = `${API_URL}/api/pdf/gerar-pdf/${id}`;
+
+        try {
+            // Fazer uma requisição para pegar o PDF
+            const response = await fetch(pdfUrl);
+            if (!response.ok) throw new Error("Erro ao gerar PDF");
+
+            // Criar um Blob a partir da resposta
+            const blob = await response.blob();
+
+            // Usar o nome do jogador para o nome do arquivo PDF
+            const filename = `${nomeJogador.replace(/\s+/g, '_')}-ficha-atleta.pdf`;
+
+            // Usar FileSaver.js para salvar o arquivo
+            saveAs(blob, filename);
+        } catch (error) {
+            console.error("Erro ao gerar PDF:", error);
+        }
     };
 
     return (
@@ -72,7 +100,7 @@ export default function PdfsPage() {
                                     {jogador.nome}
                                 </span>
                                 <button
-                                    onClick={() => gerarPdf(jogador.id)}
+                                    onClick={() => gerarPdf(jogador.id, jogador.nome)}
                                     className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 flex flex-col items-center justify-center"
                                 >
                                     <FaFilePdf /> Gerar PDF

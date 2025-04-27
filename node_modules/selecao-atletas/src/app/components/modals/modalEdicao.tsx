@@ -60,7 +60,13 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
             for (const [chave, valor] of Object.entries(valores)) {
                 if (chave.endsWith("_id") && typeof valor === "number") {
                     const entidade = getEndpoint(chave);
-                    const url = `http://localhost:3001/api/${entidade}/pegar${capitalize(getSingular(entidade))}/${valor}`;
+                    const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+                    const API_URL = isLocalhost
+                        ? 'http://localhost:3001'
+                        : `http://${window.location.hostname}:3001`;
+
+                    const url = `${API_URL}/api/${entidade}/pegar${capitalize(getSingular(entidade))}/${valor}`;
+
 
                     console.log("URL da requisição:", url); // Adicione esse log para ver a URL gerada
 
@@ -167,7 +173,12 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                 const formData = new FormData();
                 formData.append("foto", valor);
 
-                const uploadRes = await fetch("http://localhost:3001/api/uploads/upload-foto", {
+                const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+                const API_URL = isLocalhost
+                    ? 'http://localhost:3001'
+                    : `http://${window.location.hostname}:3001`;
+
+                const uploadRes = await fetch(`${API_URL}/api/uploads/upload-foto`, {
                     method: "POST",
                     body: formData,
                 });
@@ -250,7 +261,13 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                 return;
             }
 
-            const url = `http://localhost:3001/api/${endpoint.split("/")[0]}/editar${capitalize(singular)}/${id}`;
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const url = `${API_URL}/api/${endpoint.split("/")[0]}/editar${capitalize(singular)}/${id}`;
+
             console.log("URL da requisição:", url);
             console.log("Body JSON:", JSON.stringify(dadosFormatados, null, 2));
             console.log("URL da requisição:", url);

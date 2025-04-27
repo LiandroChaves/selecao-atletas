@@ -34,7 +34,12 @@ export default function CadastroCidades() {
 
     async function fetchPaises() {
         try {
-            const res = await fetch("http://localhost:3001/api/paises/pegarPaises");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/paises/pegarPaises`);
             const data = await res.json();
             setPaises(data);
         } catch (err) {
@@ -44,7 +49,12 @@ export default function CadastroCidades() {
 
     async function fetchEstados() {
         try {
-            const res = await fetch("http://localhost:3001/api/estados/pegarEstados");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/estados/pegarEstados`);
             const data = await res.json();
             setEstados(data);
         } catch (err) {
@@ -54,7 +64,13 @@ export default function CadastroCidades() {
 
     async function fetchCidades() {
         try {
-            const res = await fetch("http://localhost:3001/api/cidades/pegarCidades");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/cidades/pegarCidades`);
+
             const data = await res.json();
             setCidades(data);
         } catch (err) {
@@ -88,7 +104,12 @@ export default function CadastroCidades() {
             .join(" ");
 
         try {
-            const res = await fetch("http://localhost:3001/api/cidades/inserirCidade", {
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/cidades/inserirCidade`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

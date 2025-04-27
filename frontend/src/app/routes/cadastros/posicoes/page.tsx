@@ -28,7 +28,12 @@ export default function CadastroPosicoes() {
 
     async function fetchPosicoes() {
         try {
-            const res = await fetch("http://localhost:3001/api/posicoes/pegarPosicoes");
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/posicoes/pegarPosicoes`);
             const data = await res.json();
             setPosicoes(data);
         } catch (err) {
@@ -65,7 +70,12 @@ export default function CadastroPosicoes() {
         try {
             const token = localStorage.getItem("token");
 
-            const res = await fetch("http://localhost:3001/api/posicoes/inserirPosicao", {
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/posicoes/inserirPosicao`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -73,6 +83,7 @@ export default function CadastroPosicoes() {
                 },
                 body: JSON.stringify({ nome: nomeFormatado }),
             });
+
 
             const data = await res.json();
 

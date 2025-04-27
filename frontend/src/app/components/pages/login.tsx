@@ -30,13 +30,19 @@ export default function LoginPage() {
         setIsLoading(true);
 
         try {
-            const response = await fetch("http://localhost:3001/api/login", {
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const response = await fetch(`${API_URL}/api/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({ email, senha }),
             });
+
 
             const data = await response.json(); // <- só aqui! (UMA VEZ)
 
@@ -228,7 +234,12 @@ export default function LoginPage() {
                                     whileTap={{ scale: 0.97 }}
                                     onClick={async () => {
                                         try {
-                                            const res = await fetch("http://localhost:3001/api/usuarios/cadastro", {
+                                            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+                                            const API_URL = isLocalhost
+                                                ? 'http://localhost:3001'
+                                                : `http://${window.location.hostname}:3001`;
+
+                                            const res = await fetch(`${API_URL}/api/usuarios/cadastro`, {
                                                 method: "POST",
                                                 headers: { "Content-Type": "application/json" },
                                                 body: JSON.stringify({ email: novoUsuario, senha: novaSenha }),
