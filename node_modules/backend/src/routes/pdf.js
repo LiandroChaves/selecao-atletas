@@ -50,6 +50,7 @@ const ASSETS = {
 
 router.get("/gerar-pdf/:id", async (req, res) => {
     try {
+        const { clube, categoria } = req.query;
         const jogador = await models.Jogador.findByPk(req.params.id, {
             include: [
                 { model: models.Pais, as: "pais" },
@@ -89,7 +90,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
             .text('ESPORTE CLUBE LIMOEIRO', 0, 50, { align: 'center' });
 
         doc.fontSize(13)
-            .text('Ficha Individual do Atleta – Base', { align: 'center' });
+            .text(`Ficha Individual do Atleta – ${categoria}`, { align: 'center' });
 
         // voltar ao estilo normal/preto depois
         doc.fillColor('black')

@@ -68,7 +68,7 @@ export default function CadastroEstatisticasPartidas() {
             ? 'http://localhost:3001'
             : `http://${window.location.hostname}:3001`;
 
-        const res = await fetch(`${API_URL}/api/estatisticas-partidas/pegarEstatisticasPartidas`);
+        const res = await fetch(`${API_URL}/api/estatisticas-partidas/pegarEstatisticasPartida`);
         const data = await res.json();
         setEstatisticas(data);
     };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/utils/context/ThemeContext";
@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { useLoading } from "@/utils/context/LoadingProvider";
 import { verificarTokenValido } from "@/utils/verificarTokenValido";
 import dayjs from "dayjs";
+
 
 export default function CadastroClubes() {
     const [id, setId] = useState("");
@@ -22,6 +23,8 @@ export default function CadastroClubes() {
     const [inicioContrato, setInicioContrato] = useState("");
     const [fimContrato, setFimContrato] = useState("");
     const router = useRouter();
+    const [logo, setLogo] = useState<File | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null); // Referência para o input de arquivo
     const { isDarkMode } = useTheme();
     const { setIsLoading } = useLoading();
 
@@ -80,7 +83,7 @@ export default function CadastroClubes() {
             )
             .join(" ");
 
-        const nomeFormatado1 = estadio
+        const estadioFormatado = estadio
             .toLowerCase()
             .split(" ")
             .map((palavra, index) =>
@@ -99,6 +102,7 @@ export default function CadastroClubes() {
                 ? 'http://localhost:3001'
                 : `http://${window.location.hostname}:3001`;
 
+            // Primeiro: inserir o clube
             const res = await fetch(`${API_URL}/api/clubes/inserirClube`, {
                 method: "POST",
                 headers: {
@@ -110,7 +114,7 @@ export default function CadastroClubes() {
                     nome: nomeFormatado,
                     pais_id: Number(paisId),
                     fundacao: fundacao ? Number(fundacao) : null,
-                    estadio: nomeFormatado1 || null,
+                    estadio: estadioFormatado || null,
                     inicio_contrato: inicioContrato || null,
                     fim_contrato: fimContrato || null,
                 }),
@@ -120,6 +124,34 @@ export default function CadastroClubes() {
 
             if (res.ok) {
                 console.log("✅ Clube inserido:", data.clube);
+
+                const novoClubeId = data.clube.id; // Pega o ID do clube inserido
+
+                // Segundo: se tiver logo, envia a imagem
+                if (logo) {
+                    const formData = new FormData();
+                    formData.append("url_logo", logo);
+                    formData.append("clube_id", novoClubeId.toString());
+
+                    const logoRes = await fetch(`${API_URL}/api/logos-clubes/inserirLogo`, {
+                        method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            // NÃO coloca 'Content-Type': multipart/form-data aqui — o browser gera isso automaticamente
+                        },
+                        body: formData,
+                    });
+
+                    const logoData = await logoRes.json();
+
+                    if (logoRes.ok) {
+                        console.log("✅ Logo enviada com sucesso:", logoData.logo);
+                    } else {
+                        console.warn("Erro ao enviar logo:", logoData.error);
+                    }
+                }
+
+                // Limpa os campos depois de tudo
                 setId("");
                 setNome("");
                 setPaisId("");
@@ -127,6 +159,10 @@ export default function CadastroClubes() {
                 setEstadio("");
                 setInicioContrato("");
                 setFimContrato("");
+                setLogo(null);
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = "";
+                }
                 fetchClubes();
             } else {
                 console.warn("Erro ao inserir clube:", data.error);
@@ -188,7 +224,20 @@ export default function CadastroClubes() {
                     </label>
                     <input type="number" placeholder="Ano de fundação (opcional)" value={fundacao} onChange={(e) => setFundacao(e.target.value)} className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
                     <input placeholder="Local do clube (opcional)" value={estadio} onChange={(e) => setEstadio(e.target.value)} className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
-
+                    <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                        Logo do clube (opcional)
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                                if (e.target.files && e.target.files.length > 0) {
+                                    setLogo(e.target.files[0]);
+                                }
+                            }}
+                            className="mt-1 p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 w-full"
+                        />
+                    </label>
                     {erro && <p className="text-red-400 font-medium text-sm">{erro}</p>}
 
                     <button type="submit" className={`px-4 py-2 rounded font-semibold transition duration-300 hover:scale-[1.03] ${isDarkMode ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900" : "bg-gray-600 hover:bg-gray-500 text-white"}`}>

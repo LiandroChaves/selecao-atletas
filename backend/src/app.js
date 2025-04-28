@@ -13,6 +13,7 @@ import usuariosRoutes from "./routes/usuarios.js";
 import clubesRoutes from "./routes/clubes.js";
 import jogadoresRoutes from "./routes/jogadores.js";
 import uploadRouter from './routes/upload.js';
+import uploadLogoClubes from "./routes/uploadLogoClubes.js";
 import estatisticaGeralRoutes from "./routes/estatisticasGerais.js";
 import partidasRoutes from "./routes/partidas.js";
 import estatisticasPartidasRoutes from "./routes/estatisticasPartidas.js";
@@ -85,6 +86,7 @@ app.use("/api/caracteristica-jogadores", caracteristicasJogadoresRoutes); // Rot
 
 app.use('/api/uploads', express.static(uploadsPath)); // Serve arquivos estáticos da pasta uploads
 app.use("/api/uploads", uploadRouter); // Rota para upload de arquivos
+app.use("/api/logos-clubes", uploadLogoClubes); // Rota para upload de logos de clubes
 app.use("/api/pdf", pdfRoute);
 app.use("/api/database", databaseRoutes);
 
