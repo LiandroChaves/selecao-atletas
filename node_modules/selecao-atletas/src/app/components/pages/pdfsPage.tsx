@@ -78,8 +78,10 @@ export default function PdfsPage() {
     const gerarPdf = async () => {
         if (!selectedJogador) return;
 
-        const isLocalhost = window.location.hostname === 'localhost';
-        const API_URL = isLocalhost ? 'http://localhost:3001' : `http://${window.location.hostname}:3001`;
+        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+        const API_URL = isLocalhost
+            ? 'http://localhost:3001'
+            : `http://${window.location.hostname}:3001`;
 
         const params = new URLSearchParams({
             clube: clube,
