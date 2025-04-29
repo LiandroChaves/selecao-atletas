@@ -210,9 +210,7 @@ export default function PdfsPage() {
                         </div>
                     </div>
                 </div>
-            )
-            }
-
+            )}
             <BotaoTema />
         </main >
     );

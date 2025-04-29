@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
+import LogosClubes from "../database/models/LogoClubes.js";
 
 const router = express.Router();
 const calcularIdade = (dataNascimento) => {
@@ -50,7 +51,7 @@ const ASSETS = {
 
 router.get("/gerar-pdf/:id", async (req, res) => {
     try {
-        const { clube, categoria } = req.query;
+        const { categoria } = req.query;
         const jogador = await models.Jogador.findByPk(req.params.id, {
             include: [
                 { model: models.Pais, as: "pais" },
@@ -63,15 +64,35 @@ router.get("/gerar-pdf/:id", async (req, res) => {
                 { model: models.Caracteristicas, as: "caracteristicas" },
                 {
                     model: models.HistoricoClubes,
-                    as: "historico",                 // alias que usaremos depois
+                    as: "historico", // alias que usaremos depois
                     include: [{ model: models.Clubes, as: "clube", attributes: ["nome"] }],
-                    order: [["data_entrada", "ASC"]],  // opcional: cronológico
+                    order: [["data_entrada", "ASC"]],
                 },
             ]
         });
 
-
         if (!jogador) return res.status(404).json({ error: "Jogador não encontrado" });
+
+        // Buscar logo do clube
+        const clube = await models.Clubes.findOne({
+            where: {
+                nome: req.query.clube // Usar o nome do clube que foi enviado
+            }
+        });
+
+        if (!clube) {
+            return res.status(404).json({ error: "Clube não encontrado" });
+        }
+
+        // Buscar logo do clube
+        const logoClube = await LogosClubes.findOne({
+            where: {
+                clube_id: clube.id // Agora buscar pela id do clube
+            }
+        });
+
+        // Se logo encontrada, utilizá-la, senão utilizar a logo padrão
+        const logoPath = logoClube ? path.join(basePath, logoClube.url_logo) : ASSETS.logo;
 
         const filename = `${(jogador.nome || jogador.apelido).replace(/\s+/g, '_')}.pdf`;
         res.set('Content-Disposition',
@@ -82,7 +103,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         doc.pipe(res);
 
         // ---------- cabeçalho ----------
-        doc.image(ASSETS.logo, 40, 40, { width: 90 });
+        doc.image(logoPath, 40, 40, { width: 90 });
         doc.image(ASSETS.borda, 410, -60, { width: 250 });
         doc.fillColor('#2957A4')
             .font('Helvetica-Bold')        // ← negrito
@@ -123,7 +144,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
             // linha 3  – data nasc.  |  idade
             .text(
-                `Data nasc.: ${dayjs(jogador.data_nascimento).format("DD/MM/YYYY")}    |    ` +
+                `Apelido: ${jogador.apelido}    |   ` + `Data nasc.: ${dayjs(jogador.data_nascimento).format("DD/MM/YYYY")}    |    ` +
                 `Idade: ${calcularIdade(jogador.data_nascimento)} anos`,
                 { align: "center" }
             )

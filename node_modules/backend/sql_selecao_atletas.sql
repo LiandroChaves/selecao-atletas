@@ -112,6 +112,19 @@ CREATE TABLE clubes (
 	CONSTRAINT fkey_clubes_pais FOREIGN KEY (pais_id) REFERENCES paises(id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
+select * from logos_clubes;
+-- -- DELETE FROM logos_clubes;
+-- ALTER SEQUENCE logos_clubes_id_seq RESTART WITH 1;
+
+CREATE TABLE logos_clubes (
+    id SERIAL PRIMARY KEY,
+    clube_id INT NOT NULL,
+    url_logo VARCHAR(500) NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    CONSTRAINT fkey_logos_clube FOREIGN KEY (clube_id) REFERENCES clubes(id) ON DELETE CASCADE
+);
+
 -- ========================
 -- 3. Jogadores
 -- ========================
@@ -173,6 +186,7 @@ insert into caracteristicas (jogador_id, descricao) values (2, 'Visão de jogo')
 
 SELECT * FROM estatisticas_gerais;
 -- -- DELETE FROM estatisticas_gerais;
+-- ALTER SEQUENCE estatisticas_gerais_id_seq RESTART WITH 1;
 
 CREATE TABLE estatisticas_gerais (
 	jogador_id INT PRIMARY KEY,
@@ -217,6 +231,7 @@ CREATE TABLE partidas (
 
 SELECT * FROM estatisticas_partidas;
 -- -- DELETE FROM estatisticas_partidas;
+-- ALTER SEQUENCE estatisticas_partidas_id_seq RESTART WITH 1;
 
 CREATE TABLE estatisticas_partidas (
 	id SERIAL PRIMARY KEY,
@@ -244,6 +259,7 @@ CREATE TABLE estatisticas_partidas (
 
 SELECT * FROM historico_clubes;
 -- -- DELETE FROM historico_clubes;
+-- ALTER SEQUENCE historico_clubes_id_seq RESTART WITH 1;
 
 CREATE TABLE historico_clubes (
 	id SERIAL PRIMARY KEY,
@@ -257,15 +273,13 @@ CREATE TABLE historico_clubes (
 	CONSTRAINT fkey_historico_clube FOREIGN KEY (clube_id) REFERENCES clubes(id)
 );
 
-insert into historico_clubes (jogador_id, clube_id, data_entrada, data_saida)
-values (2,2,'2019-10-22','2023-03-23')
-
 -- ========================
 -- Histórico de Lesões
 -- ========================
 
 SELECT * FROM historico_lesoes;
 -- -- DELETE FROM historico_lesoes;
+-- ALTER SEQUENCE historico_lesoes_id_seq RESTART WITH 1;
 
 CREATE TABLE historico_lesoes (
 	id SERIAL PRIMARY KEY,
@@ -285,6 +299,7 @@ CREATE TABLE historico_lesoes (
 
 SELECT * FROM titulos;
 -- -- DELETE FROM titulos;
+-- ALTER SEQUENCE titulos_id_seq RESTART WITH 1;
 
 CREATE TABLE titulos (
 	id SERIAL PRIMARY KEY,
@@ -296,6 +311,7 @@ CREATE TABLE titulos (
 
 SELECT * FROM jogadores_titulos;
 -- -- DELETE FROM jogadores_titulos;
+-- ALTER SEQUENCE jogadores_titulos_id_seq RESTART WITH 1;
 
 CREATE TABLE jogadores_titulos (
     id SERIAL PRIMARY KEY,

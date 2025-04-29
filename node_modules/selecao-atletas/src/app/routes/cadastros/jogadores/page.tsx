@@ -604,6 +604,8 @@ export default function CadastroJogadores() {
                                         }
                                         alt={jogador.nome}
                                         className="w-full sm:w-64 object-cover rounded-md border h-auto sm:h-full"
+                                        width={256}
+                                        height={256}
                                     />
                                     {/* Informações do jogador */}
                                     <div className={`flex-1 text-sm ${isDarkMode ? "text-white" : "text-gray-800"}`}>
