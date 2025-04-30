@@ -260,16 +260,21 @@ export default function CadastroEstatisticasPartidas() {
                         "cartoes_amarelos",
                         "cartoes_vermelhos",
                     ].map((campo) => (
-                        <input
-                            key={campo}
-                            type="number"
-                            name={campo}
-                            placeholder={campo.replace(/_/g, " ")}
-                            value={form[campo as keyof typeof form]}
-                            onChange={handleChange}
-                            className="p-2 rounded text-black bg-white"
-                        />
+                        <div key={campo} className="flex flex-col gap-2">
+                            <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                                {campo.replace(/_/g, " ").toLowerCase().replace(/^\w/, c => c.toUpperCase())}
+                                <input
+                                    type="number"
+                                    name={campo}
+                                    placeholder={campo.replace(/_/g, " ")}
+                                    value={form[campo as keyof typeof form]}
+                                    onChange={handleChange}
+                                    className="w-full p-2 rounded text-black bg-white"
+                                />
+                            </label>
+                        </div>
                     ))}
+
 
                     {erro && <p className="text-red-400 text-sm font-medium">{erro}</p>}
 

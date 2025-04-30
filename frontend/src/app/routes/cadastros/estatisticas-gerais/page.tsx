@@ -33,20 +33,20 @@ export default function CadastroEstatisticasGerais() {
 
 
     const [form, setForm] = useState({
-        partidas_jogadas: 0,
-        gols: 0,
-        assistencias: 0,
-        titulos: 0,
-        faltas_cometidas: 0,
-        cartoes_amarelos: 0,
-        cartoes_vermelhos: 0,
+        partidas_jogadas: "",
+        gols: "",
+        assistencias: "",
+        titulos: "",
+        faltas_cometidas: "",
+        cartoes_amarelos: "",
+        cartoes_vermelhos: "",
     });
 
     const handleChange = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setForm((prev) => ({
             ...prev,
-            [field]: value === '' ? 0 : parseInt(value),
+            [field]: value === '' ? " " : parseInt(value),
         }));
     };
 
@@ -143,13 +143,13 @@ export default function CadastroEstatisticasGerais() {
                 console.log("✅ Estatística geral inserida com sucesso:", data.estatistica);
                 fetchEstatisticas();
                 setForm({
-                    partidas_jogadas: 0,
-                    gols: 0,
-                    assistencias: 0,
-                    titulos: 0,
-                    faltas_cometidas: 0,
-                    cartoes_amarelos: 0,
-                    cartoes_vermelhos: 0,
+                    partidas_jogadas: "",
+                    gols: "",
+                    assistencias: "",
+                    titulos: "",
+                    faltas_cometidas: "",
+                    cartoes_amarelos: "",
+                    cartoes_vermelhos: "",
                 });
             } else {
                 console.warn("⚠️ Falha ao inserir estatística:", data.error);
@@ -203,63 +203,38 @@ export default function CadastroEstatisticasGerais() {
                             </option>
                         ))}
                     </select>
-                    <div className="flex flex-col gap-2">
-                        <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Partidas jogadas</label>
-                        <input
-                            type="number"
-                            value={form.partidas_jogadas === 0 ? '' : form.partidas_jogadas}
-                            onChange={handleChange("partidas_jogadas")}
-                            className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-                        />
 
-                        <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Gols</label>
-                        <input
-                            type="number"
-                            value={form.gols === 0 ? '' : form.gols}
-                            onChange={handleChange("gols")}
-                            className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-                        />
+                    {[
+                        "partidas_jogadas",
+                        "gols",
+                        "assistencias",
+                        "titulos",
+                        "faltas_cometidas",
+                        "cartoes_amarelos",
+                        "cartoes_vermelhos",
+                    ].map((campo) => {
+                        const label = campo
+                            .replace(/_/g, " ")
+                            .toLowerCase()
+                            .replace(/^\w/, (c) => c.toUpperCase());
 
-                        <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Assistências</label>
-                        <input
-                            type="number"
-                            value={form.assistencias === 0 ? '' : form.assistencias}
-                            onChange={handleChange("assistencias")}
-                            className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-                        />
+                        return (
+                            <div key={campo} className="flex flex-col gap-1">
+                                <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                                    {label}
+                                </label>
+                                <input
+                                    type="number"
+                                    name={campo}
+                                    value={form[campo as keyof typeof form]}
+                                    onChange={handleChange(campo as keyof typeof form)}
+                                    placeholder={label}
+                                    className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                />
+                            </div>
+                        );
+                    })}
 
-                        <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Títulos</label>
-                        <input
-                            type="number"
-                            value={form.titulos === 0 ? '' : form.titulos}
-                            onChange={handleChange("titulos")}
-                            className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-                        />
-
-                        <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Faltas cometidas</label>
-                        <input
-                            type="number"
-                            value={form.faltas_cometidas === 0 ? '' : form.faltas_cometidas}
-                            onChange={handleChange("faltas_cometidas")}
-                            className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-                        />
-
-                        <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Cartões amarelos</label>
-                        <input
-                            type="number"
-                            value={form.cartoes_amarelos === 0 ? '' : form.cartoes_amarelos}
-                            onChange={handleChange("cartoes_amarelos")}
-                            className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-                        />
-
-                        <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Cartões vermelhos</label>
-                        <input
-                            type="number"
-                            value={form.cartoes_vermelhos === 0 ? '' : form.cartoes_vermelhos}
-                            onChange={handleChange("cartoes_vermelhos")}
-                            className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-                        />
-                    </div>
                     {erro && <p className="text-red-400 font-medium text-sm">{erro}</p>}
 
                     <button
@@ -271,6 +246,7 @@ export default function CadastroEstatisticasGerais() {
                         Cadastrar Estatística
                     </button>
                 </form>
+
 
 
                 <ul className="space-y-2 text-left max-h-72 overflow-y-auto">
