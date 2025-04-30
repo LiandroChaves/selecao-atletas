@@ -7,6 +7,7 @@ import { useTheme } from "../../../utils/context/ThemeContext";
 import { useLoading } from "../../../utils/context/LoadingProvider";
 import { saveAs } from 'file-saver';
 import BotaoTema from "../../../utils/utilities/changeTheme";
+import { SketchPicker, ColorResult } from 'react-color';
 
 export default function PdfsPage() {
     const router = useRouter();
@@ -18,6 +19,10 @@ export default function PdfsPage() {
     const [clube, setClube] = useState("");
     const [categoria, setCategoria] = useState("Base"); // Base ou Profissional
     const [clubes, setClubes] = useState<any[]>([]);
+    const [corTituloeBorda, setCorTituloeBorda] = useState("#2957A4"); // valor padrão
+    const [corSegundaBorda, setSegundaBorda] = useState("#22c0d4"); // valor padrão
+    const [mostrarPickerTitulo, setMostrarPickerTitulo] = useState(false);
+    const [mostrarPickerSegunda, setMostrarPickerSegunda] = useState(false);
 
     interface Jogador {
         id: string | number;
@@ -85,7 +90,9 @@ export default function PdfsPage() {
 
         const params = new URLSearchParams({
             clube: clube,
-            categoria: categoria
+            categoria: categoria,
+            corTituloeBorda: corTituloeBorda,
+            corSegundaBorda: corSegundaBorda,
         });
 
         const pdfUrl = `${API_URL}/api/pdf/gerar-pdf/${selectedJogador.id}?${params.toString()}`;
@@ -151,7 +158,7 @@ export default function PdfsPage() {
 
             {/* Modal */}
             {isModalOpen && (
-                <div className={`fixed inset-0 ${isDarkMode
+                <div className={`fixed overflow-y-auto inset-0 ${isDarkMode
                     ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700"
                     : "bg-gradient-to-br from-white via-gray-100 to-gray-200"} flex items-center justify-center z-50"`}>
                     <div
@@ -176,7 +183,86 @@ export default function PdfsPage() {
                                 ))}
                             </select>
                         </div>
+                        {/* Campo Cor do Título e primeira borda*/}
+                        <div>
+                            {/* Primeira cor */}
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium mb-1">Cor do Título e primeira borda</label>
+                                <div className="flex items-center gap-2">
+                                    <div
+                                        className="w-10 h-10 border cursor-pointer rounded"
+                                        style={{ backgroundColor: corTituloeBorda }}
+                                        onClick={() => setMostrarPickerTitulo(!mostrarPickerTitulo)}
+                                    />
+                                    <button
+                                        type="button"
+                                        className={`text-sm ${isDarkMode ? "text-white" : "text-gray-700"} underline`}
+                                        onClick={() => setMostrarPickerTitulo(!mostrarPickerTitulo)}
+                                    >
+                                        {mostrarPickerTitulo ? "Fechar" : "Escolher cor"}
+                                    </button>
+                                </div>
 
+                                {mostrarPickerTitulo && (
+                                    <div className="mt-2 w-full">
+                                        <SketchPicker
+                                            className="text-black"
+                                            color={corTituloeBorda}
+                                            onChangeComplete={(color: ColorResult) => setCorTituloeBorda(color.hex)}
+                                            width="60%"
+                                            presetColors={[
+                                                "#2957A4", "#22c0d4", "#FFD700", "#FF8C00", "#DC143C", "#32CD32", "#8A2BE2", "#4B0082",
+                                                "#000000", "#808080", "#FFFFFF", "#F5F5F5", "#00CED1", "#20B2AA",
+                                                "#FF5733", "#C70039", "#900C3F", "#581845", "#1ABC9C", "#3498DB", "#2ECC71",
+                                                "#F39C12", "#E74C3C", "#9B59B6", "#34495E", "#16A085", "#27AE60",
+                                                "#F4D03F", "#7D3C98", "#1F618D", "#D5DBDB", "#85929E", "#F7DC6F", "#E67E22",
+                                                "#BFC9CA", "#8E44AD", "#2980B9", "#9AE3D3", "#A6ACAF", "#DFFF00", "#F1C40F",
+                                                "#2E4053", "#C39BD3", "#2F4F4F" // Adicionando nova cor para evitar duplicação
+                                            ]}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Segunda cor */}
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium mb-1">Cor da segunda borda</label>
+                                <div className="flex items-center gap-2">
+                                    <div
+                                        className="w-10 h-10 border cursor-pointer rounded"
+                                        style={{ backgroundColor: corSegundaBorda }}
+                                        onClick={() => setMostrarPickerSegunda(!mostrarPickerSegunda)}
+                                    />
+                                    <button
+                                        type="button"
+                                        className={`text-sm ${isDarkMode ? "text-white" : "text-gray-700"} underline`}
+                                        onClick={() => setMostrarPickerSegunda(!mostrarPickerSegunda)}
+                                    >
+                                        {mostrarPickerSegunda ? "Fechar" : "Escolher cor"}
+                                    </button>
+                                </div>
+
+                                {mostrarPickerSegunda && (
+                                    <div className="mt-2 w-full">
+                                        <SketchPicker
+                                            className="text-black"
+                                            color={corSegundaBorda}
+                                            onChangeComplete={(color: ColorResult) => setSegundaBorda(color.hex)}
+                                            width="60%"
+                                            presetColors={[
+                                                "#2957A4", "#22c0d4", "#FFD700", "#FF8C00", "#DC143C", "#32CD32", "#4B0082",
+                                                "#000000", "#808080", "#FFFFFF", "#F5F5F5", "#00CED1", "#20B2AA",
+                                                "#FF5733", "#C70039", "#900C3F", "#581845", "#1ABC9C", "#3498DB", "#2ECC71",
+                                                "#E74C3C", "#9B59B6", "#34495E", "#16A085", "#27AE60",
+                                                "#F4D03F", "#7D3C98", "#1F618D", "#D5DBDB", "#85929E", "#F7DC6F", "#E67E22",
+                                                "#BFC9CA", "#8E44AD", "#2980B9", "#9AE3D3", "#A6ACAF", "#DFFF00", "#F1C40F",
+                                                "#2E4053", "#C39BD3", "#8A2BE2" // Adicionando nova cor para evitar duplicação
+                                            ]}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                         {/* Campo Categoria */}
                         <div className="mb-4">
                             <label className="block text-sm font-medium mb-1">Categoria</label>

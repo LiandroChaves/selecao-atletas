@@ -45,13 +45,13 @@ const ASSETS = {
         D: path.join(basePath, "pe_direito.png"),
     },
     campo: pos => path.join(basePath, `campo_${pos}.png`),
-    borda: path.join(basePath, "borda.png")
+    // borda: path.join(basePath, "borda.png")
 };
 
 
 router.get("/gerar-pdf/:id", async (req, res) => {
     try {
-        const { categoria } = req.query;
+        const { categoria, corTituloeBorda = "#2957A4", corSegundaBorda } = req.query;
         const jogador = await models.Jogador.findByPk(req.params.id, {
             include: [
                 { model: models.Pais, as: "pais" },
@@ -104,20 +104,54 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         doc.pipe(res);
 
         // ---------- cabeçalho ----------
+
+        // Logo do clube
         doc.image(logoPath, 40, 40, { width: 90 });
-        doc.image(ASSETS.borda, 410, -60, { width: 250 });
-        doc.fillColor('#2957A4')
-            .font('Helvetica-Bold')        // ← negrito
+
+        // doc.image(ASSETS.borda, 410, -60, { width: 250 });
+
+        const largura = 180;
+        const altura = 10;
+
+        doc.save();
+
+        doc.translate(490, -15);  // ponto de rotação (ajuste conforme necessário)
+        doc.rotate(30); // rotaciona -30 graus (negativo inclina para esquerda)
+
+        // Primeira faixa (cor principal)
+        doc.fillColor(corSegundaBorda)
+
+            .moveTo(0, 0)
+            .lineTo(largura, 0)
+            .lineTo(largura - 10, altura)
+            .lineTo(-10, altura)
+            .closePath()
+            .fill();
+
+        // Segunda faixa (cor secundária)
+        doc.fillColor(corTituloeBorda)
+            .moveTo(-10, altura)
+            .lineTo(largura - 10, altura)
+            .lineTo(largura - 20, altura * 2)
+            .lineTo(-20, altura * 2)
+            .closePath()
+            .fill();
+
+        // Restaura o estado do canvas
+        doc.restore();
+
+        // Título do cabeçalho
+        doc.fillColor(corTituloeBorda)             // ← aplica a mesma cor ao texto
+            .font('Helvetica-Bold')
             .fontSize(16)
             .text('ESPORTE CLUBE LIMOEIRO', 0, 50, { align: 'center' });
 
         doc.fontSize(13)
             .text(`Ficha Individual do Atleta – ${categoria}`, { align: 'center' });
 
-        // voltar ao estilo normal/preto depois
+        // Volta para o estilo padrão (texto preto, sem negrito)
         doc.fillColor('black')
             .font('Helvetica');
-
 
         // espaço para a foto
         if (jogador.foto) {
