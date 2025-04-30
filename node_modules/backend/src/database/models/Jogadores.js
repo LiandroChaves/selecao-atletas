@@ -54,11 +54,11 @@ const Jogador = sequelize.define("jogadores", {
     },
     altura: {
         type: DataTypes.DECIMAL(4, 2),
-        allowNull: false,
+        allowNull: true,
     },
     peso: {
         type: DataTypes.DECIMAL(5, 2),
-        allowNull: false,
+        allowNull: true,
     },
     pe_dominante: {
         type: DataTypes.ENUM("D", "E", "A"),

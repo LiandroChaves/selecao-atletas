@@ -73,26 +73,27 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
         if (!jogador) return res.status(404).json({ error: "Jogador não encontrado" });
 
-        // Buscar logo do clube
-        const clube = await models.Clubes.findOne({
-            where: {
-                nome: req.query.clube // Usar o nome do clube que foi enviado
-            }
-        });
+        let logoPath = ASSETS.logo;
 
-        if (!clube) {
-            return res.status(404).json({ error: "Clube não encontrado" });
+        if (req.query.clube) {
+            const clube = await models.Clubes.findOne({
+                where: {
+                    nome: req.query.clube
+                }
+            });
+
+            if (clube) {
+                const logoClube = await LogosClubes.findOne({
+                    where: {
+                        clube_id: clube.id
+                    }
+                });
+
+                if (logoClube) {
+                    logoPath = path.join(basePath, logoClube.url_logo);
+                }
+            }
         }
-
-        // Buscar logo do clube
-        const logoClube = await LogosClubes.findOne({
-            where: {
-                clube_id: clube.id // Agora buscar pela id do clube
-            }
-        });
-
-        // Se logo encontrada, utilizá-la, senão utilizar a logo padrão
-        const logoPath = logoClube ? path.join(basePath, logoClube.url_logo) : ASSETS.logo;
 
         const filename = `${(jogador.nome || jogador.apelido).replace(/\s+/g, '_')}.pdf`;
         res.set('Content-Disposition',
@@ -202,7 +203,17 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         doc.moveDown();
         const listaClubes =
             jogador.historico.length
-                ? jogador.historico.map(h => `${h.clube?.nome}  (${dayjs(h.data_entrada).format("YYYY")}–${h.data_saida ? dayjs(h.data_saida).format("YYYY") : "Atual"})`)
+                ? jogador.historico.map(h => {
+                    let ano;
+                    if (h.data_saida) {
+                        ano = dayjs(h.data_saida).format("YYYY");
+                    } else if (h.data_entrada) {
+                        ano = `${dayjs(h.data_entrada).format("YYYY")} - Atual`;
+                    } else {
+                        ano = "Sem data";
+                    }
+                    return `${h.clube?.nome} - (${ano})`;
+                })
                 : ["Sem histórico informado"];
 
         listaClubes.forEach(item => doc.text(`• ${item}`, { align: "center" }));

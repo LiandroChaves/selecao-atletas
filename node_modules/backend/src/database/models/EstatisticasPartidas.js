@@ -31,7 +31,15 @@ const EstatisticasPartidas = sequelize.define("estatisticas_partidas", {
         type: DataTypes.SMALLINT,
         defaultValue: 0,
     },
+    passes_totais: {
+        type: DataTypes.SMALLINT,
+        defaultValue: 0,
+    },
     passes_certos: {
+        type: DataTypes.SMALLINT,
+        defaultValue: 0,
+    },
+    passes_errados: {
         type: DataTypes.SMALLINT,
         defaultValue: 0,
     },

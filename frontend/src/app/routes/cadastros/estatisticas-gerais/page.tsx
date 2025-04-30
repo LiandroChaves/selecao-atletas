@@ -97,8 +97,27 @@ export default function CadastroEstatisticasGerais() {
         }
 
         if (!verificarTokenValido()) return;
-
         const token = localStorage.getItem("token");
+
+        // Verificação para valores negativos
+        const camposNumericos = [
+            "partidas_jogadas",
+            "gols",
+            "assistencias",
+            "titulos",
+            "faltas_cometidas",
+            "cartoes_amarelos",
+            "cartoes_vermelhos",
+        ];
+
+        for (const campo of camposNumericos) {
+            const valor = Number(form[campo as keyof typeof form]);
+            if (!isNaN(valor) && valor < 0) {
+                setErro(`⚠️ O campo "${campo.replace(/_/g, " ")}" não pode ser negativo.`);
+                setTimeout(() => setErro(""), 4000);
+                return;
+            }
+        }
 
         try {
             const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
@@ -110,7 +129,7 @@ export default function CadastroEstatisticasGerais() {
                 method: "POST",
                 body: JSON.stringify({
                     jogador_id: parseInt(jogadorId),
-                    ...form,
+                    ...form
                 }),
                 headers: {
                     "Content-Type": "application/json",

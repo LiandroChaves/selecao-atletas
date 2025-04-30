@@ -58,7 +58,9 @@ export const inserirEstatisticaPartida = async (req, res) => {
             minutos_jogados,
             gols,
             assistencias,
+            passes_totais,
             passes_certos,
+            passes_errados,
             finalizacoes,
             finalizacoes_no_alvo,
             desarmes,
@@ -73,7 +75,9 @@ export const inserirEstatisticaPartida = async (req, res) => {
             minutos_jogados,
             gols,
             assistencias,
+            passes_totais,
             passes_certos,
+            passes_errados,
             finalizacoes,
             finalizacoes_no_alvo,
             desarmes,
@@ -99,7 +103,9 @@ export const editarEstatisticaPartida = async (req, res) => {
             minutos_jogados,
             gols,
             assistencias,
+            passes_totais,
             passes_certos,
+            passes_errados,
             finalizacoes,
             finalizacoes_no_alvo,
             desarmes,
@@ -115,7 +121,9 @@ export const editarEstatisticaPartida = async (req, res) => {
             minutos_jogados === undefined ||
             gols === undefined ||
             assistencias === undefined ||
+            passes_totais === undefined ||
             passes_certos === undefined ||
+            passes_errados === undefined ||
             finalizacoes === undefined ||
             desarmes === undefined ||
             finalizacoes_no_alvo === undefined ||
@@ -136,7 +144,9 @@ export const editarEstatisticaPartida = async (req, res) => {
             minutos_jogados,
             gols,
             assistencias,
+            passes_totais,
             passes_certos,
+            passes_errados,
             finalizacoes,
             finalizacoes_no_alvo,
             desarmes,

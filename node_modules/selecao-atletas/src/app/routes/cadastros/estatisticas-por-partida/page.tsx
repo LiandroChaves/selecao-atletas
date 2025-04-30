@@ -20,7 +20,9 @@ export default function CadastroEstatisticasPartidas() {
         minutos_jogados: "",
         gols: "",
         assistencias: "",
+        passes_totais: "",
         passes_certos: "",
+        passes_errados: "",
         finalizacoes: "",
         finalizacoes_no_alvo: "",
         desarmes: "",
@@ -77,6 +79,16 @@ export default function CadastroEstatisticasPartidas() {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
+    function somaInvalida(certos: string, errados: string, total: string): boolean {
+        if (certos === "" || errados === "" || total === "") return false;
+
+        const s = Number(certos);
+        const e = Number(errados);
+        const t = Number(total);
+
+        return !isNaN(s) && !isNaN(e) && !isNaN(t) && (s + e > t);
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -84,6 +96,37 @@ export default function CadastroEstatisticasPartidas() {
             setErro("⚠️ Jogador e partida são obrigatórios.");
             setTimeout(() => setErro(""), 3000);
             return;
+        }
+
+        if (somaInvalida(form.passes_certos, form.passes_errados, form.passes_totais)) {
+            setErro("⚠️ A soma de passes certos e errados não pode ser maior que os passes totais.");
+            setTimeout(() => setErro(""), 4000);
+            return;
+        }
+
+        // 🚫 Verificação para campos numéricos negativos
+        const camposNumericos = [
+            "minutos_jogados",
+            "gols",
+            "assistencias",
+            "passes_totais",
+            "passes_certos",
+            "passes_errados",
+            "finalizacoes",
+            "finalizacoes_no_alvo",
+            "desarmes",
+            "faltas_cometidas",
+            "cartoes_amarelos",
+            "cartoes_vermelhos",
+        ];
+
+        for (const campo of camposNumericos) {
+            const valor = Number(form[campo as keyof typeof form]);
+            if (!isNaN(valor) && valor < 0) {
+                setErro(`⚠️ O campo "${campo.replace(/_/g, " ")}" não pode ser negativo.`);
+                setTimeout(() => setErro(""), 4000);
+                return;
+            }
         }
 
         if (!verificarTokenValido()) return;
@@ -108,7 +151,9 @@ export default function CadastroEstatisticasPartidas() {
                     minutos_jogados: Number(form.minutos_jogados) || 0,
                     gols: Number(form.gols) || 0,
                     assistencias: Number(form.assistencias) || 0,
+                    passes_totais: Number(form.passes_totais) || 0,
                     passes_certos: Number(form.passes_certos) || 0,
+                    passes_errados: Number(form.passes_errados) || 0,
                     finalizacoes: Number(form.finalizacoes) || 0,
                     finalizacoes_no_alvo: Number(form.finalizacoes_no_alvo) || 0,
                     desarmes: Number(form.desarmes) || 0,
@@ -127,7 +172,9 @@ export default function CadastroEstatisticasPartidas() {
                     minutos_jogados: "",
                     gols: "",
                     assistencias: "",
+                    passes_totais: "",
                     passes_certos: "",
+                    passes_errados: "",
                     finalizacoes: "",
                     finalizacoes_no_alvo: "",
                     desarmes: "",
@@ -203,7 +250,9 @@ export default function CadastroEstatisticasPartidas() {
                         "minutos_jogados",
                         "gols",
                         "assistencias",
+                        "passes_totais",
                         "passes_certos",
+                        "passes_errados",
                         "finalizacoes",
                         "finalizacoes_no_alvo",
                         "desarmes",
@@ -249,7 +298,11 @@ export default function CadastroEstatisticasPartidas() {
                             <br />
                             Minutos jogados: {e.minutos_jogados} minutos
                             <br />
-                            Assistências feitas: {e.assistencias} | Passes certos: {e.passes_certos}
+                            Assistências feitas: {e.assistencias}
+                            <br />
+                            Passes totais: {e.passes_totais}
+                            <br />
+                            Passes certos: {e.passes_certos} | Passes errados: {e.passes_errados}
                             <br />
                             Finalizações: {e.finalizacoes} | Finalizações no alvo: {e.finalizacoes_no_alvo}
                             <br />

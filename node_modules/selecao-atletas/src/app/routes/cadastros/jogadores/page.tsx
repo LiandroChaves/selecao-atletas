@@ -14,6 +14,7 @@ import Image from "next/image";
 export default function CadastroJogadores() {
     const [nome, setNome] = useState("");
     const [apelido, setApelido] = useState("");
+    const [nomeCurto, setNomeCurto] = useState("");
     const [dataNascimento, setDataNascimento] = useState("");
     const [paisId, setPaisId] = useState("");
     const [estadoId, setEstadoId] = useState("");
@@ -51,6 +52,13 @@ export default function CadastroJogadores() {
         fetchNiveis();
         fetchJogadores();
     }, []);
+
+    useEffect(() => {
+        if (nome && !nomeCurto) {
+            const sugestao = nome.split(" ")[0];
+            setNomeCurto(sugestao);
+        }
+    }, [nome]);
 
     const fetchPaises = async () => {
         try {
@@ -161,8 +169,8 @@ export default function CadastroJogadores() {
         e.preventDefault();
 
         if (
-            !nome.trim() || !dataNascimento.trim() || !paisId || !cidadeId || !altura.trim() ||
-            !peso.trim() || !peDominante || !nivelAmbidestriaId || !posicaoId || !clubeId
+            !nome.trim() || !dataNascimento.trim() || !paisId || !cidadeId ||
+            !peDominante || !nivelAmbidestriaId || !posicaoId || !clubeId
         ) {
             setErro("⚠️ Todos os campos são obrigatórios.");
             setTimeout(() => setErro(""), 3000);
@@ -250,8 +258,8 @@ export default function CadastroJogadores() {
                     pais_id: parseInt(paisId),
                     estado_id: estadoId ? parseInt(estadoId) : null,
                     cidade_id: parseInt(cidadeId),
-                    altura: parseFloat(altura),
-                    peso: parseFloat(peso),
+                    altura: parseFloat(altura) || 0,
+                    peso: parseFloat(peso) || 0,
                     pe_dominante: peDominante,
                     nivel_ambidestria_id: parseInt(nivelAmbidestriaId),
                     posicao_id: parseInt(posicaoId),
@@ -359,7 +367,14 @@ export default function CadastroJogadores() {
                                 className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
                             />
                         </div>
-
+                        <div className="w-full md:w-[48%] lg:w-[31%]">
+                            <input
+                                value={nomeCurto}
+                                onChange={(e) => setNomeCurto(e.target.value)}
+                                placeholder="Nome curto do jogador (ex: Augusto)"
+                                className="w-full p-2 rounded text-black bg-white"
+                            />
+                        </div>
                         {/* Apelido */}
                         <div className="w-full md:w-[48%] lg:w-[31%]">
                             <input
@@ -543,7 +558,6 @@ export default function CadastroJogadores() {
                         {/* Foto */}
                         <div className="w-full md:w-[48%] lg:w-[31%]">
                             <label className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
-                                Foto do jogador
                                 <input
                                     ref={fileInputRef}
                                     type="file"
@@ -551,6 +565,7 @@ export default function CadastroJogadores() {
                                     onChange={(e) => setFoto(e.target.files?.[0] || "")}
                                     className="w-full p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
                                 />
+                                Foto do jogador
                             </label>
                         </div>
                     </div>
@@ -584,9 +599,9 @@ export default function CadastroJogadores() {
                             return idade;
                         };
 
-                        const obterNomeCurto = (nomeCompleto: string) => {
-                            return nomeCompleto.split(" ")[0];  // Pega o primeiro nome
-                        };
+                        // const obterNomeCurto = (nomeCompleto: string) => {
+                        //     return nomeCompleto.split(" ")[0];  // Pega o primeiro nome
+                        // };
 
                         return (
                             <li
@@ -612,7 +627,7 @@ export default function CadastroJogadores() {
                                         <div><strong>ID:</strong> {jogador.id} - <strong>{jogador.nome}</strong></div>
 
                                         <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
-                                            <strong>Nome Curto:</strong> {obterNomeCurto(jogador.nome)}
+                                            <strong>Nome Curto:</strong> {nomeCurto}
                                         </div>
 
                                         <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>

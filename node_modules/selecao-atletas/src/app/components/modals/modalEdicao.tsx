@@ -359,6 +359,8 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                                                     }
                                                     alt="Imagem atual"
                                                     className="max-w-[200px] max-h-[200px] object-cover rounded"
+                                                    width={256}
+                                                    height={256}
                                                 />
                                                 <p className="text-sm text-gray-400 mt-2">
                                                     {valor ? "Imagem atual" : "Nenhuma imagem enviada"}
