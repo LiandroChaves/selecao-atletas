@@ -51,7 +51,7 @@ const ASSETS = {
 
 router.get("/gerar-pdf/:id", async (req, res) => {
     try {
-        const { categoria, corTituloeBorda = "#2957A4", corSegundaBorda } = req.query;
+        const { categoria, corTituloeBorda = "#2957A4", corSegundaBorda, clube } = req.query;
         const jogador = await models.Jogador.findByPk(req.params.id, {
             include: [
                 { model: models.Pais, as: "pais" },
@@ -144,7 +144,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         doc.fillColor(corTituloeBorda)             // ← aplica a mesma cor ao texto
             .font('Helvetica-Bold')
             .fontSize(16)
-            .text('ESPORTE CLUBE LIMOEIRO', 0, 50, { align: 'center' });
+            .text(`${clube}`, 0, 50, { align: 'center' });
 
         doc.fontSize(13)
             .text(`Ficha Individual do Atleta – ${categoria}`, { align: 'center' });
