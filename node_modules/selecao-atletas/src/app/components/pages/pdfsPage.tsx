@@ -160,9 +160,26 @@ export default function PdfsPage() {
             {isModalOpen && (
                 <div className={`fixed overflow-y-auto inset-0 ${isDarkMode
                     ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700"
-                    : "bg-gradient-to-br from-white via-gray-100 to-gray-200"} flex items-center justify-center z-50"`}>
+                    : "bg-gradient-to-br from-white via-gray-100 to-gray-200"} flex items-center justify-center z-50"`} onClick={(e) => e.stopPropagation()}>
                     <div
-                        className={`p-6 rounded-lg shadow-lg w-[90%] max-w-md ${isDarkMode ? "bg-teal-800" : "bg-gray-300"}`}
+                        className={`p-6 rounded-lg shadow-lg w-[90%] max-w-md ${isDarkMode ? "bg-teal-800" : "bg-gray-300"}`} onClickCapture={(e) => {
+                            // Verifica se o clique foi fora do picker e dos botões "Escolher cor"
+                            const target = e.target as HTMLElement;
+
+                            const clicouForaDoPickerTitulo = !target.closest(".picker-titulo");
+                            const clicouForaDoBotaoTitulo = !target.closest(".btn-titulo");
+
+                            const clicouForaDoPickerSegunda = !target.closest(".picker-segunda");
+                            const clicouForaDoBotaoSegunda = !target.closest(".btn-segunda");
+
+                            if (clicouForaDoPickerTitulo && clicouForaDoBotaoTitulo) {
+                                setMostrarPickerTitulo(false);
+                            }
+
+                            if (clicouForaDoPickerSegunda && clicouForaDoBotaoSegunda) {
+                                setMostrarPickerSegunda(false);
+                            }
+                        }}
                     >
                         <h2 className={`text-xl font-bold mb-4 text-center ${isDarkMode ? "text-white" : "text-gray-700"}`}>Configurar PDF</h2>
 
@@ -190,13 +207,13 @@ export default function PdfsPage() {
                                 <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-gray-700"}`}>Cor do Título e primeira borda</label>
                                 <div className="flex items-center gap-2">
                                     <div
-                                        className="w-10 h-10 border cursor-pointer rounded"
+                                        className="w-10 h-10 border cursor-pointer rounded btn-titulo"
                                         style={{ backgroundColor: corTituloeBorda }}
                                         onClick={() => setMostrarPickerTitulo(!mostrarPickerTitulo)}
                                     />
                                     <button
                                         type="button"
-                                        className={`text-sm ${isDarkMode ? "text-white" : "text-gray-700"} underline`}
+                                        className={`text-sm ${isDarkMode ? "text-white" : "text-gray-700"} underline btn-titulo`}
                                         onClick={() => setMostrarPickerTitulo(!mostrarPickerTitulo)}
                                     >
                                         {mostrarPickerTitulo ? "Fechar" : "Escolher cor"}
@@ -204,9 +221,9 @@ export default function PdfsPage() {
                                 </div>
 
                                 {mostrarPickerTitulo && (
-                                    <div className="mt-2 w-full">
+                                    <div className="mt-2 w-full picker-titulo">
                                         <SketchPicker
-                                            className="text-black"
+                                            className="text-black "
                                             color={corTituloeBorda}
                                             onChangeComplete={(color: ColorResult) => setCorTituloeBorda(color.hex)}
                                             width="60%"
@@ -229,13 +246,13 @@ export default function PdfsPage() {
                                 <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-gray-700"}`}>Cor da segunda borda</label>
                                 <div className="flex items-center gap-2">
                                     <div
-                                        className="w-10 h-10 border cursor-pointer rounded"
+                                        className="w-10 h-10 border cursor-pointer rounded btn-segunda"
                                         style={{ backgroundColor: corSegundaBorda }}
                                         onClick={() => setMostrarPickerSegunda(!mostrarPickerSegunda)}
                                     />
                                     <button
                                         type="button"
-                                        className={`text-sm ${isDarkMode ? "text-white" : "text-gray-700"} underline`}
+                                        className={`text-sm ${isDarkMode ? "text-white" : "text-gray-700"} underline btn-segunda`}
                                         onClick={() => setMostrarPickerSegunda(!mostrarPickerSegunda)}
                                     >
                                         {mostrarPickerSegunda ? "Fechar" : "Escolher cor"}
@@ -243,7 +260,7 @@ export default function PdfsPage() {
                                 </div>
 
                                 {mostrarPickerSegunda && (
-                                    <div className="mt-2 w-full">
+                                    <div className="mt-2 w-full picker-segunda">
                                         <SketchPicker
                                             className="text-black"
                                             color={corSegundaBorda}
