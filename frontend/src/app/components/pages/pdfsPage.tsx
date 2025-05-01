@@ -8,7 +8,6 @@ import { useLoading } from "../../../utils/context/LoadingProvider";
 import { saveAs } from 'file-saver';
 import BotaoTema from "../../../utils/utilities/changeTheme";
 import { SketchPicker, ColorResult } from 'react-color';
-import { text } from "stream/consumers";
 
 export default function PdfsPage() {
     const router = useRouter();
