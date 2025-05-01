@@ -8,6 +8,7 @@ import { useLoading } from "../../../utils/context/LoadingProvider";
 import { saveAs } from 'file-saver';
 import BotaoTema from "../../../utils/utilities/changeTheme";
 import { SketchPicker, ColorResult } from 'react-color';
+import { text } from "stream/consumers";
 
 export default function PdfsPage() {
     const router = useRouter();
@@ -168,7 +169,7 @@ export default function PdfsPage() {
 
                         {/* Campo Clube */}
                         <div className="mb-4">
-                            <label className="block text-sm font-medium mb-1">Clube</label>
+                            <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-white"}`}>Clube</label>
                             <select
                                 className={`w-full border rounded p-2 text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white w-full'
                                     }`}
@@ -187,7 +188,7 @@ export default function PdfsPage() {
                         <div>
                             {/* Primeira cor */}
                             <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1">Cor do Título e primeira borda</label>
+                                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-white"}`}>Cor do Título e primeira borda</label>
                                 <div className="flex items-center gap-2">
                                     <div
                                         className="w-10 h-10 border cursor-pointer rounded"
@@ -226,7 +227,7 @@ export default function PdfsPage() {
 
                             {/* Segunda cor */}
                             <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1">Cor da segunda borda</label>
+                                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-white"}`}>Cor da segunda borda</label>
                                 <div className="flex items-center gap-2">
                                     <div
                                         className="w-10 h-10 border cursor-pointer rounded"
@@ -265,7 +266,7 @@ export default function PdfsPage() {
                         </div>
                         {/* Campo Categoria */}
                         <div className="mb-4">
-                            <label className="block text-sm font-medium mb-1">Categoria</label>
+                            <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-white"}`}>Categoria</label>
                             <select
                                 className={`w-full border rounded p-2 text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white`}
                                 value={categoria}
