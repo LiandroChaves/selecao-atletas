@@ -164,11 +164,11 @@ export default function PdfsPage() {
                     <div
                         className={`p-6 rounded-lg shadow-lg w-[90%] max-w-md ${isDarkMode ? "bg-teal-800" : "bg-gray-300"}`}
                     >
-                        <h2 className="text-xl font-bold mb-4 text-center">Configurar PDF</h2>
+                        <h2 className={`text-xl font-bold mb-4 text-center ${isDarkMode ? "text-white" : "text-gray-700"}`}>Configurar PDF</h2>
 
                         {/* Campo Clube */}
                         <div className="mb-4">
-                            <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-white"}`}>Clube</label>
+                            <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-gray-700"}`}>Clube</label>
                             <select
                                 className={`w-full border rounded p-2 text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white w-full'
                                     }`}
@@ -187,7 +187,7 @@ export default function PdfsPage() {
                         <div>
                             {/* Primeira cor */}
                             <div className="mb-4">
-                                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-white"}`}>Cor do Título e primeira borda</label>
+                                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-gray-700"}`}>Cor do Título e primeira borda</label>
                                 <div className="flex items-center gap-2">
                                     <div
                                         className="w-10 h-10 border cursor-pointer rounded"
@@ -226,7 +226,7 @@ export default function PdfsPage() {
 
                             {/* Segunda cor */}
                             <div className="mb-4">
-                                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-white"}`}>Cor da segunda borda</label>
+                                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-gray-700"}`}>Cor da segunda borda</label>
                                 <div className="flex items-center gap-2">
                                     <div
                                         className="w-10 h-10 border cursor-pointer rounded"
@@ -265,7 +265,7 @@ export default function PdfsPage() {
                         </div>
                         {/* Campo Categoria */}
                         <div className="mb-4">
-                            <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-white"}`}>Categoria</label>
+                            <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-gray-700"}`}>Categoria</label>
                             <select
                                 className={`w-full border rounded p-2 text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white`}
                                 value={categoria}
