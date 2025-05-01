@@ -164,17 +164,6 @@ export const editarPartida = async (req, res) => {
         } = req.body;
 
         // Verifica se todos os campos obrigatórios estão presentes
-        if (
-            !id ||
-            !data ||
-            clube_casa_id === undefined ||
-            clube_fora_id === undefined ||
-            gols_casa === undefined ||
-            gols_fora === undefined
-        ) {
-            return res.status(400).json({ error: "Todos os campos obrigatórios devem ser preenchidos" });
-        }
-
         const partida = await Partidas.findByPk(id);
 
         if (!partida) {

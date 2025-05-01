@@ -65,10 +65,6 @@ export const editarJogadorTitulo = async (req, res) => {
         const { id } = req.params;
         const { titulo_id, ano, clube_id } = req.body;
 
-        if (!titulo_id || !ano || !clube_id) {
-            return res.status(400).json({ error: "Todos os campos são obrigatórios." });
-        }
-
         const registro = await JogadoresTitulos.findByPk(id);
 
         if (!registro) {

@@ -74,10 +74,6 @@ export const editarLesao = async (req, res) => {
         console.log("ID da lesão para editar:", id);
         const { jogador_id, tipo_lesao, data_inicio, data_retorno, descricao } = req.body;
 
-        if (!id || !jogador_id || !tipo_lesao || !data_inicio) {
-            return res.status(400).json({ error: "Todos os campos obrigatórios devem ser preenchidos" });
-        }
-
         const lesao = await HistoricoLesoes.findByPk(id);
         if (!lesao) {
             return res.status(404).json({ error: "Lesão não encontrada" });

@@ -211,6 +211,7 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
     const detectarTipoInput = (chave: string, valor: any) => {
         if (chave.toLowerCase().includes("imagem")) return "file";
         if (chave.toLowerCase().includes("foto")) return "file";
+        if (chave.toLowerCase().includes("url_logo")) return "file";
         if (chave.toLowerCase().includes("foto") && chave.toLocaleLowerCase().includes("foto") == null) return "file";
         if (typeof valor === "number") return "number";
         if (chave.toLowerCase().includes("descricao") || chave.toLowerCase().includes("mensagem")) return "textarea";

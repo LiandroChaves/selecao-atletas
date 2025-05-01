@@ -93,20 +93,6 @@ export const editarEstatisticaGeral = async (req, res) => {
             cartoes_vermelhos
         } = req.body;
 
-        // Verifica se algum campo está undefined ou null
-        if (
-            jogador_id === undefined ||
-            partidas_jogadas === undefined ||
-            gols === undefined ||
-            assistencias === undefined ||
-            titulos === undefined ||
-            faltas_cometidas === undefined ||
-            cartoes_amarelos === undefined ||
-            cartoes_vermelhos === undefined
-        ) {
-            return res.status(400).json({ error: "Todos os campos são obrigatórios" });
-        }
-
         const estatistica = await EstatisticaGeral.findByPk(jogador_id);
         if (!estatistica) {
             return res.status(404).json({ error: "Estatística não encontrada" });

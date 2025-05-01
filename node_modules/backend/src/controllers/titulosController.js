@@ -66,10 +66,6 @@ export const editarTitulo = async (req, res) => {
         const { id } = req.params;
         const { nome, tipo } = req.body;
 
-        if (!id || !nome || !tipo) {
-            return res.status(400).json({ error: "ID, nome e tipo são obrigatórios." });
-        }
-
         const titulo = await Titulos.findByPk(id);
         if (!titulo) {
             return res.status(404).json({ error: "Título não encontrado." });

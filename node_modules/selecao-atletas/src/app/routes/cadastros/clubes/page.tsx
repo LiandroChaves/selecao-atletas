@@ -223,7 +223,7 @@ export default function CadastroClubes() {
                         />
                     </label>
                     <input type="number" placeholder="Ano de fundação (opcional)" value={fundacao} onChange={(e) => setFundacao(e.target.value)} className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
-                    <input placeholder="Local do clube (opcional)" value={estadio} onChange={(e) => setEstadio(e.target.value)} className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
+                    <input placeholder="Estádio (opcional)" value={estadio} onChange={(e) => setEstadio(e.target.value)} className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
                     <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                         Logo do clube (opcional)
                         <input

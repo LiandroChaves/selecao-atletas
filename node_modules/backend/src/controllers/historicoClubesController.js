@@ -78,10 +78,6 @@ export const editarHistorico = async (req, res) => {
         console.log("ID da URL:", id);
         const { jogador_id, clube_id, data_entrada, data_saida } = req.body;
 
-        if (!id || !jogador_id || !clube_id || !data_entrada) {
-            return res.status(400).json({ error: "Todos os campos obrigatórios devem ser preenchidos" });
-        }
-
         const historico = await HistoricoClubes.findByPk(id);
         if (!historico) {
             return res.status(404).json({ error: "Histórico não encontrado" });

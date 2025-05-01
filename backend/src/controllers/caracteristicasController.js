@@ -94,10 +94,6 @@ export const editarCaracteristicaJogador = async (req, res) => {
         const caracteristica = await Caracteristicas.findByPk(id);
         if (!caracteristica) return res.status(404).json({ error: "Descrição não encontrada." });
 
-        if (!jogador_id || !descricao) {
-            return res.status(400).json({ error: "Jogador e descrição são obrigatórios." });
-        }
-
         await caracteristica.update({
             jogador_id,
             descricao: descricao.trim(),

@@ -76,10 +76,6 @@ export const editarClube = async (req, res) => {
         const { id } = req.params;
         const { nome, pais_id, fundacao, estadio, inicio_contrato, fim_contrato } = req.body;
 
-        if (!id || !nome || !pais_id || !fundacao || !estadio || !inicio_contrato || !fim_contrato) {
-            return res.status(400).json({ error: "Todos os campos são obrigatórios" });
-        }
-
         const clube = await Clubes.findByPk(id);
 
         if (!clube) {

@@ -165,25 +165,49 @@ export default function BuscaEedicao() {
                                     return `${item.data} - ${clubeCasa} ${item.gols_casa} x ${item.gols_fora} ${clubeFora}`;
                                 }
 
-                                // 👤 Se for jogador relacionado
+                                // 🎖 Se for jogador com título e tipo
+                                if (item.jogador?.nome && item.titulo?.nome && item.titulo?.tipo) {
+                                    return `${item.jogador.nome} - ${item.titulo.nome} (${item.titulo.tipo})`;
+                                }
+
+                                // Se for histórico de clube
+                                if (item.jogador?.nome && item.clube?.nome) {
+                                    return `${item.jogador.nome} (${item.clube.nome})`;
+                                }
+
+                                // 👤 Se for jogador com descrição
+                                if (item.jogador?.nome && item.descricao) {
+                                    return `${item.jogador.nome} - ${item.descricao}`;
+                                }
+
+                                // 🧾 Se for só descrição
+                                if (item.descricao) {
+                                    return item.descricao;
+                                }
+
+                                // 👤 Se for jogador relacionado genérico
                                 if (item.nome) return item.nome;
                                 if (item.nome_completo) return item.nome_completo;
                                 if (item.jogadores?.nome) return item.jogadores.nome;
-                                if (item.jogador?.nome) return item.jogador.nome;
 
-                                // 🏥 Se for histórico de lesão
+                                // 👤 Estatísticas por jogador e partida
+                                if (item.jogador?.nome && item.partida?.data) {
+                                    return `${item.jogador.nome} (${item.partida.data})`;
+                                }
+
+                                // 🏥 Histórico de lesão
                                 if (item.tipo_lesao) return item.tipo_lesao;
-                                if (item.descricao) return item.descricao;
 
                                 // 📅 Se tiver só data
                                 if (item.data) return item.data;
 
-
-                                if (item.titulo?.nome) return item.titulo.nome;
+                                // 🏆 Só título com tipo
+                                if (item.titulo?.nome && item.titulo?.tipo) {
+                                    return `${item.titulo.nome} (${item.titulo.tipo})`;
+                                }
 
                                 // 🔢 Se não achar nada, tenta pegar ID
                                 if (item.id) return `ID: ${item.id}`;
-
 
                                 // 📦 Se ainda assim não tiver nada, joga o JSON
                                 return JSON.stringify(item);

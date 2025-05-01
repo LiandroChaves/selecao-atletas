@@ -114,26 +114,6 @@ export const editarEstatisticaPartida = async (req, res) => {
             cartoes_vermelhos,
         } = req.body;
 
-        if (
-            !id ||
-            !jogador_id ||
-            !partida_id ||
-            minutos_jogados === undefined ||
-            gols === undefined ||
-            assistencias === undefined ||
-            passes_totais === undefined ||
-            passes_certos === undefined ||
-            passes_errados === undefined ||
-            finalizacoes === undefined ||
-            desarmes === undefined ||
-            finalizacoes_no_alvo === undefined ||
-            faltas_cometidas === undefined ||
-            cartoes_amarelos === undefined ||
-            cartoes_vermelhos === undefined
-        ) {
-            return res.status(400).json({ error: "Todos os campos obrigatórios devem ser preenchidos" });
-        }
-
         const estatistica = await EstatisticasPartidas.findByPk(id);
         if (!estatistica) {
             return res.status(404).json({ error: "Estatística não encontrada" });

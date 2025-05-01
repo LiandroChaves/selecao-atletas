@@ -179,7 +179,7 @@ CREATE TABLE caracteristicas (
 	FOREIGN KEY (jogador_id) REFERENCES jogadores(id) ON DELETE CASCADE
 );
 
-insert into caracteristicas (jogador_id, descricao) values (2, 'Visão de jogo')
+insert into caracteristicas (jogador_id, descricao) values (1, 'Visão de jogo')
 -- ========================
 -- 4. Estatísticas Gerais
 -- ========================

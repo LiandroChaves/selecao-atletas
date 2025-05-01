@@ -82,11 +82,6 @@ export const editarNivel = async (req, res) => {
         const nivel = await NivelAmbidestria.findByPk(id);
         if (!nivel) return res.status(404).json({ error: "Nível não encontrado." });
 
-        // Validações
-        if (!descricao || !descricao.trim()) {
-            return res.status(400).json({ error: "Descrição é obrigatória." });
-        }
-
         // Lista de palavras que geralmente ficam minúsculas no meio da frase
         const palavrasMinusculas = ["de", "do", "da", "dos", "das", "em", "com", "sem", "e", "a", "o", "as", "os"];
 

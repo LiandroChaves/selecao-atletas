@@ -96,7 +96,6 @@ export const editarJogador = async (req, res) => {
         if (!jogador) {
             return res.status(404).json({ message: "Jogador não encontrado" });
         }
-
         // Atualiza os campos do jogador
         await jogador.update(req.body);
 
