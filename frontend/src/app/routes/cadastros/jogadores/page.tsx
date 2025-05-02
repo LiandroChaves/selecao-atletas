@@ -54,11 +54,22 @@ export default function CadastroJogadores() {
     }, []);
 
     useEffect(() => {
-        if (nome && !nomeCurto) {
-            const sugestao = nome.split(" ")[0];
-            setNomeCurto(sugestao);
-        }
-    }, [nome]);
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Enter") {
+                e.preventDefault(); // evita comportamento padrão como abrir dropdown
+                const form = document.querySelector("form");
+                if (form) {
+                    form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+                }
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, []);
 
     const fetchPaises = async () => {
         try {
@@ -200,6 +211,16 @@ export default function CadastroJogadores() {
             )
             .join(" ");
 
+        const nomeCurtoFormatado = nomeCurto
+            .toLowerCase()
+            .split(" ")
+            .map((palavra, index) =>
+                index === 0 || !["de", "do", "da", "das", "dos", "e", "em", "no", "na", "nos", "nas"].includes(palavra)
+                    ? palavra.charAt(0).toUpperCase() + palavra.slice(1)
+                    : palavra
+            )
+            .join(" ");
+
         let nomeArquivoFoto = "";
 
         try {
@@ -253,6 +274,7 @@ export default function CadastroJogadores() {
                 method: "POST",
                 body: JSON.stringify({
                     nome: nomeFormatado,
+                    nome_curto: nomeCurtoFormatado,
                     apelido: nomeFormatadoApe,
                     data_nascimento: dataNascimento,
                     pais_id: parseInt(paisId),
@@ -599,10 +621,6 @@ export default function CadastroJogadores() {
                             return idade;
                         };
 
-                        // const obterNomeCurto = (nomeCompleto: string) => {
-                        //     return nomeCompleto.split(" ")[0];  // Pega o primeiro nome
-                        // };
-
                         return (
                             <li
                                 key={jogador.id}
@@ -627,7 +645,7 @@ export default function CadastroJogadores() {
                                         <div><strong>ID:</strong> {jogador.id} - <strong>{jogador.nome}</strong></div>
 
                                         <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
-                                            <strong>Nome Curto:</strong> {nomeCurto}
+                                            <strong>Nome Curto:</strong> {jogador.nome_curto ? jogador.nome_curto : "Nome curto não informado"}
                                         </div>
 
                                         <div className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>

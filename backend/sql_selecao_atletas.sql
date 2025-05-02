@@ -162,6 +162,9 @@ CREATE TABLE jogadores (
 	CONSTRAINT fkey_jogadores_clube FOREIGN KEY (clube_atual_id) REFERENCES clubes(id)
 );
 
+ALTER TABLE jogadores
+ADD COLUMN nome_curto VARCHAR(255)
+
 -- ========================
 -- 3.1 Características principais
 -- ========================

@@ -52,6 +52,7 @@ export const listarJogadores = async (req, res) => {
             attributes: [
                 "id",
                 "nome",
+                "nome_curto",
                 "apelido",
                 "data_nascimento",
                 "pais_id",

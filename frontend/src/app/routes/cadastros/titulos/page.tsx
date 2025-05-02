@@ -25,6 +25,24 @@ export default function CadastroTitulos() {
         fetchTitulos();
     }, []);
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Enter") {
+                e.preventDefault(); // evita comportamento padrão como abrir dropdown
+                const form = document.querySelector("form");
+                if (form) {
+                    form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+                }
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, []);
+
     const fetchTitulos = async () => {
         const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
         const API_URL = isLocalhost
