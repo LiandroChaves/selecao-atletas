@@ -258,10 +258,6 @@ CREATE TABLE estatisticas_partidas (
 	CONSTRAINT fkey_estatisticas_partida_partida FOREIGN KEY (partida_id) REFERENCES partidas(id) ON DELETE CASCADE
 );
 
-ALTER TABLE estatisticas_partidas
-ADD COLUMN passes_totais SMALLINT DEFAULT 0,
-ADD COLUMN passes_errados SMALLINT DEFAULT 0;
-
 -- ========================
 -- 6. Histórico de Clubes
 -- ========================

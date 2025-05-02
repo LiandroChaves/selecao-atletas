@@ -68,6 +68,15 @@ router.get("/gerar-pdf/:id", async (req, res) => {
                     include: [{ model: models.Clubes, as: "clube", attributes: ["nome"] }],
                     order: [["data_entrada", "ASC"]],
                 },
+                {
+                    model: models.JogadoresTitulos,
+                    as: "titulos",
+                    include: [
+                        { model: models.Titulos, as: "titulo" },
+                        { model: models.Clubes, as: "clube" } // <--- incluir esse
+                    ],
+                    order: [["ano", "ASC"]],
+                },
             ]
         });
 
@@ -141,10 +150,12 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         doc.restore();
 
         // Título do cabeçalho
-        doc.fillColor(corTituloeBorda)             // ← aplica a mesma cor ao texto
+        const nomeClube = clube || "Esporte Clube Limoeiro";
+
+        doc.fillColor(corTituloeBorda)
             .font('Helvetica-Bold')
             .fontSize(16)
-            .text(`${clube}`, 0, 50, { align: 'center' });
+            .text(`${nomeClube}`, 0, 50, { align: 'center' });
 
         doc.fontSize(13)
             .text(`Ficha Individual do Atleta – ${categoria}`, { align: 'center' });
@@ -155,12 +166,12 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
         // espaço para a foto
         if (jogador.foto) {
-            doc.image(`uploads/${jogador.foto}`, 480, 110, { width: 100, height: 120, fit: [100, 120] });
+            doc.image(`uploads/${jogador.foto}`, 460, 95, { width: 100, height: 120, fit: [100, 120] });
         } else {
             doc.rect(430, 120, 100, 120).stroke();
         }
 
-        doc.moveDown(2);
+        doc.moveDown(4);
 
         // ---------- dados básicos ----------
         doc.fontSize(11)
@@ -190,13 +201,21 @@ router.get("/gerar-pdf/:id", async (req, res) => {
                 `Altura: ${jogador.altura} m    |    Peso: ${jogador.peso} kg`,
                 { align: "center" }
             )
-            .moveDown(3);        // espaçamento extra antes do próximo bloco
 
+            .moveDown()
+        // ---------- campos de posição ----------
+        const ycamposText = doc.y + 10; // y inicial para os campos
+        doc.text("Posição principal / secundária:", 165, ycamposText);
+        doc.moveDown(3);
+        const yCampos = doc.y - 20; // y inicial para os campos
+        safeImage(doc, ASSETS.campo(jogador.posicao?.id), 70, yCampos, { width: 120 });
+        safeImage(doc, ASSETS.campo(jogador.posicao_secundaria?.id), 270, yCampos, { width: 120 });
 
+        // ---------- ambidestria ----------
         // ---------- pé dominante ----------
         doc.text(
             `Grau de ambidestria: ${jogador.nivel_ambidestria?.descricao ?? "—"}`,
-            { align: "center" }
+            0, ycamposText + 15, { align: "right" },
         );
         doc.text(
             `Pé dominante: ${jogador.pe_dominante === "E"
@@ -207,23 +226,13 @@ router.get("/gerar-pdf/:id", async (req, res) => {
                         ? "Ambos"
                         : "—"
             }`,
-            { align: "center" }
+            0, ycamposText, { align: "right" },
         );
         doc.moveDown(2);
         const imgPe = ASSETS.pe[jogador.pe_dominante];
-        safeImage(doc, imgPe, doc.x + 240, doc.y - 15, { width: 100 });
-        doc.moveDown(7);
-
-        // ---------- ambidestria ----------
-        doc.moveDown();
-
-        // ---------- campos de posição ----------
-        doc.text("Posição principal / secundária:", { align: "center" });
-        doc.moveDown();
-        const yCampos = doc.y + 5;
-        safeImage(doc, ASSETS.campo(jogador.posicao?.id), 140, yCampos, { width: 120 });
-        safeImage(doc, ASSETS.campo(jogador.posicao_secundaria?.id), 340, yCampos, { width: 120 });
+        safeImage(doc, imgPe, doc.x + 460, doc.y, { width: 100 });
         doc.moveDown(17);
+
 
         // ---------- características ----------
         doc.text("Características principais:", { align: "center" });
@@ -235,22 +244,83 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         // ---------- histórico ----------
         doc.moveDown(2).text("Histórico de clubes:", { underline: true, align: "center" });
         doc.moveDown();
-        const listaClubes =
-            jogador.historico.length
-                ? jogador.historico.map(h => {
-                    let ano;
-                    if (h.data_saida) {
-                        ano = dayjs(h.data_saida).format("YYYY");
-                    } else if (h.data_entrada) {
-                        ano = `${dayjs(h.data_entrada).format("YYYY")} - Atual`;
-                    } else {
-                        ano = "Sem data";
-                    }
-                    return `${h.clube?.nome} - (${ano})`;
-                })
-                : ["Sem histórico informado"];
 
-        listaClubes.forEach(item => doc.text(`• ${item}`, { align: "center" }));
+        if (jogador.historico.length) {
+            const linhas = [];
+
+            // Ordena pelo ano de entrada (ascendente)
+            const historicoOrdenado = [...jogador.historico].sort((a, b) => {
+                const dataA = a.data_entrada ? dayjs(a.data_entrada) : dayjs(0);
+                const dataB = b.data_entrada ? dayjs(b.data_entrada) : dayjs(0);
+                return dataA - dataB;
+            });
+
+            historicoOrdenado.forEach(h => {
+                const entrada = h.data_entrada ? dayjs(h.data_entrada).format("YYYY") : "";
+                const saida = h.data_saida ? dayjs(h.data_saida).format("YYYY") : "";
+
+                let periodo = "";
+                if (!entrada && !saida) {
+                    periodo = "(Sem data)";
+                } else if (!saida) {
+                    periodo = `(${entrada} - Atual ou data de saída não informada)`;
+                } else if (entrada === saida) {
+                    periodo = `(${entrada})`;
+                } else {
+                    periodo = `(${entrada} - ${saida})`;
+                }
+
+                linhas.push(`${h.clube?.nome ?? "Clube desconhecido"} ${periodo}`);
+            });
+
+            // Exibir dois por linha
+            for (let i = 0; i < linhas.length; i += 2) {
+                const linhaEsquerda = linhas[i];
+                const linhaDireita = linhas[i + 1] ?? "";
+                doc.text(
+                    `${linhaEsquerda}${linhaDireita ? " | " + linhaDireita : ""}`,
+                    { align: "center" }
+                );
+            }
+
+        } else {
+            doc.text("Sem histórico informado", { align: "center" });
+        }
+
+        // ---------- titulos jogadores ----------
+        doc.moveDown(2).text("Títulos conquistados:", { underline: true, align: "center" });
+        doc.moveDown();
+
+        if (jogador.titulos.length) {
+            const linhas = [];
+
+            // Ordenar por ano crescente
+            const titulosOrdenados = [...jogador.titulos].sort((a, b) => {
+                const anoA = a.ano ?? 0;
+                const anoB = b.ano ?? 0;
+                return anoA - anoB;
+            });
+
+            titulosOrdenados.forEach(t => {
+                const ano = t.ano ? dayjs(t.ano).format("YYYY") : "";
+                const nomeTitulo = t.titulo?.nome ?? "Título desconhecido";
+                const nomeClube = t.clube?.nome ?? "Clube desconhecido";
+                linhas.push(`${nomeTitulo} ${ano} - ${nomeClube}`);
+            });
+
+            // Exibir dois por linha
+            for (let i = 0; i < linhas.length; i += 2) {
+                const linhaEsquerda = linhas[i];
+                const linhaDireita = linhas[i + 1] ?? "";
+                doc.text(
+                    `${linhaEsquerda}${linhaDireita ? " | " + linhaDireita : ""}`,
+                    { align: "center" }
+                );
+            }
+
+        } else {
+            doc.text("Sem títulos conquistados", { align: "center" });
+        }
 
         doc.end();
     } catch (err) {

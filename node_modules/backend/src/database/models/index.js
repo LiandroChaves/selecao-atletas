@@ -18,10 +18,16 @@ import HistoricoLesoes from "./HistoricoLesoes.js";
 import JogadoresTitulos from "./JogadoresTitulos.js";
 import CaracteristicasJogador from "./Caracteristicas.js";
 
+HistoricoClubes.belongsTo(Jogador, { as: "jogador", foreignKey: "jogador_id" });
 Jogador.hasMany(HistoricoClubes, { as: "historico", foreignKey: "jogador_id" });
 CaracteristicasJogador.belongsTo(Jogador, { as: "jogador", foreignKey: "jogador_id" });
 Jogador.hasMany(CaracteristicasJogador, { as: "descricoes", foreignKey: "jogador_id" });
-HistoricoClubes.belongsTo(Jogador, { as: "jogador", foreignKey: "jogador_id" });
+JogadoresTitulos.belongsTo(Jogador, { foreignKey: "jogador_id", as: "jogador", onDelete: "CASCADE" });
+Jogador.hasMany(JogadoresTitulos, {
+    foreignKey: "jogador_id",
+    as: "titulos",
+    onDelete: "CASCADE"
+});
 
 const models = {
     Pais,

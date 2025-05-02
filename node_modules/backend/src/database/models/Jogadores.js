@@ -8,6 +8,7 @@ import Cidade from "./Cidades.js";
 import Clubes from "./Clubes.js";
 import NivelAmbidestria from "./Ambidestria.js";
 import Caracteristicas from "./Caracteristicas.js";
+import JogadoresTitulos from "./JogadoresTitulos.js";
 
 const Jogador = sequelize.define("jogadores", {
     id: {
@@ -20,7 +21,7 @@ const Jogador = sequelize.define("jogadores", {
         type: DataTypes.STRING(255),
         allowNull: false,
     },
-    nome_curto : {
+    nome_curto: {
         type: DataTypes.STRING(255),
         allowNull: true,
     },
@@ -128,5 +129,6 @@ Jogador.belongsTo(NivelAmbidestria, { as: 'nivel_ambidestria', foreignKey: 'nive
 Jogador.belongsTo(Posicao, { as: 'posicao_secundaria', foreignKey: 'posicao_secundaria_id' });
 
 Jogador.hasMany(Caracteristicas, { as: "caracteristicas", foreignKey: "jogador_id" });
+
 
 export default Jogador;
