@@ -80,6 +80,24 @@ router.get("/gerar-pdf/:id", async (req, res) => {
             ]
         });
 
+        const estatisticas = await models.EstatisticasPartidas.findAll({
+            where: { jogador_id: jogador.id },
+            include: [
+                {
+                    model: models.Partidas, as: "partida", include: [
+                        { model: models.Clubes, as: "clubeCasa" },
+                        { model: models.Clubes, as: "clubeFora" }
+                    ]
+                }
+            ],
+            order: [["partida_id", "ASC"]]
+        });
+
+        const historicoLesoes = await models.HistoricoLesoes.findAll({
+            where: { jogador_id: jogador.id },
+            order: [["data_inicio", "ASC"]]
+        });
+
         if (!jogador) return res.status(404).json({ error: "Jogador não encontrado" });
 
         let logoPath = ASSETS.logo;
@@ -241,6 +259,27 @@ router.get("/gerar-pdf/:id", async (req, res) => {
             : [{ descricao: "Sem características informadas" }])
             .forEach(c => doc.text(`• ${c.descricao}`, { align: "center" }));
 
+
+        const pageWidth = doc.page.width;
+        const margin = doc.page.margins.left;
+        const columnWidth = (pageWidth - margin * 2) / 2;
+
+        function drawLineCentered(leftText, rightText) {
+            const currentY = doc.y; // salva a posição Y antes de escrever
+
+            doc.text(leftText, margin, currentY, {
+                width: columnWidth,
+                align: "center"
+            });
+
+            doc.text(rightText, margin + columnWidth, currentY, {
+                width: columnWidth,
+                align: "center"
+            });
+
+            // avança uma única linha depois que ambos foram escritos
+        }
+
         // ---------- histórico ----------
         doc.moveDown(2).text("Histórico de clubes:", { underline: true, align: "center" });
         doc.moveDown();
@@ -275,20 +314,21 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
             // Exibir dois por linha
             for (let i = 0; i < linhas.length; i += 2) {
-                const linhaEsquerda = linhas[i];
-                const linhaDireita = linhas[i + 1] ?? "";
-                doc.text(
-                    `${linhaEsquerda}${linhaDireita ? " | " + linhaDireita : ""}`,
-                    { align: "center" }
-                );
+                const esquerda = linhas[i];
+                const direita = linhas[i + 1] ?? "";
+                drawLineCentered(esquerda, direita);
             }
 
         } else {
             doc.text("Sem histórico informado", { align: "center" });
         }
-
+        doc.moveDown(4);
         // ---------- titulos jogadores ----------
-        doc.moveDown(2).text("Títulos conquistados:", { underline: true, align: "center" });
+        doc.text("Títulos conquistados:", margin, doc.y, {
+            width: pageWidth - margin * 3,
+            align: "center",
+            underline: true
+        });
         doc.moveDown();
 
         if (jogador.titulos.length) {
@@ -310,18 +350,80 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
             // Exibir dois por linha
             for (let i = 0; i < linhas.length; i += 2) {
-                const linhaEsquerda = linhas[i];
-                const linhaDireita = linhas[i + 1] ?? "";
-                doc.text(
-                    `${linhaEsquerda}${linhaDireita ? " | " + linhaDireita : ""}`,
-                    { align: "center" }
-                );
+                const esquerda = linhas[i];
+                const direita = linhas[i + 1] ?? "";
+                drawLineCentered(esquerda, direita);
             }
 
         } else {
             doc.text("Sem títulos conquistados", { align: "center" });
         }
 
+        // ---------- segunda página ----------
+        doc.addPage();
+
+        // Repete a foto
+        if (jogador.foto) {
+            doc.image(`uploads/${jogador.foto}`, 460, 95, { width: 100, height: 120, fit: [100, 120] });
+        }
+
+        // Título da página
+        doc.fontSize(14).text("Dados Específicos do Atleta", 50, 50);
+
+        // Estatísticas por partida
+        doc.moveDown(3).fontSize(12).fillColor("black").text("Estatísticas por partida:", { underline: true });
+        doc.moveDown();
+
+        if (estatisticas.length) {
+            estatisticas.forEach((e) => {
+                const partida = e.partida;
+                const dataPartida = dayjs(partida?.data).format("DD/MM/YYYY");
+                const estadio = partida?.estadio || "Local não informado";
+                const campeonato = partida?.campeonato || "Campeonato não informado";
+                const clubeCasa = partida?.clubeCasa?.nome || "Clube Casa";
+                const clubeFora = partida?.clubeFora?.nome || "Clube Fora";
+                const placar = `${clubeCasa}: ${partida?.gols_casa} x ${partida?.gols_fora} :${clubeFora}`;
+
+                doc
+                    .fontSize(11)
+                    .fillColor("black")
+                    .text(`Partida realizada em: ${dataPartida}  |  Local: ${estadio}`, { bold: true })
+                doc.moveDown()
+                    .fillColor("black")
+                    .fontSize(10)
+                    .text(`Campeonato: ${campeonato}`)
+                    .text(`Placar: ${placar}`)
+                    .text(`Minutos jogados: ${e.minutos_jogados}`)
+                    .text(`Gols: ${e.gols}`)
+                    .text(`Assistências: ${e.assistencias}`)
+                    .text(`Passes: ${e.passes_totais} (${e.passes_certos} certos, ${e.passes_errados} errados)`)
+                    .text(`Finalizações: ${e.finalizacoes} (${e.finalizacoes_no_alvo} no alvo)`)
+                    .text(`Desarmes: ${e.desarmes}`)
+                    .text(`Faltas cometidas: ${e.faltas_cometidas}`)
+                    .text(`Cartões: ${e.cartoes_amarelos} Amarelos, ${e.cartoes_vermelhos} Vermelhos`)
+                    .moveDown();
+            });
+        } else {
+            doc.fontSize(10).text("Sem estatísticas registradas.");
+        }
+
+
+        // Lesões
+        doc.moveDown(2).fontSize(12).text("Histórico de lesões:", { underline: true });
+        doc.moveDown();
+
+        if (historicoLesoes.length) {
+            historicoLesoes.forEach(l => {
+                const inicio = dayjs(l.data_inicio).format("DD/MM/YYYY");
+                const retorno = l.data_retorno ? dayjs(l.data_retorno).format("DD/MM/YYYY") : "—";
+                doc.fontSize(10).text(
+                    `Tipo: ${l.tipo_lesao}\nInício: ${inicio} | Retorno: ${retorno}\n${l.descricao ?? ""}`,
+                    { align: "left" }
+                );
+            });
+        } else {
+            doc.fontSize(10).text("Sem lesões registradas.");
+        }
         doc.end();
     } catch (err) {
         console.error("Erro ao gerar PDF:", err);
