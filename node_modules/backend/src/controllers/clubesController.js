@@ -6,6 +6,21 @@ export const inserirClube = async (req, res) => {
     try {
         const { nome, pais_id, fundacao, estadio, inicio_contrato, fim_contrato } = req.body;
 
+        // Verifica se já existe um clube com esse nome e país
+        const clubeExistente = await Clubes.findOne({
+            where: {
+                nome,
+                pais_id
+            }
+        });
+
+        if (clubeExistente) {
+            return res.status(200).json({
+                mensagem: "Clube já existente. Retornando dados existentes.",
+                clube: clubeExistente
+            });
+        }
+
         const novoClube = await Clubes.create({
             nome,
             pais_id,
