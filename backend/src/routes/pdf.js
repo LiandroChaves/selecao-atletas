@@ -368,7 +368,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         }
 
         // Título da página
-        doc.fontSize(14).text("Dados Específicos do Atleta", 50, 50);
+        doc.fontSize(14).fillColor(`${corTituloeBorda}`).text("Dados Específicos do Atleta", 50, 50);
 
         // Estatísticas por partida
         doc.moveDown(3).fontSize(12).fillColor("black").text("Estatísticas por partida:", { underline: true });
