@@ -272,11 +272,28 @@ CREATE TABLE historico_clubes (
 	clube_id INT NOT NULL,
 	data_entrada DATE NOT NULL,
 	data_saida DATE,
+	jogos INT DEFAULT 0,
 	created_at TIMESTAMP DEFAULT NOW(),
 	updated_at TIMESTAMP DEFAULT NOW(),
 	CONSTRAINT fkey_historico_jogador FOREIGN KEY (jogador_id) REFERENCES jogadores(id) ON DELETE CASCADE,
 	CONSTRAINT fkey_historico_clube FOREIGN KEY (clube_id) REFERENCES clubes(id)
 );
+
+ALTER TABLE historico_clubes
+ADD COLUMN jogos INT DEFAULT 0;
+
+
+-- LEMBRA DE COLOCAR ISSO NA TABELA DELE
+
+
+
+
+
+
+
+
+
+
 
 -- ========================
 -- Histórico de Lesões

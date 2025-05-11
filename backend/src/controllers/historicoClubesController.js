@@ -56,13 +56,14 @@ export const pegarHistorico = async (req, res) => {
 
 export const inserirHistorico = async (req, res) => {
     try {
-        const { jogador_id, clube_id, data_entrada, data_saida } = req.body;
+        const { jogador_id, clube_id, data_entrada, data_saida, jogos } = req.body;
 
         const novo = await HistoricoClubes.create({
             jogador_id,
             clube_id,
             data_entrada,
             data_saida: data_saida || null,
+            jogos
         });
 
         res.status(201).json({ mensagem: "Histórico adicionado com sucesso", historico: novo });
@@ -76,7 +77,7 @@ export const editarHistorico = async (req, res) => {
     try {
         const { id } = req.params;
         console.log("ID da URL:", id);
-        const { jogador_id, clube_id, data_entrada, data_saida } = req.body;
+        const { jogador_id, clube_id, data_entrada, data_saida, jogos} = req.body;
 
         const historico = await HistoricoClubes.findByPk(id);
         if (!historico) {
@@ -88,6 +89,7 @@ export const editarHistorico = async (req, res) => {
             clube_id,
             data_entrada,
             data_saida: data_saida || null,
+            jogos
         });
 
         res.status(200).json({ mensagem: "Histórico atualizado com sucesso", historico });

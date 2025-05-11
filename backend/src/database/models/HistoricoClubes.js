@@ -33,6 +33,10 @@ const HistoricoClubes = sequelize.define("historico_clubes", {
         type: DataTypes.DATEONLY,
         allowNull: true,
     },
+    jogos: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
     created_at: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
