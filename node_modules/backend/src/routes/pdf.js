@@ -199,7 +199,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
             // linha 2  – nome curto  |  naturalidade
             .text(
-                `Nome curto: ${jogador.nome.split(" ")[0] || jogador.apelido}    |    ` +
+                `Nome curto: ${jogador.nome_curto || jogador.apelido}    |    ` +
                 `Naturalidade: ${jogador.cidade?.nome ?? "—"}`,
                 { align: "center" }
             )
@@ -248,6 +248,24 @@ router.get("/gerar-pdf/:id", async (req, res) => {
             }`,
             455, ycamposText,
         );
+
+        // Determine o caminho da imagem do pé dominante
+        let imagemPe = null;
+
+        if (jogador.pe_dominante === "E") {
+            imagemPe = ASSETS.pe.E;
+        } else if (jogador.pe_dominante === "D") {
+            imagemPe = ASSETS.pe.D;
+        } else if (jogador.pe_dominante === "A") {
+            // Se quiser mostrar os dois pés para ambidestro, você pode compor os dois
+            imagemPe = null; // ou uma imagem específica para ambidestro, se tiver: ASSETS.pe.A
+        }
+
+        // Renderiza a imagem no PDF, se aplicável
+        if (imagemPe) {
+            doc.image(imagemPe, 455, ycamposText + 30, { width: 100 }); // ajuste o tamanho e posição conforme necessário
+        }
+
         doc.moveDown(17);
 
         // voltar tudo ao estilo padrão

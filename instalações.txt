@@ -8,24 +8,3 @@ PostgreSQL (mesmo ou superior à sua versão atual):
 ➤ Durante a instalação, anote a senha (COLOQUE A MESMA SENHA USADA NO BANCO) do usuário postgres.
 
 pgAdmin 4 (instala junto com o PostgreSQL normalmente).
-
-criar tabela:
-
-select * from logos_clubes;
--- -- DELETE FROM logos_clubes;
--- ALTER SEQUENCE logos_clubes_id_seq RESTART WITH 1;
-
-CREATE TABLE logos_clubes (
-    id SERIAL PRIMARY KEY,
-    clube_id INT NOT NULL,
-    url_logo VARCHAR(500) NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    CONSTRAINT fkey_logos_clube FOREIGN KEY (clube_id) REFERENCES clubes(id) ON DELETE CASCADE
-);
-
-alterar estatísticas partidas:
-
-ALTER TABLE estatisticas_partidas
-ADD COLUMN passes_totais SMALLINT DEFAULT 0,
-ADD COLUMN passes_errados SMALLINT DEFAULT 0;

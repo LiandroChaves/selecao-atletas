@@ -19,6 +19,7 @@ export default function CadastroHistoricoClubes() {
         clube_id: "",
         data_entrada: "",
         data_saida: "",
+        jogos: "",
     });
     const [atualizarHistorico, setAtualizarHistorico] = useState(0);
     const [erro, setErro] = useState("");
@@ -121,13 +122,14 @@ export default function CadastroHistoricoClubes() {
                     clube_id: Number(form.clube_id),
                     data_entrada: form.data_entrada,
                     data_saida: form.data_saida || null,
+                    jogos: form.jogos
                 }),
             });
 
             const data = await res.json();
 
             if (res.ok) {
-                setForm({ jogador_id: "", clube_id: "", data_entrada: "", data_saida: "" });
+                setForm({ jogador_id: "", clube_id: "", data_entrada: "", data_saida: "", jogos: "" });
                 setAtualizarHistorico(prev => prev + 1); // força novo fetch
             } else {
                 setErro(data.error || "Erro ao cadastrar histórico.");
@@ -189,6 +191,17 @@ export default function CadastroHistoricoClubes() {
                         ))}
                     </select>
                     <div className="flex flex-col gap-1">
+                        <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Jogos</label>
+                        <input
+                            type="number"
+                            name="jogos"
+                            value={form.jogos}
+                            onChange={handleChange}
+                            className="p-2 rounded text-black bg-white"
+                            placeholder="Jogos"
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1">
                         <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Data de entrada no clube</label>
                         <input
                             type="date"
@@ -232,6 +245,7 @@ export default function CadastroHistoricoClubes() {
                         >
                             <strong>Jogador:</strong> {h.jogador?.nome ?? "Desconhecido"}<br />
                             <strong>Clube:</strong> {h.clube?.nome ?? "Desconhecido"}<br />
+                            <strong>Jogos:</strong> {h.jogos ?? "Quantidade de jogos não informados"}<br />
                             Entrada no clube: {dayjs(h.data_entrada).format("DD/MM/YYYY")}<br />
                             Saída do clube: {h.data_saida ? dayjs(h.data_saida).format("DD/MM/YYYY") : "Ainda permanece no clube"}
                         </li>
