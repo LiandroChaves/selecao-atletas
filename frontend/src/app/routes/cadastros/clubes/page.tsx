@@ -221,7 +221,7 @@ export default function CadastroClubes() {
                             <option key={pais.id} value={pais.id}>{pais.nome}</option>
                         ))}
                     </select>
-                    <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                    {/* <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                         Início do contrato do clube (opcional)
                         <input
                             type="date"
@@ -239,7 +239,7 @@ export default function CadastroClubes() {
                             onChange={(e) => setFimContrato(e.target.value)}
                             className="mt-1 p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 w-full"
                         />
-                    </label>
+                    </label> */}
                     <input type="number" placeholder="Ano de fundação (opcional)" value={fundacao} onChange={(e) => setFundacao(e.target.value)} className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
                     <input placeholder="Estádio (opcional)" value={estadio} onChange={(e) => setEstadio(e.target.value)} className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
                     <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>

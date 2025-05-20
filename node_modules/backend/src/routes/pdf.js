@@ -132,7 +132,11 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         // ---------- cabeçalho ----------
 
         // Logo do clube
-        doc.image(logoPath, 40, 40, { width: 90 });
+        doc.image(logoPath, 40, 40, {
+            fit: [90, 90], // mantém proporção até 90x90
+            align: 'left',
+            valign: 'top'
+        });
 
         // doc.image(ASSETS.borda, 410, -60, { width: 250 });
 
@@ -194,20 +198,20 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         doc.fontSize(11)
 
             // linha 1  – nome completo
-            .text(`Nome completo: ${jogador.nome || "—"}`, { align: "center" })
+            .text(`Nome completo: ${jogador.nome || "Não informado"}`, { align: "center" })
             .moveDown()
 
             // linha 2  – nome curto  |  naturalidade
             .text(
                 `Nome curto: ${jogador.nome_curto || jogador.apelido}    |    ` +
-                `Naturalidade: ${jogador.cidade?.nome ?? "—"}`,
+                `Naturalidade: ${jogador.cidade?.nome ?? "Não informado"}`,
                 { align: "center" }
             )
             .moveDown()
 
             // linha 3  – apelido  |  data nasc.  |  idade
             .text(
-                `Apelido: ${jogador.apelido || "—"}    |   ` +
+                `Apelido: ${jogador.apelido || "Não informado"}    |   ` +
                 `Data nasc.: ${dayjs(jogador.data_nascimento).format("DD/MM/YYYY")}    |    ` +
                 `Idade: ${calcularIdade(jogador.data_nascimento)} anos`,
                 { align: "center" }
@@ -216,7 +220,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
             // linha 4  – altura  |  peso
             .text(
-                `Altura: ${jogador.altura || "—"} m    |    Peso: ${jogador.peso || "—"} kg`,
+                `Altura: ${jogador.altura || "Não informado"} m    |    Peso: ${jogador.peso || "Não informado"} kg`,
                 { align: "center" }
             )
             .moveDown()
@@ -234,19 +238,17 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         // ---------- ambidestria ----------
         // ---------- pé dominante ----------
         doc.text(
-            `Grau de ambidestria: ${jogador.nivel_ambidestria?.descricao ?? "—"}`,
-            0, ycamposText + 15, { align: "right" },
+            `Grau de ambidestria: ${jogador.nivel_ambidestria?.descricao ?? "Não informado"}`,
+            418, ycamposText,
         );
         doc.text(
             `Pé dominante: ${jogador.pe_dominante === "E"
                 ? "Esquerdo"
                 : jogador.pe_dominante === "D"
                     ? "Direito"
-                    : jogador.pe_dominante === "A"
-                        ? "Ambos"
-                        : "—"
+                    : "Não informado"
             }`,
-            455, ycamposText,
+            432, ycamposText - 15,
         );
 
         // Determine o caminho da imagem do pé dominante
@@ -263,7 +265,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
         // Renderiza a imagem no PDF, se aplicável
         if (imagemPe) {
-            doc.image(imagemPe, 455, ycamposText + 30, { width: 100 }); // ajuste o tamanho e posição conforme necessário
+            doc.image(imagemPe, 455, ycamposText + 25, { width: 100 }); // ajuste o tamanho e posição conforme necessário
         }
 
         doc.moveDown(17);
@@ -271,13 +273,6 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         // voltar tudo ao estilo padrão
         doc.font("Helvetica").fontSize(10);
         doc.fillColor("black");
-
-        // ---------- características ----------
-        doc.text("Características principais:", 230, doc.y);
-        (jogador.caracteristicas.length
-            ? jogador.caracteristicas
-            : [{ descricao: "Sem características informadas" }])
-            .forEach(c => doc.text(`• ${c.descricao}`, 230, doc.y));
 
         // ---------- histórico ----------
         doc.moveDown(3).text("Histórico de clubes:", 230, doc.y, { underline: true });
@@ -462,6 +457,18 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         doc.fontSize(14).fillColor(`${corTituloeBorda}`).text("Dados Específicos do Atleta", 50, doc.y);
         doc.moveDown();
 
+        // voltar tudo ao estilo padrão
+        doc.font("Helvetica").fontSize(10);
+        doc.fillColor("black");
+
+        // ---------- características ----------
+        doc.text("Características principais:", doc.x, doc.y);
+        (jogador.caracteristicas.length
+            ? jogador.caracteristicas
+            : [{ descricao: "Sem características informadas" }])
+            .forEach(c => doc.text(`• ${c.descricao}`, doc.x, doc.y));
+
+
         // Estatísticas por partida
         doc.moveDown(3).fontSize(12).fillColor("black").text("Estatísticas por partida:", { underline: true });
         doc.moveDown();
@@ -506,7 +513,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         if (historicoLesoes.length) {
             historicoLesoes.forEach(l => {
                 const inicio = dayjs(l.data_inicio).format("DD/MM/YYYY");
-                const retorno = l.data_retorno ? dayjs(l.data_retorno).format("DD/MM/YYYY") : "—";
+                const retorno = l.data_retorno ? dayjs(l.data_retorno).format("DD/MM/YYYY") : "Não informado";
                 doc.fontSize(10).text(
                     `Tipo: ${l.tipo_lesao}\nInício: ${inicio} | Retorno: ${retorno}\n${l.descricao ?? ""}`,
                     { align: "left" }

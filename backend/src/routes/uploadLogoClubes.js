@@ -45,6 +45,21 @@ router.post('/inserirLogo', upload.single('url_logo'), async (req, res) => {
         const { clube_id } = req.body;
         const ext = path.extname(req.file.originalname);
 
+        // Antes de salvar nova logo
+        const logoAntiga = await LogosClubes.findOne({ where: { clube_id } });
+
+        if (logoAntiga) {
+            // Deleta imagem antiga do disco, se existir
+            const logoAntigaPath = path.join(logosDir, logoAntiga.url_logo);
+            if (fs.existsSync(logoAntigaPath)) {
+                fs.unlinkSync(logoAntigaPath);
+            }
+
+            // Remove do banco
+            await logoAntiga.destroy();
+        }
+
+
         // Busca o nome do clube
         const clube = await Clubes.findByPk(clube_id);
         if (!clube) {
