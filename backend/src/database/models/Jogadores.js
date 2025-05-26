@@ -31,11 +31,11 @@ const Jogador = sequelize.define("jogadores", {
     },
     data_nascimento: {
         type: DataTypes.DATEONLY,
-        allowNull: false,
+        allowNull: true,
     },
     pais_id: {
         type: DataTypes.SMALLINT,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: "paises",
             key: "id",
@@ -51,7 +51,7 @@ const Jogador = sequelize.define("jogadores", {
     },
     cidade_id: {
         type: DataTypes.SMALLINT,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: "cidades",
             key: "id",
@@ -95,7 +95,7 @@ const Jogador = sequelize.define("jogadores", {
     },
     clube_atual_id: {
         type: DataTypes.INTEGER,
-        allowNull: true,
+        allowNull: false,
         references: {
             model: "clubes",
             key: "id",

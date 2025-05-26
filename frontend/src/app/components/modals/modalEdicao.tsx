@@ -36,7 +36,7 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
             jogador_titulo_id: "jogadores-titulos",
             clube_casa_id: "clubes",
             clube_fora_id: "clubes",
-            caracteristica: "caracteristica-jogadores"
+            caracteristica: "caracteristica-jogadores",
         };
         return mapa[chave as keyof typeof mapa] || chave.replace("_id", "") + "s";
     };
@@ -217,6 +217,10 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
         if (chave.toLowerCase().includes("descricao") || chave.toLowerCase().includes("mensagem")) return "textarea";
         if (chave.toLowerCase().includes("data") || chave.toLowerCase().includes("date")) return "date";
         if (chave.toLowerCase().includes("contrato") || chave.toLowerCase().includes("contrato")) return "date";
+        if (chave.toLowerCase().includes("pais_id") || chave.toLowerCase().includes("pais_id")) return "number";
+        if (chave.toLowerCase().includes("cidade_id") || chave.toLowerCase().includes("cidade_id")) return "number";
+        if (chave.toLowerCase().includes("estado_id") || chave.toLowerCase().includes("estado_id")) return "number";
+        if (chave.toLowerCase().includes("posicao_secundaria_id") || chave.toLowerCase().includes("posicao_secundaria_id")) return "number";
         return "text";
     };
 
@@ -327,7 +331,7 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                     <h2 className="text-2xl font-bold mb-4 text-center">Editar Registro</h2>
                     {Object.entries(valores)
                         .filter(([chave]) =>
-                            !["createdAt", "updatedAt", "deletedAt", "created_at", "updated_at", "deleted_at"].includes(chave)
+                            !["createdAt", "updatedAt", "deletedAt", "created_at", "updated_at", "deleted_at","pais","estado","cidade","posicao_secundaria"].includes(chave)
                         )
                         .map(([chave, valor]) => {
                             const tipo = detectarTipoInput(chave, valor);

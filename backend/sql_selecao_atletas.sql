@@ -119,11 +119,15 @@ select * from logos_clubes;
 CREATE TABLE logos_clubes (
     id SERIAL PRIMARY KEY,
     clube_id INT NOT NULL,
-    url_logo VARCHAR(500) NOT NULL,
+    url_logo VARCHAR(500) NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     CONSTRAINT fkey_logos_clube FOREIGN KEY (clube_id) REFERENCES clubes(id) ON DELETE CASCADE
 );
+
+
+ALTER TABLE logos_clubes ADD CONSTRAINT unique_logo_clube UNIQUE (clube_id);
+
 
 -- ========================
 -- 3. Jogadores
@@ -136,6 +140,7 @@ SELECT * FROM jogadores;
 CREATE TABLE jogadores (
 	id SERIAL PRIMARY KEY,
 	nome VARCHAR(255) NOT NULL,
+	nome_curto VARCHAR(255),
 	apelido VARCHAR(255),
 	data_nascimento DATE NOT NULL,
 	pais_id SMALLINT NOT NULL,
@@ -162,8 +167,10 @@ CREATE TABLE jogadores (
 	CONSTRAINT fkey_jogadores_clube FOREIGN KEY (clube_atual_id) REFERENCES clubes(id)
 );
 
-ALTER TABLE jogadores
-ADD COLUMN nome_curto VARCHAR(255)
+ALTER TABLE jogadores ALTER COLUMN data_nascimento DROP NOT NULL;
+ALTER TABLE jogadores ALTER COLUMN pais_id DROP NOT NULL;
+ALTER TABLE jogadores ALTER COLUMN cidade_id DROP NOT NULL;
+ALTER TABLE jogadores ALTER COLUMN estado_id DROP NOT NULL;
 
 -- ========================
 -- 3.1 Características principais
@@ -281,19 +288,7 @@ CREATE TABLE historico_clubes (
 
 ALTER TABLE historico_clubes
 ADD COLUMN jogos INT DEFAULT 0;
-
-
 -- LEMBRA DE COLOCAR ISSO NA TABELA DELE
-
-
-
-
-
-
-
-
-
-
 
 -- ========================
 -- Histórico de Lesões

@@ -9,16 +9,31 @@ import { Op } from "sequelize";
 
 export const criarJogador = async (req, res) => {
     try {
-        // Trata os campos de data antes de criar o jogador
-        const contrato_inicio = req.body.contrato_inicio === "data não informada" ? null : req.body.contrato_inicio;
-        const contrato_fim = req.body.contrato_fim === "data não informada" ? null : req.body.contrato_fim;
-        const posicao_secundaria_id = req.body.posicao_secundaria_id === "não informado" ? null : req.body.posicao_secundaria_id;
+        const { nome, pe_dominante, nivel_ambidestria_id, clube_atual_id, posicao_id } = req.body;
+
+        if (!nome || !pe_dominante || !nivel_ambidestria_id || !clube_atual_id || !posicao_id) {
+            return res.status(400).json({ erro: "Campos obrigatórios: nome, pe_dominante, nivel_ambidestria_id, clube_atual_id, posicao_id." });
+        }
+
+        // Tratamento dos campos de data e outros opcionais
+        const contrato_inicio = !req.body.contrato_inicio || req.body.contrato_inicio === "data não informada"
+            ? null : req.body.contrato_inicio;
+
+        const contrato_fim = !req.body.contrato_fim || req.body.contrato_fim === "data não informada"
+            ? null : req.body.contrato_fim;
+
+        const posicao_secundaria_id = !req.body.posicao_secundaria_id || req.body.posicao_secundaria_id === "não informado"
+            ? null : req.body.posicao_secundaria_id;
+
+        const data_nascimento = !req.body.data_nascimento || req.body.data_nascimento === "Invalid date" || req.body.data_nascimento === ""
+            ? null : req.body.data_nascimento;
 
         const novoJogador = await Jogador.create({
             ...req.body,
             posicao_secundaria_id,
             contrato_inicio,
             contrato_fim,
+            data_nascimento
         });
 
         return res.status(201).json(novoJogador);

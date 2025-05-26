@@ -192,7 +192,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
             doc.rect(430, 120, 100, 120).stroke();
         }
 
-        doc.moveDown(4);
+        doc.moveDown(2);
 
         // ---------- dados básicos ----------
         doc.fontSize(11)
@@ -239,7 +239,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         // ---------- pé dominante ----------
         doc.text(
             `Grau de ambidestria: ${jogador.nivel_ambidestria?.descricao ?? "Não informado"}`,
-            418, ycamposText,
+            418, ycamposText, { align: "left" }
         );
         doc.text(
             `Pé dominante: ${jogador.pe_dominante === "E"
@@ -248,7 +248,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
                     ? "Direito"
                     : "Não informado"
             }`,
-            432, ycamposText - 15,
+            418, ycamposText - 15,
         );
 
         // Determine o caminho da imagem do pé dominante
@@ -275,7 +275,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         doc.fillColor("black");
 
         // ---------- histórico ----------
-        doc.moveDown(3).text("Histórico de clubes:", 230, doc.y, { underline: true });
+        doc.moveDown(3).text("Histórico de clubes:", 245, doc.y, { underline: true },);
         doc.moveDown();
 
         // Cabeçalho das colunas centralizado
@@ -377,7 +377,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         // ---------- segunda página ----------
         doc.addPage();
         // ---------- títulos jogadores ----------
-        doc.moveDown(2).text("Títulos conquistados:", 230, doc.y, { underline: true });
+        doc.moveDown(2).text("Títulos conquistados:", 245, doc.y, { underline: true });
 
         // Cabeçalho das colunas
         doc.font("Helvetica-Bold").fontSize(10);
@@ -460,9 +460,12 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         // voltar tudo ao estilo padrão
         doc.font("Helvetica").fontSize(10);
         doc.fillColor("black");
-
         // ---------- características ----------
-        doc.text("Características principais:", doc.x, doc.y);
+        doc.fontSize(12).fillColor("black").text("Características principais:", doc.x, doc.y, { underline: true });
+        doc.moveDown()
+        doc.font("Helvetica").fontSize(10);
+        doc.fillColor("black");
+
         (jogador.caracteristicas.length
             ? jogador.caracteristicas
             : [{ descricao: "Sem características informadas" }])
