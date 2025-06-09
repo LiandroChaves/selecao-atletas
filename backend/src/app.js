@@ -22,6 +22,7 @@ import historicoLesoesRoutes from "./routes/historicoLesoes.js";
 import titulosRoutes from "./routes/titulos.js";
 import jogadoresTitulosRoutes from "./routes/jogadoresTitulos.js";
 import caracteristicasJogadoresRoutes from "./routes/caracteristica.js";
+import bandeiras from "./routes/bandeiras.js";
 import pdfRoute from "./routes/pdf.js"
 import databaseRoutes from "./routes/database.js";
 import path from 'path';
@@ -83,6 +84,7 @@ app.use("/api/posicao_secundarias", posicoesRoutes);
 app.use("/api/clube_atuals", clubesRoutes); // Rota de clubes atuais
 app.use("/api/nivel_ambidestrias", ambidestriaRoutes); // Rota de níveis de ambidestria
 app.use("/api/caracteristica-jogadores", caracteristicasJogadoresRoutes); // Rota de descricao de jogadores
+app.use("/api/bandeiras", bandeiras); // Rota de bandeiras
 
 app.use('/api/uploads', express.static(uploadsPath)); // Serve arquivos estáticos da pasta uploads
 app.use("/api/uploads", uploadRouter); // Rota para upload de arquivos
@@ -90,6 +92,7 @@ app.use("/api/logos-clubes", uploadLogoClubes); // Rota para upload de logos de 
 app.use("/api/pdf", pdfRoute);
 app.use("/api/database", databaseRoutes);
 
+app.use('/assets/pdf', express.static(path.join(__dirname, "assets", "pdf")));
 
 // Rota padrão
 app.get("/", (req, res) => {

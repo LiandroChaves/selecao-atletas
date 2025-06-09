@@ -17,6 +17,7 @@ import Titulos from "./Titulos.js";
 import HistoricoLesoes from "./HistoricoLesoes.js";
 import JogadoresTitulos from "./JogadoresTitulos.js";
 import CaracteristicasJogador from "./Caracteristicas.js";
+import Bandeiras from "./Bandeiras.js";
 
 HistoricoClubes.belongsTo(Jogador, { as: "jogador", foreignKey: "jogador_id" });
 Jogador.hasMany(HistoricoClubes, { as: "historico", foreignKey: "jogador_id" });
@@ -46,7 +47,8 @@ const models = {
     EstatisticasPartidas,
     Titulos,
     HistoricoLesoes,
-    JogadoresTitulos
+    JogadoresTitulos,
+    Bandeiras
 };
 
 Object.values(models).forEach((model) => {

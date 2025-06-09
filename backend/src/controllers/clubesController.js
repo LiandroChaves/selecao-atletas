@@ -1,3 +1,5 @@
+// File: backend/src/controllers/clubesController.js
+
 import Clubes from "../database/models/Clubes.js";
 import Paises from "../database/models/Pais.js";
 import { Op } from "sequelize";

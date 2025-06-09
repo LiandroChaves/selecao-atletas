@@ -158,7 +158,8 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
             "historico-lesoes": "historicoLesao",
             "titulos": "titulo",
             "jogadores-titulos": "jogadorTitulo",
-            "caracteristica-jogadores": "caracteristica"
+            "caracteristica-jogadores": "caracteristica",
+            "bandeiras": "bandeira",
         };
         return mapa[endpoint.split("/")[0] as keyof typeof mapa] || endpoint;
     };
@@ -212,6 +213,7 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
         if (chave.toLowerCase().includes("imagem")) return "file";
         if (chave.toLowerCase().includes("foto")) return "file";
         if (chave.toLowerCase().includes("url_logo")) return "file";
+        if (chave.toLowerCase().includes("logo_bandeira")) return "file";
         if (chave.toLowerCase().includes("foto") && chave.toLocaleLowerCase().includes("foto") == null) return "file";
         if (typeof valor === "number") return "number";
         if (chave.toLowerCase().includes("descricao") || chave.toLowerCase().includes("mensagem")) return "textarea";

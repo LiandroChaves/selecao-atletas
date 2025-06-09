@@ -8,7 +8,6 @@ import Cidade from "./Cidades.js";
 import Clubes from "./Clubes.js";
 import NivelAmbidestria from "./Ambidestria.js";
 import Caracteristicas from "./Caracteristicas.js";
-import JogadoresTitulos from "./JogadoresTitulos.js";
 
 const Jogador = sequelize.define("jogadores", {
     id: {

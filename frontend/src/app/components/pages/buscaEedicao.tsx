@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaFlagCheckered } from "react-icons/fa";
 import { useTheme } from "../../../utils/context/ThemeContext";
 import { useLoading } from "../../../utils/context/LoadingProvider";
 import Modal from "../modals/modalPesquisaeEdicao";
@@ -32,6 +32,8 @@ const cadastros = [
     { label: "Histórico de Lesões", icon: <FaBriefcaseMedical />, endpoint: "historico-lesoes/pegarHistoricoLesoes" },
     { label: "Títulos", icon: <FaTrophy />, endpoint: "titulos/pegarTitulos" },
     { label: "Jogadores - Títulos", icon: <FaTrophy />, endpoint: "jogadores-titulos/pegarJogadoresTitulos" },
+    { label: "Bandeiras", icon: <FaFlagCheckered />, endpoint: "bandeiras/pegarBandeiras" },
+
 ];
 
 export default function BuscaEedicao() {
@@ -256,7 +258,8 @@ export default function BuscaEedicao() {
                                                             "historico-lesoes/pegarHistoricoLesoes": "historico-lesoes/deletarHistoricoLesao",
                                                             "titulos/pegarTitulos": "titulos/deletarTitulo",
                                                             "jogadores-titulos/pegarJogadoresTitulos": "jogadores-titulos/deletarJogadorTitulo",
-                                                            "caracteristica-jogadores/pegarCaracteristicas": "caracteristica-jogadores/deletarCaracteristicas"
+                                                            "caracteristica-jogadores/pegarCaracteristicas": "caracteristica-jogadores/deletarCaracteristicas",
+                                                            "bandeiras/pegarBandeiras": "bandeiras/deletarBandeira",
                                                         };
 
                                                         const deleteEndpoint = endpointMap[selected.endpoint];

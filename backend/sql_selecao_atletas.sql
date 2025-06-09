@@ -125,9 +125,7 @@ CREATE TABLE logos_clubes (
     CONSTRAINT fkey_logos_clube FOREIGN KEY (clube_id) REFERENCES clubes(id) ON DELETE CASCADE
 );
 
-
 ALTER TABLE logos_clubes ADD CONSTRAINT unique_logo_clube UNIQUE (clube_id);
-
 
 -- ========================
 -- 3. Jogadores
@@ -344,7 +342,6 @@ CREATE TABLE jogadores_titulos (
     CONSTRAINT unique_jogador_titulo UNIQUE (jogador_id, titulo_id)
 );
 
-
 -- 8. Índices
 
 CREATE INDEX idx_jogadores_nome ON jogadores(nome);
@@ -356,3 +353,17 @@ CREATE INDEX idx_jogadores_cidade ON jogadores(cidade_id);
 -- -- apagar e recriar tudo do zero
 -- DROP SCHEMA public CASCADE;
 -- CREATE SCHEMA public;
+
+
+
+SELECT * FROM bandeiras;
+-- -- DELETE FROM bandeiras;
+-- ALTER SEQUENCE bandeiras_id_seq RESTART WITH 1;
+
+CREATE TABLE IF NOT EXISTS bandeiras (
+	id SERIAL PRIMARY KEY NOT NULL,
+	nome VARCHAR(255) NOT NULL,
+	logo_bandeira TEXT NOT NULL
+)
+
+

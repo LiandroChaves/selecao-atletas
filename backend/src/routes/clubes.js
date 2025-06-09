@@ -1,3 +1,5 @@
+// File: backend/src/routes/clubes.js
+
 import { Router } from "express";
 import { inserirClube, pegarClubes, editarClube, deletarClube, pegarClubeAtualPorId, pegarClube } from "../controllers/clubesController.js";
 

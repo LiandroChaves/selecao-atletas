@@ -50,7 +50,7 @@ const ASSETS = {
 
 router.get("/gerar-pdf/:id", async (req, res) => {
     try {
-        const { categoria, corTituloeBorda = "#2957A4", corSegundaBorda, clube } = req.query;
+        const { categoria, corTituloeBorda = "#2957A4", corSegundaBorda, clube, bandeira } = req.query;
         const jogador = await models.Jogador.findByPk(req.params.id, {
             include: [
                 { model: models.Pais, as: "pais" },
@@ -310,6 +310,10 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
         doc.moveDown();
 
+        const caminhoBandeira = bandeira && bandeira !== "undefined"
+            ? path.join(basePath, bandeira)
+            : ASSETS.bandeiraBrasil;
+
         if (jogador.historico.length) {
             const historico = [...jogador.historico].sort((a, b) => {
                 const dataA = a.data_entrada ? dayjs(a.data_entrada) : dayjs(0);
@@ -338,7 +342,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
                     // Bandeira apenas na 1ª linha do ano
                     if (idx === 0) {
-                        doc.image(ASSETS.bandeiraBrasil, posicaoInicialX - 15, yAtual, { width: 12, height: 8 });
+                        doc.image(caminhoBandeira, posicaoInicialX - 15, yAtual, { width: 12, height: 8 });
                     }
 
                     const textoAno = idx === 0 ? ano : "";

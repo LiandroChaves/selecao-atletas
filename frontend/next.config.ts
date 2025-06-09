@@ -15,6 +15,12 @@ const nextConfig: NextConfig = {
                 port: "3001",
                 pathname: "/backend/assets/**",
             },
+            {
+                protocol: 'http',
+                hostname: 'localhost',
+                port: '3001',
+                pathname: '/assets/pdf/**',
+            },
         ],
     },
 };
