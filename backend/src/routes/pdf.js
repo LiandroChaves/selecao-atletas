@@ -63,8 +63,28 @@ router.get("/gerar-pdf/:id", async (req, res) => {
                 { model: models.Caracteristicas, as: "caracteristicas" },
                 {
                     model: models.HistoricoClubes,
-                    as: "historico", // alias que usaremos depois
-                    include: [{ model: models.Clubes, as: "clube", attributes: ["nome"] }],
+                    as: "historico",
+                    include: [
+                        {
+                            model: models.Clubes,
+                            as: "clube",
+                            attributes: ["nome", "pais_id"],
+                            include: [
+                                {
+                                    model: models.Pais,
+                                    as: "pais",
+                                    attributes: ["nome"],
+                                    include: [
+                                        {
+                                            model: models.Bandeiras,
+                                            as: "bandeira",
+                                            attributes: ["logo_bandeira"] // ou "arquivo", depende do seu model
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
                     order: [["data_entrada", "ASC"]],
                 },
                 {
@@ -72,7 +92,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
                     as: "titulos",
                     include: [
                         { model: models.Titulos, as: "titulo" },
-                        { model: models.Clubes, as: "clube" } // <--- incluir esse
+                        { model: models.Clubes, as: "clube" }
                     ],
                     order: [["ano", "ASC"]],
                 },
@@ -187,7 +207,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
         // espaço para a foto
         if (jogador.foto) {
-            doc.image(`uploads/${jogador.foto}`, 460, 95, { width: 100, height: 120, fit: [100, 120] });
+            doc.image(`uploads/${jogador.foto}`, 480, 95, { width: 100, height: 120, fit: [100, 120] });
         } else {
             doc.rect(430, 120, 100, 120).stroke();
         }
@@ -239,7 +259,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         // ---------- pé dominante ----------
         doc.text(
             `Grau de ambidestria: ${jogador.nivel_ambidestria?.descricao ?? "Não informado"}`,
-            418, ycamposText, { align: "left" }
+            418, ycamposText + 30, { align: "left" }
         );
         doc.text(
             `Pé dominante: ${jogador.pe_dominante === "E"
@@ -248,7 +268,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
                     ? "Direito"
                     : "Não informado"
             }`,
-            418, ycamposText - 15,
+            418, ycamposText + 15,
         );
 
         // Determine o caminho da imagem do pé dominante
@@ -265,7 +285,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
         // Renderiza a imagem no PDF, se aplicável
         if (imagemPe) {
-            doc.image(imagemPe, 455, ycamposText + 25, { width: 100 }); // ajuste o tamanho e posição conforme necessário
+            doc.image(imagemPe, 455, ycamposText + 55, { width: 100 }); // ajuste o tamanho e posição conforme necessário
         }
 
         doc.moveDown(17);
@@ -310,10 +330,6 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
         doc.moveDown();
 
-        const caminhoBandeira = bandeira && bandeira !== "undefined"
-            ? path.join(basePath, bandeira)
-            : ASSETS.bandeiraBrasil;
-
         if (jogador.historico.length) {
             const historico = [...jogador.historico].sort((a, b) => {
                 const dataA = a.data_entrada ? dayjs(a.data_entrada) : dayjs(0);
@@ -340,9 +356,22 @@ router.get("/gerar-pdf/:id", async (req, res) => {
                     // Usar mesma Y para todas as colunas
                     const yAtual = doc.y;
 
+                    let caminhoBandeira = ASSETS.bandeiraBrasil; // padrão
+
+                    const logoPath = h.clube?.pais?.bandeira?.logo_bandeira;
+                    if (logoPath) {
+                        const fullPath = path.join(basePath, logoPath);
+                        if (fs.existsSync(fullPath)) {
+                            caminhoBandeira = fullPath;
+                        }
+                    }
+
                     // Bandeira apenas na 1ª linha do ano
                     if (idx === 0) {
-                        doc.image(caminhoBandeira, posicaoInicialX - 15, yAtual, { width: 12, height: 8 });
+                        safeImage(doc, caminhoBandeira, posicaoInicialX - 15, yAtual, {
+                            width: 12,
+                            height: 8,
+                        });
                     }
 
                     const textoAno = idx === 0 ? ano : "";

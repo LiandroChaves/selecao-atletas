@@ -31,17 +31,18 @@ export const pegarPaises = async (req, res) => {
 
 // ➕ Inserir novo país
 export const inserirPaises = async (req, res) => {
-    const { nome } = req.body;
+    const { nome, bandeira_id } = req.body;
 
     if (!nome || nome.trim() === "") {
         return res.status(400).json({ error: "O nome do país é obrigatório" });
     }
 
     try {
-        const novoPais = await Pais.create({ nome });
+        const novoPais = await Pais.create({ nome, bandeira_id });
         res.status(201).json({
             mensagem: "País cadastrado com sucesso!",
             pais: novoPais,
+            bandeira_id: bandeira_id || null
         });
     } catch (error) {
         console.error("Erro ao cadastrar país:", error);
@@ -52,7 +53,7 @@ export const inserirPaises = async (req, res) => {
 export const editarPais = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nome } = req.body;
+        const { nome, bandeira_id } = req.body;
 
         if (!id || !nome || nome.trim() === "") {
             return res.status(400).json({ error: "ID e nome do país são obrigatórios" });
@@ -63,11 +64,12 @@ export const editarPais = async (req, res) => {
             return res.status(404).json({ error: "País não encontrado" });
         }
 
-        await pais.update({ nome: nome.trim() });
+        await pais.update({ nome: nome.trim(), bandeira_id });
 
         res.status(200).json({
             mensagem: "País atualizado com sucesso!",
-            pais
+            pais,
+            bandeira_id: bandeira_id || null
         });
     } catch (error) {
         console.error("Erro ao editar país:", error);

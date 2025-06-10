@@ -12,6 +12,14 @@ const Pais = sequelize.define("Pais", {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    bandeira_id: {
+        type: DataTypes.SMALLINT,
+        allowNull: true,
+        references: {
+            model: "bandeiras",
+            key: "id",
+        },
+    },
 }, {
     tableName: "paises",
     timestamps: false,

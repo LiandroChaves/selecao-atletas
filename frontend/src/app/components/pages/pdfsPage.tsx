@@ -23,8 +23,6 @@ export default function PdfsPage() {
     const [corSegundaBorda, setSegundaBorda] = useState("#22c0d4"); // valor padrão
     const [mostrarPickerTitulo, setMostrarPickerTitulo] = useState(false);
     const [mostrarPickerSegunda, setMostrarPickerSegunda] = useState(false);
-    const [bandeiras, setBandeiras] = useState<any[]>([]);
-    const [selectedBandeira, setSelectedBandeira] = useState<string>("");
 
     interface Jogador {
         id: string | number;
@@ -55,21 +53,6 @@ export default function PdfsPage() {
         fetchJogadores();
     }, []);
 
-    const fetchBandeiras = async () => {
-        try {
-            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-            const API_URL = isLocalhost
-                ? 'http://localhost:3001'
-                : `http://${window.location.hostname}:3001`;
-
-            const res = await fetch(`${API_URL}/api/bandeiras/pegarBandeiras`);
-            const data = await res.json();
-            setBandeiras(data);
-        } catch (err) {
-            console.error("❌ Erro ao buscar bandeiras:", err);
-        }
-    };
-
     async function fetchClubes() {
         try {
             const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
@@ -91,12 +74,6 @@ export default function PdfsPage() {
         }
     }, [isModalOpen]);
 
-    useEffect(() => {
-        if (isModalOpen) {
-            fetchBandeiras();
-        }
-    }, [isModalOpen]);
-
     const abrirModal = (jogador: Jogador) => {
         setSelectedJogador(jogador);
         setIsModalOpen(true);
@@ -115,7 +92,6 @@ export default function PdfsPage() {
             categoria: categoria,
             corTituloeBorda: corTituloeBorda,
             corSegundaBorda: corSegundaBorda,
-            bandeira: selectedBandeira || "",
         });
 
         const pdfUrl = `${API_URL}/api/pdf/gerar-pdf/${selectedJogador.id}?${params.toString()}`;
@@ -133,8 +109,6 @@ export default function PdfsPage() {
             setSelectedJogador(null);
             setClube("");
             setCategoria("Base");
-            setBandeiras([]);
-            setSelectedBandeira("");
             setCorTituloeBorda("#2957A4");
             setSegundaBorda("#22c0d4");
         } catch (error) {
@@ -226,21 +200,6 @@ export default function PdfsPage() {
                                     </option>
                                 ))}
                             </select>
-                        <div className="mb-4 mt-4">
-                            <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-gray-700"}`}>Bandeira</label>
-                            <select
-                                className={`border rounded p-2 text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white w-full`}
-                                value={selectedBandeira}
-                                onChange={(e) => setSelectedBandeira(e.target.value)}
-                            >
-                                <option value="">Selecione uma bandeira</option>
-                                {bandeiras.map((bandeira) => (
-                                    <option key={bandeira.id} value={bandeira.logo_bandeira}>
-                                        {bandeira.nome || bandeira.id}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
                         </div>
                         {/* Campo Cor do Título e primeira borda*/}
                         <div>

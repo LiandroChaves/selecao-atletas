@@ -30,6 +30,11 @@ Jogador.hasMany(JogadoresTitulos, {
     onDelete: "CASCADE"
 });
 
+Pais.belongsTo(Bandeiras, {
+  foreignKey: "bandeira_id",
+  as: "bandeira"
+});
+
 const models = {
     Pais,
     NivelAmbidestria,

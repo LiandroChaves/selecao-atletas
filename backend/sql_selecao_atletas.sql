@@ -19,6 +19,12 @@ CREATE TABLE usuarios (
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+
+
+
+
+
+
 -- PAÍSES
 
 SELECT * FROM paises;
@@ -28,9 +34,23 @@ SELECT * FROM paises;
 CREATE TABLE paises (
 	id SERIAL PRIMARY KEY,
 	nome VARCHAR(100) NOT NULL,
+	bandeira_id INT,
 	created_at TIMESTAMP DEFAULT NOW(),
 	updated_at TIMESTAMP DEFAULT NOW()
 );
+
+ALTER TABLE paises ADD COLUMN bandeira_id INT;
+
+ALTER TABLE paises
+ADD CONSTRAINT fkey_paises_bandeira
+FOREIGN KEY (bandeira_id) REFERENCES bandeiras(id)
+ON DELETE SET NULL ON UPDATE CASCADE;
+
+
+
+
+
+
 
 -- ESTADOS
 
@@ -140,10 +160,10 @@ CREATE TABLE jogadores (
 	nome VARCHAR(255) NOT NULL,
 	nome_curto VARCHAR(255),
 	apelido VARCHAR(255),
-	data_nascimento DATE NOT NULL,
-	pais_id SMALLINT NOT NULL,
+	data_nascimento DATE,
+	pais_id SMALLINT,
 	estado_id SMALLINT,
-	cidade_id SMALLINT NOT NULL,
+	cidade_id SMALLINT,
 	altura DECIMAL(4,2),
 	peso DECIMAL(5,2),
 	pe_dominante pe_dominante_enum NOT NULL,
@@ -164,11 +184,6 @@ CREATE TABLE jogadores (
 	CONSTRAINT fkey_jogadores_posicao_secundaria FOREIGN KEY (posicao_secundaria_id) REFERENCES posicoes(id),
 	CONSTRAINT fkey_jogadores_clube FOREIGN KEY (clube_atual_id) REFERENCES clubes(id)
 );
-
-ALTER TABLE jogadores ALTER COLUMN data_nascimento DROP NOT NULL;
-ALTER TABLE jogadores ALTER COLUMN pais_id DROP NOT NULL;
-ALTER TABLE jogadores ALTER COLUMN cidade_id DROP NOT NULL;
-ALTER TABLE jogadores ALTER COLUMN estado_id DROP NOT NULL;
 
 -- ========================
 -- 3.1 Características principais

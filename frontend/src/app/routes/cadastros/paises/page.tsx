@@ -11,6 +11,8 @@ import { verificarTokenValido } from "@/utils/verificarTokenValido";
 
 export default function CadastroPaises() {
     const [nome, setNome] = useState("");
+    const [bandeiraId, setBandeiraId] = useState<number | null>(null);
+    const [bandeiras, setBandeiras] = useState<{ id: number; nome: string }[]>([]);
     const [paises, setPaises] = useState<{ id: number; nome: string }[]>([]);
     const [erro, setErro] = useState("");
     const router = useRouter();
@@ -55,6 +57,22 @@ export default function CadastroPaises() {
         }
     }
 
+    async function fetchBandeiras() {
+        try {
+            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+            const API_URL = isLocalhost
+                ? 'http://localhost:3001'
+                : `http://${window.location.hostname}:3001`;
+
+            const res = await fetch(`${API_URL}/api/bandeiras/pegarBandeiras`);
+            const data = await res.json();
+            setBandeiras(data);
+        } catch (err) {
+            console.error("❌ Erro ao buscar bandeiras:", err);
+        }
+    }
+
+
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
@@ -90,7 +108,10 @@ export default function CadastroPaises() {
 
             const res = await fetch(`${API_URL}/api/paises/inserirPaises`, {
                 method: "POST",
-                body: JSON.stringify({ nome: nomeFormatado }),
+                body: JSON.stringify({
+                    nome: nomeFormatado,
+                    bandeira_id: bandeiraId
+                }),
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
@@ -115,6 +136,7 @@ export default function CadastroPaises() {
 
     useEffect(() => {
         fetchPaises();
+        fetchBandeiras();
     }, []);
 
     return (
@@ -152,6 +174,18 @@ export default function CadastroPaises() {
                         placeholder="Nome do país"
                         className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
                     />
+                    <select
+                        value={bandeiraId ?? ""}
+                        onChange={(e) => setBandeiraId(e.target.value ? parseInt(e.target.value) : null)}
+                        className="p-2 rounded text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                    >
+                        <option value="">Selecione uma bandeira</option>
+                        {bandeiras.map((b) => (
+                            <option key={b.id} value={b.id}>
+                                {b.nome}
+                            </option>
+                        ))}
+                    </select>
                     {erro && (
                         <p className="text-red-400 font-medium text-sm">{erro}</p>
                     )}
