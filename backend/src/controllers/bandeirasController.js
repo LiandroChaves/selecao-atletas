@@ -23,23 +23,46 @@ export const inserirBandeira = async (req, res) => {
             return res.status(400).json({ error: "O nome da bandeira é obrigatório." });
         }
 
-        const ext = path.extname(req.file.originalname);
-        const filename = `bandeira_${Date.now()}${ext}`;
-        const finalPath = path.join(bandeirasDir, filename);
+        const nomeTrimado = nome.trim();
 
-        fs.renameSync(req.file.path, finalPath);
-
-        const novaBandeira = await Bandeiras.create({
-            nome: nome.trim(),
-            logo_bandeira: filename,
+        // Verifica se já existe uma bandeira com o mesmo nome (ignorando maiúsculas/minúsculas)
+        const bandeiraExistente = await Bandeiras.findOne({
+            where: { nome: { [Op.iLike]: nomeTrimado } },
         });
 
-        res.status(201).json({ bandeira: novaBandeira });
+        const ext = path.extname(req.file.originalname);
+        const novoNomeArquivo = `bandeira_${Date.now()}${ext}`;
+        const destinoFinal = path.join(bandeirasDir, novoNomeArquivo);
+
+        fs.renameSync(req.file.path, destinoFinal);
+
+        if (bandeiraExistente) {
+            // Deleta imagem antiga do disco
+            const caminhoAntigo = path.join(bandeirasDir, bandeiraExistente.logo_bandeira);
+            if (fs.existsSync(caminhoAntigo)) {
+                fs.unlinkSync(caminhoAntigo);
+            }
+
+            // Atualiza a imagem da bandeira existente
+            bandeiraExistente.logo_bandeira = novoNomeArquivo;
+            await bandeiraExistente.save();
+
+            return res.status(200).json({ mensagem: "Imagem da bandeira atualizada com sucesso", bandeira: bandeiraExistente });
+        }
+
+        // Caso não exista, cria nova bandeira
+        const novaBandeira = await Bandeiras.create({
+            nome: nomeTrimado,
+            logo_bandeira: novoNomeArquivo,
+        });
+
+        res.status(201).json({ mensagem: "Bandeira criada com sucesso", bandeira: novaBandeira });
     } catch (error) {
-        console.error("Erro ao inserir bandeira:", error);
-        res.status(500).json({ error: "Erro interno ao inserir bandeira." });
+        console.error("Erro ao inserir/editar bandeira:", error);
+        res.status(500).json({ error: "Erro interno ao inserir ou editar bandeira." });
     }
 };
+
 
 export const pegarBandeiras = async (req, res) => {
     try {

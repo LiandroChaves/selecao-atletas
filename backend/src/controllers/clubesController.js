@@ -3,6 +3,7 @@
 import Clubes from "../database/models/Clubes.js";
 import Paises from "../database/models/Pais.js";
 import { Op } from "sequelize";
+import LogosClubes from "../database/models/LogoClubes.js";
 
 export const inserirClube = async (req, res) => {
     try {
@@ -164,3 +165,29 @@ export const pegarClubeAtualPorId = async (req, res) => {
         res.status(500).json({ error: "Erro interno ao buscar clube." });
     }
 }
+
+export const pegarClubesComLogo = async (_req, res) => {
+    try {
+        const clubes = await Clubes.findAll({
+            include: [
+                {
+                    model: LogosClubes,
+                    as: "logo",
+                    required: true, // isso faz INNER JOIN: só clubes com logo
+                    attributes: ["url_logo"],
+                },
+                {
+                    model: Paises,
+                    as: "pais",
+                    attributes: ["nome"],
+                },
+            ],
+            order: [["id", "ASC"]],
+        });
+
+        res.status(200).json(clubes);
+    } catch (error) {
+        console.error("Erro ao buscar clubes com logo:", error);
+        res.status(500).json({ error: "Erro interno ao buscar clubes com logo." });
+    }
+};

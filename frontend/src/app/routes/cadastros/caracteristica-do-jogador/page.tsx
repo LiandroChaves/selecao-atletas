@@ -8,6 +8,7 @@ import BotaoTema from "@/utils/utilities/changeTheme";
 import { motion } from "framer-motion";
 import { useLoading } from "@/utils/context/LoadingProvider";
 import { verificarTokenValido } from "@/utils/verificarTokenValido";
+import { useDisableOnSubmit } from "@/utils/hooks/useDisableOnSubmit";
 
 export default function CadastroDescricaoJogador() {
     const [jogadorId, setJogadorId] = useState("");
@@ -18,6 +19,7 @@ export default function CadastroDescricaoJogador() {
     const router = useRouter();
     const { isDarkMode } = useTheme();
     const { setIsLoading } = useLoading();
+    const { isSubmitting, handleSubmitWrapper } = useDisableOnSubmit();
 
     useEffect(() => {
         setIsLoading(false);
@@ -73,8 +75,7 @@ export default function CadastroDescricaoJogador() {
         }
     }
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
+    async function submitForm() {
 
         if (!jogadorId || !descricao) {
             setErro("⚠️ Jogador e descrição são obrigatórios.");
@@ -131,6 +132,11 @@ export default function CadastroDescricaoJogador() {
         }
     }
 
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        handleSubmitWrapper(submitForm);
+    }
+
     return (
         <main className={`min-h-screen flex items-center justify-center p-4 transition-all duration-500 ${isDarkMode ? "bg-gradient-to-br from-gray-900 via-gray-800 to-teal-900" : "bg-gradient-to-br from-white via-gray-100 to-gray-200"}`}>
             <motion.div
@@ -177,9 +183,13 @@ export default function CadastroDescricaoJogador() {
 
                     <button
                         type="submit"
-                        className={`px-4 py-2 rounded font-semibold transition duration-300 hover:scale-[1.03] ${isDarkMode ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900" : "bg-gray-600 hover:bg-gray-500 text-white"}`}
+                        disabled={isSubmitting}
+                        className={`px-4 py-2 rounded font-semibold transition duration-300 hover:scale-[1.03] ${isDarkMode
+                            ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900"
+                            : "bg-gray-600 hover:bg-gray-500 text-white"
+                            } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
-                        Cadastrar
+                        {isSubmitting ? "Cadastrando..." : "Cadastrar"}
                     </button>
                 </form>
 

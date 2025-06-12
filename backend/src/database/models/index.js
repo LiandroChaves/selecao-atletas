@@ -18,6 +18,7 @@ import HistoricoLesoes from "./HistoricoLesoes.js";
 import JogadoresTitulos from "./JogadoresTitulos.js";
 import CaracteristicasJogador from "./Caracteristicas.js";
 import Bandeiras from "./Bandeiras.js";
+import LogosClubes from "./LogoClubes.js";
 
 HistoricoClubes.belongsTo(Jogador, { as: "jogador", foreignKey: "jogador_id" });
 Jogador.hasMany(HistoricoClubes, { as: "historico", foreignKey: "jogador_id" });
@@ -31,9 +32,13 @@ Jogador.hasMany(JogadoresTitulos, {
 });
 
 Pais.belongsTo(Bandeiras, {
-  foreignKey: "bandeira_id",
-  as: "bandeira"
+    foreignKey: "bandeira_id",
+    as: "bandeira"
 });
+
+Clubes.belongsTo(Pais, { foreignKey: "pais_id", as: "pais" });
+LogosClubes.belongsTo(Clubes, { foreignKey: "clube_id", as: "clube" });
+Clubes.hasOne(LogosClubes, { foreignKey: "clube_id", as: "logo" });
 
 const models = {
     Pais,

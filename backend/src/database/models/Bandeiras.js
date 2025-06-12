@@ -13,6 +13,7 @@ const Bandeiras = sequelize.define("bandeiras", {
     nome: {
         type: DataTypes.STRING(255),
         allowNull: false,
+        unique: true,
     },
     logo_bandeira: {
         type: DataTypes.TEXT,

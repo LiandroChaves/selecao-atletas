@@ -41,6 +41,8 @@ CREATE TABLE paises (
 
 ALTER TABLE paises ADD COLUMN bandeira_id INT;
 
+update paises set nome = 'Europa' where id = 2
+
 ALTER TABLE paises
 ADD CONSTRAINT fkey_paises_bandeira
 FOREIGN KEY (bandeira_id) REFERENCES bandeiras(id)

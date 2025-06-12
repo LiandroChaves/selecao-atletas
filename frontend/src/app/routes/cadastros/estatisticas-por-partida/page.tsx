@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { useLoading } from "@/utils/context/LoadingProvider";
 import { verificarTokenValido } from "@/utils/verificarTokenValido";
 import dayjs from "dayjs";
+import { useDisableOnSubmit } from "@/utils/hooks/useDisableOnSubmit";
 
 export default function CadastroEstatisticasPartidas() {
     const [estatisticas, setEstatisticas] = useState<any[]>([]);
@@ -34,6 +35,7 @@ export default function CadastroEstatisticasPartidas() {
     const { isDarkMode } = useTheme();
     const { setIsLoading } = useLoading();
     const router = useRouter();
+    const { isSubmitting, handleSubmitWrapper } = useDisableOnSubmit();
 
     useEffect(() => {
         setIsLoading(false);

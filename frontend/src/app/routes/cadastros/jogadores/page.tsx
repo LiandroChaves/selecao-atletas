@@ -10,6 +10,7 @@ import { useLoading } from "@/utils/context/LoadingProvider";
 import { verificarTokenValido } from "@/utils/verificarTokenValido";
 import dayjs from "dayjs";
 import Image from "next/image";
+import { useDisableOnSubmit } from "@/utils/hooks/useDisableOnSubmit";
 
 export default function CadastroJogadores() {
     const [nome, setNome] = useState("");
@@ -41,6 +42,7 @@ export default function CadastroJogadores() {
     const { setIsLoading } = useLoading();
     const { isDarkMode } = useTheme();
     const router = useRouter();
+    const { isSubmitting, handleSubmitWrapper } = useDisableOnSubmit();
 
     useEffect(() => {
         setIsLoading(true);
@@ -176,8 +178,7 @@ export default function CadastroJogadores() {
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    async function submitForm() {
 
         if (
             !nome.trim() || !peDominante || !nivelAmbidestriaId || !posicaoId || !clubeId
@@ -328,6 +329,12 @@ export default function CadastroJogadores() {
         } catch (error) {
             console.error("Erro ao inserir jogador:", error);
         }
+
+    }
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        handleSubmitWrapper(submitForm);
     };
 
     // Função para validar altura
@@ -598,10 +605,13 @@ export default function CadastroJogadores() {
                     <div className="flex justify-center mt-6">
                         <button
                             type="submit"
-                            className={`px-6 py-2 rounded font-semibold transition duration-300 hover:scale-[1.03] ${isDarkMode ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900" : "bg-gray-600 hover:bg-gray-500 text-white"
-                                }`}
+                            disabled={isSubmitting}
+                            className={`px-4 py-2 rounded font-semibold transition duration-300 hover:scale-[1.03] ${isDarkMode
+                                ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900"
+                                : "bg-gray-600 hover:bg-gray-500 text-white"
+                                } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                         >
-                            Cadastrar Jogador
+                            {isSubmitting ? "Cadastrando..." : "Cadastrar"}
                         </button>
                     </div>
                 </form>

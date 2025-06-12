@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../db.js";
-import Clubes from "./Clubes.js";
 
 const LogosClubes = sequelize.define("logos_clubes", {
     id: {
@@ -23,7 +22,5 @@ const LogosClubes = sequelize.define("logos_clubes", {
     createdAt: "created_at",
     updatedAt: "updated_at",
 });
-
-LogosClubes.belongsTo(Clubes, { foreignKey: "clube_id", as: "clube" });
 
 export default LogosClubes;

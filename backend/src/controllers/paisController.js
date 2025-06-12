@@ -55,8 +55,8 @@ export const editarPais = async (req, res) => {
         const { id } = req.params;
         const { nome, bandeira_id } = req.body;
 
-        if (!id || !nome || nome.trim() === "") {
-            return res.status(400).json({ error: "ID e nome do país são obrigatórios" });
+        if (!id) {
+            return res.status(400).json({ error: "ID do país é obrigatório" });
         }
 
         const pais = await Pais.findByPk(id);
@@ -64,12 +64,19 @@ export const editarPais = async (req, res) => {
             return res.status(404).json({ error: "País não encontrado" });
         }
 
-        await pais.update({ nome: nome.trim(), bandeira_id });
+        // Atualiza somente os campos enviados
+        if (nome && nome.trim() !== "") {
+            pais.nome = nome.trim();
+        }
+        if (bandeira_id !== undefined) {
+            pais.bandeira_id = bandeira_id;
+        }
+
+        await pais.save();
 
         res.status(200).json({
             mensagem: "País atualizado com sucesso!",
-            pais,
-            bandeira_id: bandeira_id || null
+            pais
         });
     } catch (error) {
         console.error("Erro ao editar país:", error);

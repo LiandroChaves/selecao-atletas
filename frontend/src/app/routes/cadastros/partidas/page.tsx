@@ -9,6 +9,7 @@ import BotaoTema from "@/utils/utilities/changeTheme";
 import { useLoading } from "../../../../utils/context/LoadingProvider";
 import { verificarTokenValido } from "@/utils/verificarTokenValido";
 import dayjs from "dayjs";
+import { useDisableOnSubmit } from "@/utils/hooks/useDisableOnSubmit";
 
 
 export default function CadastroPartidas() {
@@ -26,6 +27,7 @@ export default function CadastroPartidas() {
     const { isDarkMode } = useTheme();
     const { setIsLoading } = useLoading();
     const [partidas, setPartidas] = useState<Partida[]>([]);
+    const { isSubmitting, handleSubmitWrapper } = useDisableOnSubmit();
 
     interface Partida {
         id: number;
@@ -95,9 +97,7 @@ export default function CadastroPartidas() {
         }
     }
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-
+    async function submitForm() {
         console.log('Dados enviados:', { data, campeonato, estadio, clubeCasaId, clubeForaId });
 
         if (!data || !clubeCasaId || !clubeForaId) {
@@ -172,6 +172,11 @@ export default function CadastroPartidas() {
         } catch (error) {
             console.error("❌ Erro na requisição:", error);
         }
+    }
+
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        handleSubmitWrapper(submitForm);
     }
 
     return (
@@ -266,13 +271,15 @@ export default function CadastroPartidas() {
                         className="p-2 rounded text-black bg-white"
                     />
                     {erro && <p className="text-red-400 text-sm font-medium">{erro}</p>}
-                    <button
-                        className={`px-4 py-2 rounded font-semibold hover:scale-105 transition ${isDarkMode
-                            ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900"
-                            : "bg-gray-600 hover:bg-gray-500 text-white"
-                            }`}
+<button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className={`px-4 py-2 rounded font-semibold transition duration-300 hover:scale-[1.03] ${isDarkMode
+                                ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900"
+                                : "bg-gray-600 hover:bg-gray-500 text-white"
+                            } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
-                        Cadastrar Partida
+                        {isSubmitting ? "Cadastrando..." : "Cadastrar"}
                     </button>
                 </form>
                 <ul className="space-y-2 text-left max-h-72 overflow-y-auto">

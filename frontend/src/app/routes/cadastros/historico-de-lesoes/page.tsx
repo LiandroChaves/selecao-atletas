@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { useLoading } from "@/utils/context/LoadingProvider";
 import { verificarTokenValido } from "@/utils/verificarTokenValido";
 import dayjs from "dayjs";
+import { useDisableOnSubmit } from "@/utils/hooks/useDisableOnSubmit";
 
 export default function CadastroHistoricoLesoes() {
     const [lesoes, setLesoes] = useState<any[]>([]);
@@ -24,6 +25,7 @@ export default function CadastroHistoricoLesoes() {
     const { isDarkMode } = useTheme();
     const { setIsLoading } = useLoading();
     const router = useRouter();
+    const { isSubmitting, handleSubmitWrapper } = useDisableOnSubmit();
 
     useEffect(() => {
         setIsLoading(false);
@@ -76,8 +78,7 @@ export default function CadastroHistoricoLesoes() {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    async function submitForm() {
 
         if (!form.jogador_id || !form.tipo_lesao || !form.data_inicio) {
             setErro("⚠️ Jogador, tipo de lesão e data de início são obrigatórios.");
@@ -136,6 +137,11 @@ export default function CadastroHistoricoLesoes() {
             console.error("Erro ao cadastrar:", error);
             setErro("Erro ao cadastrar.");
         }
+    }
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        handleSubmitWrapper(submitForm);
     };
 
     return (
@@ -181,9 +187,15 @@ export default function CadastroHistoricoLesoes() {
 
                     {erro && <p className="text-red-400 text-sm font-medium">{erro}</p>}
 
-                    <button type="submit"
-                        className={`px-4 py-2 rounded font-semibold hover:scale-105 transition ${isDarkMode ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900" : "bg-gray-600 hover:bg-gray-500 text-white"}`}>
-                        Cadastrar
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className={`px-4 py-2 rounded font-semibold transition duration-300 hover:scale-[1.03] ${isDarkMode
+                            ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900"
+                            : "bg-gray-600 hover:bg-gray-500 text-white"
+                            } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                    >
+                        {isSubmitting ? "Cadastrando..." : "Cadastrar"}
                     </button>
                 </form>
 

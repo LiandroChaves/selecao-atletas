@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import { useLoading } from "@/utils/context/LoadingProvider";
 import { verificarTokenValido } from "@/utils/verificarTokenValido";
 import dayjs from "dayjs";
-
+import { useDisableOnSubmit } from "@/utils/hooks/useDisableOnSubmit";
 
 export default function CadastroClubes() {
     const [id, setId] = useState("");
@@ -27,6 +27,7 @@ export default function CadastroClubes() {
     const fileInputRef = useRef<HTMLInputElement | null>(null); // Referência para o input de arquivo
     const { isDarkMode } = useTheme();
     const { setIsLoading } = useLoading();
+    const { isSubmitting, handleSubmitWrapper } = useDisableOnSubmit();
 
     useEffect(() => {
         setIsLoading(false);
@@ -82,8 +83,7 @@ export default function CadastroClubes() {
         }
     }
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
+    async function submitForm() {
 
         if (!nome || !paisId) {
             setErro("⚠️ ID, nome e país são obrigatórios.");
@@ -193,6 +193,19 @@ export default function CadastroClubes() {
         }
     }
 
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        handleSubmitWrapper(submitForm);
+    }
+
+    function formatarNomeClube(nome: string) {
+        const partes = nome.split("-");
+        if (partes.length > 1) {
+            return `${partes[0].trim()} - ${partes[1].trim().toUpperCase()}`;
+        }
+        return nome;
+    }
+
     return (
         <main className={`min-h-screen flex items-center justify-center p-4 transition-all duration-500 ${isDarkMode ? "bg-gradient-to-br from-gray-900 via-gray-800 to-teal-900" : "bg-gradient-to-br from-white via-gray-100 to-gray-200"}`}>
             <motion.div
@@ -221,25 +234,6 @@ export default function CadastroClubes() {
                             <option key={pais.id} value={pais.id}>{pais.nome}</option>
                         ))}
                     </select>
-                    {/* <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
-                        Início do contrato do clube (opcional)
-                        <input
-                            type="date"
-                            value={inicioContrato}
-                            onChange={(e) => setInicioContrato(e.target.value)}
-                            className="mt-1 p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 w-full"
-                        />
-                    </label>
-
-                    <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
-                        Fim do contrato do clube (opcional)
-                        <input
-                            type="date"
-                            value={fimContrato}
-                            onChange={(e) => setFimContrato(e.target.value)}
-                            className="mt-1 p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 w-full"
-                        />
-                    </label> */}
                     <input type="number" placeholder="Ano de fundação (opcional)" value={fundacao} onChange={(e) => setFundacao(e.target.value)} className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
                     <input placeholder="Estádio (opcional)" value={estadio} onChange={(e) => setEstadio(e.target.value)} className="p-2 rounded text-black bg-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
                     <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
@@ -257,16 +251,22 @@ export default function CadastroClubes() {
                         />
                     </label>
                     {erro && <p className="text-red-400 font-medium text-sm">{erro}</p>}
-
-                    <button type="submit" className={`px-4 py-2 rounded font-semibold transition duration-300 hover:scale-[1.03] ${isDarkMode ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900" : "bg-gray-600 hover:bg-gray-500 text-white"}`}>
-                        Cadastrar
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className={`px-4 py-2 rounded font-semibold transition duration-300 hover:scale-[1.03] ${isDarkMode
+                            ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900"
+                            : "bg-gray-600 hover:bg-gray-500 text-white"
+                            } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                    >
+                        {isSubmitting ? "Cadastrando..." : "Cadastrar"}
                     </button>
                 </form>
 
                 <ul className="space-y-2 text-left max-h-72 overflow-y-auto">
                     {clubes.map((clube) => (
                         <li key={clube.id} className={`p-2 rounded ${isDarkMode ? "bg-teal-600 text-white" : "bg-white text-black border border-gray-300"}`}>
-                            <strong>ID:</strong> {clube.id} - <strong>{clube.nome}</strong><br />
+                            <strong>ID:</strong> {clube.id} - <strong>{formatarNomeClube(clube.nome)}</strong><br />
                             <span className="text-sm">País: {clube.pais?.nome ?? "Não informado"}</span>
                             {clube.inicio_contrato && <div className="text-sm">Início: {dayjs(clube.inicio_contrato).format("DD/MM/YYYY")}</div>}
                             {clube.fim_contrato && <div className="text-sm">Fim: {dayjs(clube.fim_contrato).format("DD/MM/YYYY")}</div>}

@@ -60,7 +60,7 @@ export default function PdfsPage() {
                 ? 'http://localhost:3001'
                 : `http://${window.location.hostname}:3001`;
 
-            const res = await fetch(`${API_URL}/api/clubes/pegarClubes`);
+            const res = await fetch(`${API_URL}/api/clubes/pegarClubesComLogo`);
             const data = await res.json();
             setClubes(data);
         } catch (error) {
@@ -186,7 +186,7 @@ export default function PdfsPage() {
 
                         {/* Campo Clube */}
                         <div className="mb-4">
-                            <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-gray-700"}`}>Clube</label>
+                            <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-gray-700"}`}>Logo-escudo do PDF</label>
                             <select
                                 className={`w-full border rounded p-2 text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white w-full'
                                     }`}

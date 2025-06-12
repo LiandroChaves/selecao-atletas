@@ -8,6 +8,7 @@ import BotaoTema from "@/utils/utilities/changeTheme";
 import { motion } from "framer-motion";
 import { useLoading } from "../../../../utils/context/LoadingProvider";
 import { verificarTokenValido } from "@/utils/verificarTokenValido";
+import { useDisableOnSubmit } from "@/utils/hooks/useDisableOnSubmit";
 
 export default function CadastroPaises() {
     const [nome, setNome] = useState("");
@@ -18,6 +19,7 @@ export default function CadastroPaises() {
     const router = useRouter();
     const { setIsLoading } = useLoading();
     const { isDarkMode } = useTheme();
+    const { isSubmitting, handleSubmitWrapper } = useDisableOnSubmit();
 
     useEffect(() => {
         setIsLoading(false);
@@ -72,9 +74,7 @@ export default function CadastroPaises() {
         }
     }
 
-
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
+    async function submitForm() {
 
         if (!nome.trim()) {
             setErro("⚠️ O nome do país é obrigatório.");
@@ -106,33 +106,70 @@ export default function CadastroPaises() {
                 ? 'http://localhost:3001'
                 : `http://${window.location.hostname}:3001`;
 
-            const res = await fetch(`${API_URL}/api/paises/inserirPaises`, {
-                method: "POST",
-                body: JSON.stringify({
-                    nome: nomeFormatado,
-                    bandeira_id: bandeiraId
-                }),
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            // 1. Verifica se já existe o país
+            const busca = await fetch(`${API_URL}/api/paises/pegarPaises`);
+            const lista = await busca.json();
 
-            const data = await res.json();
+            const paisExistente = lista.find((p: any) => p.nome === nomeFormatado);
 
-            if (res.ok) {
-                console.log("✅ País inserido com sucesso:", data.pais);
+            if (paisExistente) {
+                if (!paisExistente.bandeira_id && bandeiraId) {
+                    // Atualiza com a bandeira, se ainda não tiver
+                    const res = await fetch(`${API_URL}/api/paises/editarPais/${paisExistente.id}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({ bandeira_id: bandeiraId })
+                    });
+
+                    const data = await res.json();
+
+                    if (res.ok) {
+                        console.log("🔄 País existente atualizado com bandeira:", data);
+                    } else {
+                        console.warn("⚠️ Erro ao atualizar país existente:", data.error);
+                    }
+                } else {
+                    console.warn("⚠️ País já existe e já tem bandeira.");
+                }
             } else {
-                console.warn("⚠️ Falha ao inserir país:", data.error);
+                // 2. Insere novo país
+                const res = await fetch(`${API_URL}/api/paises/inserirPaises`, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        nome: nomeFormatado,
+                        bandeira_id: bandeiraId
+                    }),
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    console.log("✅ País inserido com sucesso:", data.pais);
+                } else {
+                    console.warn("⚠️ Falha ao inserir país:", data.error);
+                }
             }
 
             setNome("");
+            setBandeiraId(null);
             fetchPaises();
+
         } catch (error) {
-            console.error("❌ Erro ao inserir país:", error);
+            console.error("❌ Erro ao processar país:", error);
         }
     }
 
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        handleSubmitWrapper(submitForm);
+    }
 
     useEffect(() => {
         fetchPaises();
@@ -190,12 +227,14 @@ export default function CadastroPaises() {
                         <p className="text-red-400 font-medium text-sm">{erro}</p>
                     )}
                     <button
+                        type="submit"
+                        disabled={isSubmitting}
                         className={`px-4 py-2 rounded font-semibold transition duration-300 hover:scale-[1.03] ${isDarkMode
-                            ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900"
-                            : "bg-gray-600 hover:bg-gray-500 text-white"
-                            }`}
+                                ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900"
+                                : "bg-gray-600 hover:bg-gray-500 text-white"
+                            } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
-                        Cadastrar
+                        {isSubmitting ? "Cadastrando..." : "Cadastrar"}
                     </button>
                 </form>
 

@@ -8,6 +8,7 @@ import { useTheme } from "@/utils/context/ThemeContext";
 import BotaoTema from "@/utils/utilities/changeTheme";
 import { useLoading } from "../../../../utils/context/LoadingProvider";
 import { verificarTokenValido } from "@/utils/verificarTokenValido";
+import { useDisableOnSubmit } from "@/utils/hooks/useDisableOnSubmit";
 
 export default function CadastroNiveisAmbidestria() {
     const [descricao, setDescricao] = useState("");
@@ -16,6 +17,7 @@ export default function CadastroNiveisAmbidestria() {
     const router = useRouter();
     const { isDarkMode } = useTheme();
     const { setIsLoading } = useLoading();
+    const { isSubmitting, handleSubmitWrapper } = useDisableOnSubmit();
 
     useEffect(() => {
         setIsLoading(false);
@@ -55,8 +57,7 @@ export default function CadastroNiveisAmbidestria() {
         }
     }
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
+    async function submitForm() {
 
         if (!descricao.trim()) {
             setErro("⚠️ A descrição é obrigatória.");
@@ -104,6 +105,11 @@ export default function CadastroNiveisAmbidestria() {
         }
     }
 
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        handleSubmitWrapper(submitForm);
+    }
+
     useEffect(() => {
         fetchNiveis();
     }, []);
@@ -147,12 +153,14 @@ export default function CadastroNiveisAmbidestria() {
                         <p className="text-red-400 font-medium text-sm">{erro}</p>
                     )}
                     <button
+                        type="submit"
+                        disabled={isSubmitting}
                         className={`px-4 py-2 rounded font-semibold transition duration-300 hover:scale-[1.03] ${isDarkMode
                             ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900"
                             : "bg-gray-600 hover:bg-gray-500 text-white"
-                            }`}
+                            } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
-                        Cadastrar
+                        {isSubmitting ? "Cadastrando..." : "Cadastrar"}
                     </button>
                 </form>
 

@@ -332,9 +332,15 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
         if (jogador.historico.length) {
             const historico = [...jogador.historico].sort((a, b) => {
+                const paisA = a.clube?.pais?.bandeira?.logo_bandeira ?? "brasil";
+                const paisB = b.clube?.pais?.bandeira?.logo_bandeira ?? "brasil";
+
+                if (paisA < paisB) return -1;
+                if (paisA > paisB) return 1;
+
                 const dataA = a.data_entrada ? dayjs(a.data_entrada) : dayjs(0);
                 const dataB = b.data_entrada ? dayjs(b.data_entrada) : dayjs(0);
-                return dataB - dataA;
+                return dataB - dataA; // dentro do mesmo país, ordenar por ano decrescente
             });
 
             const gruposPorAno = {};
@@ -352,12 +358,9 @@ router.get("/gerar-pdf/:id", async (req, res) => {
                 lista.forEach((h, idx) => {
                     const clube = h.clube?.nome ?? "Clube desconhecido";
                     const jogos = h.jogos ?? 0;
-
-                    // Usar mesma Y para todas as colunas
                     const yAtual = doc.y;
 
-                    let caminhoBandeira = ASSETS.bandeiraBrasil; // padrão
-
+                    let caminhoBandeira = ASSETS.bandeiraBrasil;
                     const logoPath = h.clube?.pais?.bandeira?.logo_bandeira;
                     if (logoPath) {
                         const fullPath = path.join(basePath, logoPath);
@@ -366,16 +369,14 @@ router.get("/gerar-pdf/:id", async (req, res) => {
                         }
                     }
 
-                    // Bandeira apenas na 1ª linha do ano
-                    if (idx === 0) {
-                        safeImage(doc, caminhoBandeira, posicaoInicialX - 15, yAtual, {
-                            width: 12,
-                            height: 8,
-                        });
-                    }
+                    // 🖼️ Bandeira do país
+                    safeImage(doc, caminhoBandeira, posicaoInicialX + larguraColunaAno - 15, yAtual, {
+                        width: 12,
+                        height: 8,
+                    });
 
+                    // Mostrar o ano apenas na primeira linha do grupo
                     const textoAno = idx === 0 ? ano : "";
-
 
                     doc.text(textoAno, posicaoInicialX, yAtual, {
                         width: larguraColunaAno,
@@ -391,12 +392,10 @@ router.get("/gerar-pdf/:id", async (req, res) => {
                         width: larguraColunaJogos,
                         align: "right"
                     });
-
                 });
 
                 doc.moveDown(0.3); // pequeno espaçamento entre anos
             });
-
         } else {
             doc.text("Sem histórico informado", posicaoInicialX, doc.y);
         }

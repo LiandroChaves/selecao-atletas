@@ -8,6 +8,7 @@ import BotaoTema from "@/utils/utilities/changeTheme";
 import { motion } from "framer-motion";
 import { useLoading } from "@/utils/context/LoadingProvider";
 import { verificarTokenValido } from "@/utils/verificarTokenValido";
+import { useDisableOnSubmit } from "@/utils/hooks/useDisableOnSubmit";
 
 export default function CadastroEstatisticasGerais() {
     const [jogadorId, setJogadorId] = useState("");
@@ -17,6 +18,7 @@ export default function CadastroEstatisticasGerais() {
     const router = useRouter();
     const { setIsLoading } = useLoading();
     const { isDarkMode } = useTheme();
+    const { isSubmitting, handleSubmitWrapper } = useDisableOnSubmit();
 
     interface Jogador {
         id: number;
@@ -103,8 +105,7 @@ export default function CadastroEstatisticasGerais() {
         }
     }
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
+    async function submitForm() {
 
         if (!jogadorId.trim()) {
             setErro("⚠️ O ID do jogador é obrigatório.");
@@ -175,6 +176,11 @@ export default function CadastroEstatisticasGerais() {
         } catch (error) {
             console.error("❌ Erro ao inserir estatística:", error);
         }
+    }
+
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        handleSubmitWrapper(submitForm);
     }
 
     return (
@@ -254,12 +260,14 @@ export default function CadastroEstatisticasGerais() {
                     {erro && <p className="text-red-400 font-medium text-sm">{erro}</p>}
 
                     <button
+                        type="submit"
+                        disabled={isSubmitting}
                         className={`px-4 py-2 rounded font-semibold transition duration-300 hover:scale-[1.03] ${isDarkMode
                             ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900"
                             : "bg-gray-600 hover:bg-gray-500 text-white"
-                            }`}
+                            } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
-                        Cadastrar Estatística
+                        {isSubmitting ? "Cadastrando..." : "Cadastrar"}
                     </button>
                 </form>
 

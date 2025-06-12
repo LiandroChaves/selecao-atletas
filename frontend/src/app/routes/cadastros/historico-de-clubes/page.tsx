@@ -9,6 +9,7 @@ import { verificarTokenValido } from "@/utils/verificarTokenValido";
 import BotaoTema from "@/utils/utilities/changeTheme";
 import { motion } from "framer-motion";
 import dayjs from "dayjs";
+import { useDisableOnSubmit } from "@/utils/hooks/useDisableOnSubmit";
 
 export default function CadastroHistoricoClubes() {
     const [historicos, setHistoricos] = useState<any[]>([]);
@@ -26,6 +27,8 @@ export default function CadastroHistoricoClubes() {
     const { isDarkMode } = useTheme();
     const { setIsLoading } = useLoading();
     const router = useRouter();
+    const { isSubmitting, handleSubmitWrapper } = useDisableOnSubmit();
+
 
     useEffect(() => {
         setIsLoading(false);
@@ -93,9 +96,7 @@ export default function CadastroHistoricoClubes() {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
+    async function submitForm() {
         if (!form.jogador_id || !form.clube_id || !form.data_entrada) {
             setErro("⚠️ Nome do jogador, nome do clube e data de entrada são obrigatórios.");
             setTimeout(() => setErro(""), 3000);
@@ -139,6 +140,11 @@ export default function CadastroHistoricoClubes() {
             console.error("Erro ao cadastrar:", error);
             setErro("Erro ao cadastrar.");
         }
+    }
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        handleSubmitWrapper(submitForm);
     };
 
     return (
@@ -228,13 +234,14 @@ export default function CadastroHistoricoClubes() {
 
                     <button
                         type="submit"
-                        className={`px-4 py-2 rounded font-semibold hover:scale-105 transition ${isDarkMode
+                        disabled={isSubmitting}
+                        className={`px-4 py-2 rounded font-semibold transition duration-300 hover:scale-[1.03] ${isDarkMode
                             ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900"
                             : "bg-gray-600 hover:bg-gray-500 text-white"
-                            }`}
+                            } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
-                        Cadastrar
-                    </button>
+                        {isSubmitting ? "Cadastrando..." : "Cadastrar"}
+                    </button>   
                 </form>
 
                 <ul className="space-y-2 text-left max-h-72 overflow-y-auto">
