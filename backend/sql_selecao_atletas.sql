@@ -36,12 +36,11 @@ CREATE TABLE paises (
 	nome VARCHAR(100) NOT NULL,
 	bandeira_id INT,
 	created_at TIMESTAMP DEFAULT NOW(),
-	updated_at TIMESTAMP DEFAULT NOW()
+	updated_at TIMESTAMP DEFAULT NOW(),
+    CONSTRAINT fkey_paises_bandeira FOREIGN KEY (bandeira_id) REFERENCES bandeiras(id)
 );
 
 ALTER TABLE paises ADD COLUMN bandeira_id INT;
-
-update paises set nome = 'Europa' where id = 2
 
 ALTER TABLE paises
 ADD CONSTRAINT fkey_paises_bandeira
@@ -113,6 +112,21 @@ CREATE TABLE posicoes (
 	updated_at TIMESTAMP DEFAULT NOW()
 );
 
+
+UPDATE posicoes SET nome = 'Goleiro' WHERE id = 1;
+UPDATE posicoes SET nome = 'Zagueiro' WHERE id = 2;
+UPDATE posicoes SET nome = 'Lateral Direito' WHERE id = 3;
+UPDATE posicoes SET nome = 'Lateral Esquerdo' WHERE id = 4;
+UPDATE posicoes SET nome = 'Volante' WHERE id = 5;
+UPDATE posicoes SET nome = 'Meia' WHERE id = 6;
+UPDATE posicoes SET nome = 'meia esquerdo' WHERE id = 7;
+UPDATE posicoes SET nome = 'meia direito' WHERE id = 8;
+UPDATE posicoes SET nome = 'meia esquerdo e direito' WHERE id = 9;
+UPDATE posicoes SET nome = 'Atacante' WHERE id = 10;
+UPDATE posicoes SET nome = 'Extremo direito' WHERE id = 11;
+UPDATE posicoes SET nome = 'Extremo esquerdo' WHERE id = 12;
+
+
 -- ========================
 -- 2. Clubes
 -- ========================
@@ -146,8 +160,6 @@ CREATE TABLE logos_clubes (
     updated_at TIMESTAMP DEFAULT NOW(),
     CONSTRAINT fkey_logos_clube FOREIGN KEY (clube_id) REFERENCES clubes(id) ON DELETE CASCADE
 );
-
-ALTER TABLE logos_clubes ADD CONSTRAINT unique_logo_clube UNIQUE (clube_id);
 
 -- ========================
 -- 3. Jogadores
@@ -285,7 +297,7 @@ CREATE TABLE estatisticas_partidas (
 -- ========================
 
 SELECT * FROM historico_clubes;
--- -- DELETE FROM historico_clubes;
+-- -- DELETE FROM historico_clubes where jogador_id = 1;
 -- ALTER SEQUENCE historico_clubes_id_seq RESTART WITH 1;
 
 CREATE TABLE historico_clubes (
