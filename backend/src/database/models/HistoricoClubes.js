@@ -1,7 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../db.js";
 import Clubes from "./Clubes.js";
-import Jogador from "./Jogadores.js";
 
 const HistoricoClubes = sequelize.define("historico_clubes", {
     id: {
@@ -26,11 +25,11 @@ const HistoricoClubes = sequelize.define("historico_clubes", {
         },
     },
     data_entrada: {
-        type: DataTypes.DATEONLY,
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
     data_saida: {
-        type: DataTypes.DATEONLY,
+        type: DataTypes.INTEGER,
         allowNull: true,
     },
     jogos: {

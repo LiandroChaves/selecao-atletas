@@ -291,6 +291,7 @@ export default function PdfsPage() {
                             >
                                 <option value="Base">Base</option>
                                 <option value="Profissional">Profissional</option>
+                                <option value="Profissional">Amador</option>
                             </select>
                         </div>
 

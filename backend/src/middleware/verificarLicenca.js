@@ -1,6 +1,6 @@
 // src/middleware/verificarLicenca.js
 
-let dataLimite = new Date('2025-07-10');
+let dataLimite = new Date('2025-08-10');
 
 export async function verificarLicenca(req, res, next) {
     const hoje = new Date();

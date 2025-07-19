@@ -7,11 +7,18 @@ const {
     Cidades,
     NivelAmbidestria,
     Posicoes,
+    Bandeiras,
 } = models;
 
 const seedData = async () => {
 
-    const brasil = await Pais.create({ nome: 'Brasil' });
+    await Bandeiras.create({
+        id: 1,
+        nome: "Brasil",
+        logo_bandeira: "brasil.png"
+    })
+
+    const brasil = await Pais.create({ nome: 'Brasil',bandeira_id: 1 });
 
     const estadosPadrao = [
         { nome: 'Ceará', uf: 'CE' },
@@ -261,15 +268,28 @@ const seedData = async () => {
 
 
     await Posicoes.bulkCreate([
-        { nome: 'Goleiro' },
-        { nome: 'Zagueiro' },
-        { nome: 'Lateral Direito' },
-        { nome: 'Lateral Esquerdo' },
-        { nome: 'Volante' },
-        { nome: 'Meia' },
-        { nome: 'Atacante' },
-        { nome: 'Extremo direito' },
-        { nome: 'Extremo esquerdo' },
+        { id: 1, nome: 'Goleiro' },
+        { id: 2, nome: 'Zagueiro Central' },
+        { id: 3, nome: 'Zagueiro Esquerdo' },
+        { id: 4, nome: 'Zagueiro Direito' },
+        { id: 5, nome: 'Zagueiro Esquerdo e Direito' },
+        { id: 6, nome: 'Lateral Esquerdo' },
+        { id: 7, nome: 'Lateral Direito' },
+        { id: 8, nome: 'Lateral Esquerdo e Direito' },
+        { id: 9, nome: 'Primeiro Volante' },
+        { id: 10, nome: 'Segundo Volante' },
+        { id: 11, nome: 'Ala Esquerdo' },
+        { id: 12, nome: 'Ala Direito' },
+        { id: 13, nome: 'Ala Esquerdo e Direito' },
+        { id: 14, nome: 'Meia Central' },
+        { id: 15, nome: 'Meia Esquerdo' },
+        { id: 16, nome: 'Meia Direito' },
+        { id: 17, nome: 'Meia Esquerdo e Direito' },
+        { id: 18, nome: 'Falso Nove' },
+        { id: 19, nome: 'Atacante' },
+        { id: 20, nome: 'Atacante direito' },
+        { id: 21, nome: 'Atacante esquerdo' },
+        { id: 22, nome: 'Atacante Esquerdo e Direito' },
     ]);
 
 };

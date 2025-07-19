@@ -30,18 +30,11 @@ export const pegarHistorico = async (req, res) => {
         }
 
         const historico = await HistoricoClubes.findAll({
+            attributes: ["id", "jogador_id", "clube_id", "data_entrada", "data_saida", "jogos"],
             where: where,
             include: [
-                {
-                    model: Jogador,
-                    as: "jogador",
-                    attributes: ["id", "nome", "apelido"],
-                },
-                {
-                    model: Clubes,
-                    as: "clube",
-                    attributes: ["id", "nome"],
-                },
+                { model: Jogador, as: "jogador", attributes: ["id", "nome", "apelido"] },
+                { model: Clubes, as: "clube", attributes: ["id", "nome"] },
             ],
             order: [["data_entrada", "DESC"]],
         });
@@ -61,8 +54,8 @@ export const inserirHistorico = async (req, res) => {
         const novo = await HistoricoClubes.create({
             jogador_id,
             clube_id,
-            data_entrada,
-            data_saida: data_saida || null,
+            data_entrada: parseInt(data_entrada),
+            data_saida: data_saida ? parseInt(data_saida) : null,
             jogos
         });
 
@@ -77,7 +70,7 @@ export const editarHistorico = async (req, res) => {
     try {
         const { id } = req.params;
         console.log("ID da URL:", id);
-        const { jogador_id, clube_id, data_entrada, data_saida, jogos} = req.body;
+        const { jogador_id, clube_id, data_entrada, data_saida, jogos } = req.body;
 
         const historico = await HistoricoClubes.findByPk(id);
         if (!historico) {

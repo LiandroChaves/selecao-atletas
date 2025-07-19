@@ -223,6 +223,7 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
         if (chave.toLowerCase().includes("cidade_id") || chave.toLowerCase().includes("cidade_id")) return "number";
         if (chave.toLowerCase().includes("estado_id") || chave.toLowerCase().includes("estado_id")) return "number";
         if (chave.toLowerCase().includes("posicao_secundaria_id") || chave.toLowerCase().includes("posicao_secundaria_id")) return "number";
+        if (chave.toLowerCase().includes("uf")) return "uf";
         return "text";
     };
 
@@ -333,7 +334,7 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                     <h2 className="text-2xl font-bold mb-4 text-center">Editar Registro</h2>
                     {Object.entries(valores)
                         .filter(([chave]) =>
-                            !["createdAt", "updatedAt", "deletedAt", "created_at", "updated_at", "deleted_at","pais","estado","cidade","posicao_secundaria"].includes(chave)
+                            !["createdAt", "updatedAt", "deletedAt", "created_at", "updated_at", "deleted_at", "pais", "estado", "cidade", "posicao_secundaria", "logo_bandeira","clube"].includes(chave)
                         )
                         .map(([chave, valor]) => {
                             const tipo = detectarTipoInput(chave, valor);
@@ -381,18 +382,29 @@ export default function ModalEdicao({ isOpen, onClose, item, endpoint, onSuccess
                                                     }`}
                                             />
                                         </div>
-                                    ) : (
+                                    ) : tipo === "uf" ? (
                                         <input
-                                            type={tipo}
-                                            value={tipo === "number" ? valor ?? 0 : valor ?? ""}
-                                            onChange={(e) =>
-                                                handleChange(chave, tipo === "number" ? Number(e.target.value) : e.target.value)
-                                            }
+                                            type="text"
+                                            value={valor ?? ""}
+                                            onChange={(e) => {
+                                                const upper = e.target.value.toUpperCase().slice(0, 2);
+                                                handleChange(chave, upper);
+                                            }}
+                                            maxLength={2}
                                             readOnly={isReadOnly}
-                                            className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 text-gray-500" : "bg-white text-gray-700"
-                                                }`}
-                                        />
-                                    )}
+                                            className={`w-full p-2 rounded-md uppercase tracking-widest ${isReadOnly ? "bg-gray-300 text-gray-500" : "bg-white text-gray-700"}`}
+                                        /> ) : (
+                                            <input
+                                                type={tipo}
+                                                value={tipo === "number" ? valor ?? 0 : valor ?? ""}
+                                                onChange={(e) =>
+                                                    handleChange(chave, tipo === "number" ? Number(e.target.value) : e.target.value)
+                                                }
+                                                readOnly={isReadOnly}
+                                                className={`w-full p-2 rounded-md ${isReadOnly ? "bg-gray-300 text-gray-500" : "bg-white text-gray-700"
+                                                    }`}
+                                            />
+                                        )}
 
                                     {nomesRelacionados[chave] && (
                                         <p className="text-xs text-gray-300 mt-1">Relacionado: {nomesRelacionados[chave]}</p>

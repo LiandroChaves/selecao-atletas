@@ -8,7 +8,6 @@ import { useLoading } from "@/utils/context/LoadingProvider";
 import { verificarTokenValido } from "@/utils/verificarTokenValido";
 import BotaoTema from "@/utils/utilities/changeTheme";
 import { motion } from "framer-motion";
-import dayjs from "dayjs";
 import { useDisableOnSubmit } from "@/utils/hooks/useDisableOnSubmit";
 
 export default function CadastroHistoricoClubes() {
@@ -121,8 +120,8 @@ export default function CadastroHistoricoClubes() {
                 body: JSON.stringify({
                     jogador_id: Number(form.jogador_id),
                     clube_id: Number(form.clube_id),
-                    data_entrada: form.data_entrada,
-                    data_saida: form.data_saida || null,
+                    data_entrada: Number(form.data_entrada),
+                    data_saida: Number(form.data_saida) || null,
                     jogos: form.jogos
                 }),
             });
@@ -208,28 +207,36 @@ export default function CadastroHistoricoClubes() {
                         />
                     </div>
                     <div className="flex flex-col gap-1">
-                        <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Data de entrada no clube</label>
+                        <label className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                            Ano de entrada no clube
+                        </label>
                         <input
-                            type="date"
+                            type="number"
                             name="data_entrada"
                             value={form.data_entrada}
                             onChange={handleChange}
                             className="p-2 rounded text-black bg-white"
-                            placeholder="Data de entrada"
+                            placeholder="Ex: 2023"
+                            min="1900"
+                            max="9999"
                         />
                     </div>
+
                     <div className="flex flex-col gap-1">
-                        <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Data de saída do clube (opcional)</label>
+                        <label className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                            Ano de saída do clube (opcional)
+                        </label>
                         <input
-                            type="date"
+                            type="number"
                             name="data_saida"
                             value={form.data_saida}
                             onChange={handleChange}
                             className="p-2 rounded text-black bg-white"
-                            placeholder="Data de saída"
+                            placeholder="Ex: 2024"
+                            min="1900"
+                            max="9999"
                         />
                     </div>
-
                     {erro && <p className="text-red-400 text-sm font-medium">{erro}</p>}
 
                     <button
@@ -241,7 +248,7 @@ export default function CadastroHistoricoClubes() {
                             } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
                         {isSubmitting ? "Cadastrando..." : "Cadastrar"}
-                    </button>   
+                    </button>
                 </form>
 
                 <ul className="space-y-2 text-left max-h-72 overflow-y-auto">
@@ -253,8 +260,8 @@ export default function CadastroHistoricoClubes() {
                             <strong>Jogador:</strong> {h.jogador?.nome ?? "Desconhecido"}<br />
                             <strong>Clube:</strong> {h.clube?.nome ?? "Desconhecido"}<br />
                             <strong>Jogos:</strong> {h.jogos ?? "Quantidade de jogos não informados"}<br />
-                            Entrada no clube: {dayjs(h.data_entrada).format("DD/MM/YYYY")}<br />
-                            Saída do clube: {h.data_saida ? dayjs(h.data_saida).format("DD/MM/YYYY") : "Ainda permanece no clube"}
+                            Ano de entrada no clube: {h.data_entrada}<br />
+                            Ano de saída do clube: {h.data_saida ? h.data_saida : "Ainda permanece no clube"}
                         </li>
                     ))}
                 </ul>

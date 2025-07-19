@@ -90,7 +90,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
                             ]
                         }
                     ],
-                    order: [["data_entrada", "ASC"]],
+                    order: [["data_entrada", "DESC"]],
                 },
                 {
                     model: models.JogadoresTitulos,
@@ -228,16 +228,16 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
             // linha 2  – nome curto  |  naturalidade
             .text(
-                `Nome curto: ${jogador.nome_curto || jogador.apelido}    |    ` +
-                `Naturalidade: ${jogador.cidade?.nome ?? "Não informado"}`,
+                `Nome curto: ${jogador.nome_curto || jogador.apelido}  |  ` +
+                `Naturalidade: ${jogador.cidade?.nome ?? "Não informado"} - ${jogador.estado?.uf}`,
                 { align: "center" }
             )
             .moveDown()
 
             // linha 3  – apelido  |  data nasc.  |  idade
             .text(
-                `Apelido: ${jogador.apelido || "Não informado"}    |   ` +
-                `Data nasc.: ${dayjs(jogador.data_nascimento).format("DD/MM/YYYY")}    |    ` +
+                `Apelido: ${jogador.apelido || "Não informado"} | ` +
+                `Data nasc.: ${dayjs(jogador.data_nascimento).format("DD/MM/YYYY")}  |  ` +
                 `Idade: ${calcularIdade(jogador.data_nascimento)} anos`,
                 { align: "center" }
             )
@@ -304,6 +304,21 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         // Histórico clubes
         doc.addPage();
 
+        function formatarNomeClube(nome) {
+            if (!nome.includes("-")) return nome;
+
+            const [antes, depois] = nome.split("-");
+            const depoisTrimado = depois.trim();
+
+            // Se tiver exatamente 2 letras, considera como UF e coloca em maiúsculas
+            if (depoisTrimado.length === 2) {
+                return `${antes.trim()} - ${depoisTrimado.toUpperCase()}`;
+            }
+
+            // Caso contrário, mantém como foi digitado
+            return `${antes.trim()} - ${depoisTrimado}`;
+        }
+
         // Função que detecta se o clube é profissional (tem sufixo "- Ux")
         function isProfissional(nomeClube) {
             return /- U\d+$/.test(nomeClube);
@@ -323,33 +338,23 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         });
 
         // Função para desenhar o cabeçalho das colunas
-        function desenharCabecalho(posicaoInicialX, larguraColunaAno, larguraColunaClube, larguraColunaJogos, totalLargura) {
+        function desenharCabecalho(x, colAno, colClube, colJogos, colSaida, larguraTotal) {
             doc.font("Helvetica-Bold").fontSize(10);
+            const y = doc.y;
 
-            const yInicial = doc.y;
+            doc.text("Ano", x, y, { width: colAno, align: "left" });
+            doc.text("Clube", x + colAno, y, { width: colClube, align: "left" });
+            doc.text("Jogos", x + colAno + colClube, y, { width: colJogos, align: "right" });
+            doc.text("Saída", x + colAno + colClube + colJogos, y, { width: colSaida, align: "right" });
 
-            doc.text("Ano", posicaoInicialX, yInicial, {
-                width: larguraColunaAno,
-                align: "left"
-            });
-            doc.text("Clube", posicaoInicialX + larguraColunaAno, yInicial, {
-                width: larguraColunaClube,
-                align: "left"
-            });
-            doc.text("Jogos", posicaoInicialX + larguraColunaAno + larguraColunaClube, yInicial, {
-                width: larguraColunaJogos,
-                align: "right"
-            });
-
-            doc.moveTo(posicaoInicialX - 15, yInicial + 12)
-                .lineTo(posicaoInicialX + totalLargura + 15, yInicial + 12)
+            doc.moveTo(x - 15, y + 12)
+                .lineTo(x + larguraTotal + 15, y + 12)
                 .stroke();
 
-            // Move para posição exata da próxima linha após o cabeçalho
-            doc.y = yInicial + 18; // 12 de linha + 6 de espaçamento
-
-            doc.font("Helvetica"); // ⚠️ Reset para fonte normal
+            doc.y = y + 18;
+            doc.font("Helvetica");
         }
+
         // Função para renderizar o histórico
         function renderHistorico(titulo, historicoArray) {
             if (historicoArray.length === 0) return;
@@ -370,98 +375,101 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
             doc.moveDown();
 
-            // Define as variáveis de largura e posição
             const larguraColunaAno = 50;
-            const larguraColunaClube = 250;
-            const larguraColunaJogos = 50;
-            const totalLargura = larguraColunaAno + larguraColunaClube + larguraColunaJogos;
+            const larguraColunaClube = 200;
+            const larguraColunaJogos = 40;
+            const larguraColunaSaida = 50;
+            const totalLargura = larguraColunaAno + larguraColunaClube + larguraColunaJogos + larguraColunaSaida;
+
             const posicaoInicialX = (doc.page.width - totalLargura) / 2;
 
-            // Desenha o cabeçalho passando as variáveis
-            desenharCabecalho(posicaoInicialX, larguraColunaAno, larguraColunaClube, larguraColunaJogos, totalLargura);
+            desenharCabecalho(posicaoInicialX, larguraColunaAno, larguraColunaClube, larguraColunaJogos, larguraColunaSaida, totalLargura);
 
-            // Ordenar e agrupar
+            // Ordenar por bandeira e por ano DESC
             const historico = [...historicoArray].sort((a, b) => {
-                const paisA = a.clube?.pais?.bandeira?.logo_bandeira ?? "brasil";
-                const paisB = b.clube?.pais?.bandeira?.logo_bandeira ?? "brasil";
+                const dataA = a.data_entrada ?? 0;
+                const dataB = b.data_entrada ?? 0;
 
-                if (paisA < paisB) return -1;
-                if (paisA > paisB) return 1;
+                if (dataA !== dataB) return dataB - dataA;
 
-                const dataA = a.data_entrada ? dayjs(a.data_entrada) : dayjs(0);
-                const dataB = b.data_entrada ? dayjs(b.data_entrada) : dayjs(0);
-                return dataB - dataA;
+                // Mais recente primeiro (id maior)
+                return (b.id ?? 0) - (a.id ?? 0);
             });
 
+            // Agrupar por ano
             const gruposPorAno = {};
             historico.forEach(h => {
-                const ano = h.data_entrada ? dayjs(h.data_entrada).format("YYYY") : "Sem data";
+                const ano = h.data_entrada ? h.data_entrada.toString() : "Sem data";
                 if (!gruposPorAno[ano]) gruposPorAno[ano] = [];
                 gruposPorAno[ano].push(h);
             });
 
             doc.font("Helvetica").fontSize(10);
 
-            Object.keys(gruposPorAno).sort((a, b) => b.localeCompare(a)).forEach(ano => {
-                const lista = gruposPorAno[ano];
+            Object.keys(gruposPorAno)
+                .sort((a, b) => parseInt(b) - parseInt(a)) // anos decrescentes
+                .forEach(ano => {
+                    const lista = gruposPorAno[ano]; // já está na ordem correta
 
-                lista.forEach((h, idx) => {
-                    const alturaLinha = 14; // ajuste conforme layout
-                    const limiteInferior = doc.page.height - doc.page.margins.bottom;
+                    lista.forEach((h, idx) => {
+                        const alturaLinha = 14;
+                        const limiteInferior = doc.page.height - doc.page.margins.bottom;
 
-                    // Quebra de página automática
-                    if (doc.y + alturaLinha > limiteInferior) {
-                        doc.addPage();
-                        desenharCabecalho(posicaoInicialX, larguraColunaAno, larguraColunaClube, larguraColunaJogos, totalLargura);
-                    }
-
-                    let clube = h.clube?.nome ?? "Clube desconhecido";
-                    const jogos = h.jogos ?? 0;
-                    const yAtual = doc.y;
-
-                    let caminhoBandeira = ASSETS.bandeiraBrasil;
-                    const logoPath = h.clube?.pais?.bandeira?.logo_bandeira;
-                    if (logoPath) {
-                        const fullPath = path.join(basePath, logoPath);
-                        if (fs.existsSync(fullPath)) {
-                            caminhoBandeira = fullPath;
+                        if (doc.y + alturaLinha > limiteInferior) {
+                            doc.addPage();
+                            desenharCabecalho(posicaoInicialX, larguraColunaAno, larguraColunaClube, larguraColunaJogos, larguraColunaSaida, totalLargura);
                         }
-                    }
 
-                    // Bandeira do país
-                    safeImage(doc, caminhoBandeira, posicaoInicialX + larguraColunaAno - 15, yAtual, {
-                        width: 12,
-                        height: 8,
-                    });
+                        const clube = h.clube?.nome ? formatarNomeClube(h.clube.nome) : "Clube desconhecido";
+                        const jogos = h.jogos ?? 0;
+                        const saida = h.data_saida ? h.data_saida.toString() : "–";
+                        const yAtual = doc.y;
 
-                    const textoAno = idx === 0 ? ano : "";
+                        let caminhoBandeira = ASSETS.bandeiraBrasil;
+                        const logoPath = h.clube?.pais?.bandeira?.logo_bandeira;
+                        if (logoPath) {
+                            const fullPath = path.join(basePath, logoPath);
+                            if (fs.existsSync(fullPath)) {
+                                caminhoBandeira = fullPath;
+                            }
+                        }
 
-                    doc.text(textoAno, posicaoInicialX, yAtual, {
-                        width: larguraColunaAno,
-                        align: "left"
+                        safeImage(doc, caminhoBandeira, posicaoInicialX + larguraColunaAno - 15, yAtual, {
+                            width: 12,
+                            height: 8,
+                        });
+
+                        const textoAno = idx === 0 ? ano : "";
+
+                        doc.text(textoAno, posicaoInicialX, yAtual, {
+                            width: larguraColunaAno,
+                            align: "left"
+                        });
+                        doc.text(clube, posicaoInicialX + larguraColunaAno, yAtual, {
+                            width: larguraColunaClube,
+                            align: "left"
+                        });
+                        doc.text(jogos.toString(), posicaoInicialX + larguraColunaAno + larguraColunaClube, yAtual, {
+                            width: larguraColunaJogos,
+                            align: "right"
+                        });
+                        doc.text(saida, posicaoInicialX + larguraColunaAno + larguraColunaClube + larguraColunaJogos, yAtual, {
+                            width: larguraColunaSaida,
+                            align: "right"
+                        });
                     });
-                    doc.text(clube, posicaoInicialX + larguraColunaAno, yAtual, {
-                        width: larguraColunaClube,
-                        align: "left"
-                    });
-                    doc.text(jogos.toString(), posicaoInicialX + larguraColunaAno + larguraColunaClube, yAtual, {
-                        width: larguraColunaJogos,
-                        align: "right"
-                    });
+                    doc.moveDown(0.3);
                 });
-
-                doc.moveDown(0.3);
-            });
         }
 
         // Chamar para histórico normal
         if (historicoNormal.length > 0) {
-            renderHistorico("Histórico de clubes:", historicoNormal);
+            renderHistorico("Histórico de clubes (PROFISSIONAL) :", historicoNormal);
         }
 
         // Chamar para histórico profissionais
         if (historicoProfissional.length > 0) {
-            renderHistorico("Histórico de clubes (profissionais):", historicoProfissional);
+            renderHistorico("Histórico de clubes (BASE):", historicoProfissional);
         }
 
         // Caso não haja nenhum histórico em ambos
@@ -527,9 +535,9 @@ router.get("/gerar-pdf/:id", async (req, res) => {
             doc.font("Helvetica").fontSize(10);
 
             titulosOrdenados.forEach((t, idx) => {
-                const ano = t.ano ? dayjs(t.ano).format("YYYY") : "Sem ano";
+                const ano = t.ano ? String(t.ano) : "Sem ano";
                 const nomeTitulo = t.titulo?.nome ?? "Título desconhecido";
-                const nomeClube = t.clube?.nome ?? "Clube desconhecido";
+                const nomeClube = formatarNomeClube(t.clube?.nome) ?? "Clube desconhecido";
 
                 const yAtual = doc.y;
 
@@ -554,10 +562,6 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         }
 
         doc.moveDown(2);
-
-        if (jogador.foto) {
-            doc.image(`uploads/${jogador.foto}`, 460, 160, { width: 100, height: 120, fit: [100, 120] });
-        }
 
         // Título da página
         doc.fontSize(14).fillColor(`${corTituloeBorda}`).text("Dados Específicos do Atleta", 50, doc.y);

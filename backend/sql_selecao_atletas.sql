@@ -1,4 +1,44 @@
+-- 1. Usuários
+SELECT * FROM usuarios;
+-- 2. Bandeiras
+SELECT * FROM bandeiras;
+-- 3. Países
+SELECT * FROM paises;
+-- 4. Estados
+SELECT * FROM estados;
+-- 5. Cidades
+SELECT * FROM cidades;
+-- 6. Níveis de Ambidestria
+SELECT * FROM niveis_ambidestria;
+-- 7. Posições
+SELECT * FROM posicoes;
+-- 8. Clubes
+SELECT * FROM clubes;
+-- 9. Logos dos Clubes
+SELECT * FROM logos_clubes;
+-- 10. Jogadores
+SELECT * FROM jogadores;
+-- 11. Características dos Jogadores
+SELECT * FROM caracteristicas;
+-- 12. Estatísticas Gerais dos Jogadores
+SELECT * FROM estatisticas_gerais;
+-- 13. Partidas
+SELECT * FROM partidas;
+-- 14. Estatísticas por Partida
+SELECT * FROM estatisticas_partidas;
+-- 15. Histórico de Clubes dos Jogadores
+SELECT * FROM historico_clubes;
+-- 16. Histórico de Lesões dos Jogadores
+SELECT * FROM historico_lesoes;
+-- 17. Títulos
+SELECT * FROM titulos;
+-- 18. Relação Jogadores x Títulos
+SELECT * FROM jogadores_titulos;
+
+-- ========================
 -- ENUMs
+-- ========================
+
 CREATE TYPE tipo_titulo AS ENUM ('Nacional', 'Internacional', 'Individual');
 CREATE TYPE pe_dominante_enum AS ENUM ('D', 'E', 'A');
 
@@ -7,11 +47,7 @@ CREATE TYPE pe_dominante_enum AS ENUM ('D', 'E', 'A');
 -- ========================
 
 -- USUÁRIOS
-
-SELECT * FROM usuarios;
--- -- DELETE FROM usuarios;
-
-CREATE TABLE usuarios (
+CREATE TABLE IF NOT EXISTS usuarios (
 	id SERIAL PRIMARY KEY,
 	email VARCHAR(100) UNIQUE NOT NULL,
 	senha VARCHAR(255) NOT NULL,
@@ -19,47 +55,24 @@ CREATE TABLE usuarios (
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
-
-
-
-
-
 -- PAÍSES
+CREATE TABLE IF NOT EXISTS bandeiras (
+	id SERIAL PRIMARY KEY NOT NULL,
+	nome VARCHAR(255) NOT NULL,
+	logo_bandeira TEXT NOT NULL
+);
 
-SELECT * FROM paises;
--- -- DELETE FROM paises;
--- ALTER SEQUENCE paises_id_seq RESTART WITH 1;
-
-CREATE TABLE paises (
+CREATE TABLE IF NOT EXISTS paises (
 	id SERIAL PRIMARY KEY,
 	nome VARCHAR(100) NOT NULL,
 	bandeira_id INT,
 	created_at TIMESTAMP DEFAULT NOW(),
 	updated_at TIMESTAMP DEFAULT NOW(),
-    CONSTRAINT fkey_paises_bandeira FOREIGN KEY (bandeira_id) REFERENCES bandeiras(id)
+	CONSTRAINT fkey_paises_bandeira FOREIGN KEY (bandeira_id) REFERENCES bandeiras(id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
-ALTER TABLE paises ADD COLUMN bandeira_id INT;
-
-ALTER TABLE paises
-ADD CONSTRAINT fkey_paises_bandeira
-FOREIGN KEY (bandeira_id) REFERENCES bandeiras(id)
-ON DELETE SET NULL ON UPDATE CASCADE;
-
-
-
-
-
-
-
 -- ESTADOS
-
-SELECT * FROM estados;
--- -- DELETE FROM estados;
--- ALTER SEQUENCE estados_id_seq RESTART WITH 1;
-
-CREATE TABLE estados (
+CREATE TABLE IF NOT EXISTS estados (
 	id SERIAL PRIMARY KEY,
 	nome VARCHAR(100) NOT NULL,
 	uf CHAR(2) NOT NULL,
@@ -70,12 +83,7 @@ CREATE TABLE estados (
 );
 
 -- CIDADES
-
-SELECT * FROM cidades;
--- -- DELETE FROM cidades;
--- ALTER SEQUENCE cidades_id_seq RESTART WITH 1;
-
-CREATE TABLE cidades (
+CREATE TABLE IF NOT EXISTS cidades (
 	id SERIAL PRIMARY KEY,
 	nome VARCHAR(100) NOT NULL,
 	pais_id SMALLINT,
@@ -87,12 +95,7 @@ CREATE TABLE cidades (
 );
 
 -- NÍVEIS DE AMBIDESTRIA
-
-SELECT * FROM niveis_ambidestria;
--- -- DELETE FROM niveis_ambidestria;
--- ALTER SEQUENCE niveis_ambidestria_id_seq RESTART WITH 1;
-
-CREATE TABLE niveis_ambidestria (
+CREATE TABLE IF NOT EXISTS niveis_ambidestria (
 	id SERIAL PRIMARY KEY,
 	descricao VARCHAR(50) NOT NULL,
 	created_at TIMESTAMP DEFAULT NOW(),
@@ -100,42 +103,18 @@ CREATE TABLE niveis_ambidestria (
 );
 
 -- POSIÇÕES
-
-SELECT * FROM posicoes;
--- -- DELETE FROM posicoes;
--- ALTER SEQUENCE posicoes_id_seq RESTART WITH 1;
-
-CREATE TABLE posicoes (
+CREATE TABLE IF NOT EXISTS posicoes (
 	id SERIAL PRIMARY KEY,
 	nome VARCHAR(100) NOT NULL,
 	created_at TIMESTAMP DEFAULT NOW(),
 	updated_at TIMESTAMP DEFAULT NOW()
 );
 
-
-UPDATE posicoes SET nome = 'Goleiro' WHERE id = 1;
-UPDATE posicoes SET nome = 'Zagueiro' WHERE id = 2;
-UPDATE posicoes SET nome = 'Lateral Direito' WHERE id = 3;
-UPDATE posicoes SET nome = 'Lateral Esquerdo' WHERE id = 4;
-UPDATE posicoes SET nome = 'Volante' WHERE id = 5;
-UPDATE posicoes SET nome = 'Meia' WHERE id = 6;
-UPDATE posicoes SET nome = 'meia esquerdo' WHERE id = 7;
-UPDATE posicoes SET nome = 'meia direito' WHERE id = 8;
-UPDATE posicoes SET nome = 'meia esquerdo e direito' WHERE id = 9;
-UPDATE posicoes SET nome = 'Atacante' WHERE id = 10;
-UPDATE posicoes SET nome = 'Extremo direito' WHERE id = 11;
-UPDATE posicoes SET nome = 'Extremo esquerdo' WHERE id = 12;
-
-
 -- ========================
 -- 2. Clubes
 -- ========================
 
-SELECT * FROM clubes;
--- -- DELETE FROM clubes;
--- ALTER SEQUENCE clubes_id_seq RESTART WITH 1;
-
-CREATE TABLE clubes (
+CREATE TABLE IF NOT EXISTS clubes (
 	id SERIAL PRIMARY KEY,
 	nome VARCHAR(255) NOT NULL,
 	pais_id SMALLINT NOT NULL,
@@ -148,28 +127,20 @@ CREATE TABLE clubes (
 	CONSTRAINT fkey_clubes_pais FOREIGN KEY (pais_id) REFERENCES paises(id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
-select * from logos_clubes;
--- -- DELETE FROM logos_clubes;
--- ALTER SEQUENCE logos_clubes_id_seq RESTART WITH 1;
-
-CREATE TABLE logos_clubes (
-    id SERIAL PRIMARY KEY,
-    clube_id INT NOT NULL,
-    url_logo VARCHAR(500) NOT NULL UNIQUE,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    CONSTRAINT fkey_logos_clube FOREIGN KEY (clube_id) REFERENCES clubes(id) ON DELETE CASCADE
+CREATE TABLE IF NOT EXISTS logos_clubes (
+	id SERIAL PRIMARY KEY,
+	clube_id INT NOT NULL,
+	url_logo VARCHAR(500) NOT NULL UNIQUE,
+	created_at TIMESTAMP DEFAULT NOW(),
+	updated_at TIMESTAMP DEFAULT NOW(),
+	CONSTRAINT fkey_logos_clube FOREIGN KEY (clube_id) REFERENCES clubes(id) ON DELETE CASCADE
 );
 
 -- ========================
 -- 3. Jogadores
 -- ========================
 
-SELECT * FROM jogadores;
--- -- DELETE FROM jogadores;
--- ALTER SEQUENCE jogadores_id_seq RESTART WITH 1;
-
-CREATE TABLE jogadores (
+CREATE TABLE IF NOT EXISTS jogadores (
 	id SERIAL PRIMARY KEY,
 	nome VARCHAR(255) NOT NULL,
 	nome_curto VARCHAR(255),
@@ -199,15 +170,8 @@ CREATE TABLE jogadores (
 	CONSTRAINT fkey_jogadores_clube FOREIGN KEY (clube_atual_id) REFERENCES clubes(id)
 );
 
--- ========================
--- 3.1 Características principais
--- ========================
-
-SELECT * FROM caracteristicas;
--- -- DELETE FROM caracteristicas;
--- ALTER SEQUENCE caracteristicas_id_seq RESTART WITH 1;
-
-CREATE TABLE caracteristicas (
+-- Características principais
+CREATE TABLE IF NOT EXISTS caracteristicas (
 	id SERIAL PRIMARY KEY,
 	jogador_id INT NOT NULL,
 	descricao VARCHAR(100) NOT NULL,
@@ -216,16 +180,11 @@ CREATE TABLE caracteristicas (
 	FOREIGN KEY (jogador_id) REFERENCES jogadores(id) ON DELETE CASCADE
 );
 
-insert into caracteristicas (jogador_id, descricao) values (1, 'Visão de jogo')
 -- ========================
 -- 4. Estatísticas Gerais
 -- ========================
 
-SELECT * FROM estatisticas_gerais;
--- -- DELETE FROM estatisticas_gerais;
--- ALTER SEQUENCE estatisticas_gerais_id_seq RESTART WITH 1;
-
-CREATE TABLE estatisticas_gerais (
+CREATE TABLE IF NOT EXISTS estatisticas_gerais (
 	jogador_id INT PRIMARY KEY,
 	partidas_jogadas INT DEFAULT 0,
 	gols INT DEFAULT 0,
@@ -240,14 +199,10 @@ CREATE TABLE estatisticas_gerais (
 );
 
 -- ========================
--- 5. Partidas
+-- 5. Partidas & Estatísticas
 -- ========================
 
-SELECT * FROM partidas;
--- -- DELETE FROM partidas;
--- ALTER SEQUENCE partidas_id_seq RESTART WITH 1;
-
-CREATE TABLE partidas (
+CREATE TABLE IF NOT EXISTS partidas (
 	id SERIAL PRIMARY KEY,
 	data DATE NOT NULL,
 	campeonato VARCHAR(255),
@@ -262,15 +217,7 @@ CREATE TABLE partidas (
 	CONSTRAINT fkey_partidas_clube_fora FOREIGN KEY (clube_fora_id) REFERENCES clubes(id)
 );
 
--- ========================
--- Estatísticas por Partida
--- ========================
-
-SELECT * FROM estatisticas_partidas;
--- -- DELETE FROM estatisticas_partidas;
--- ALTER SEQUENCE estatisticas_partidas_id_seq RESTART WITH 1;
-
-CREATE TABLE estatisticas_partidas (
+CREATE TABLE IF NOT EXISTS estatisticas_partidas (
 	id SERIAL PRIMARY KEY,
 	jogador_id INT NOT NULL,
 	partida_id INT NOT NULL,
@@ -293,19 +240,15 @@ CREATE TABLE estatisticas_partidas (
 );
 
 -- ========================
--- 6. Histórico de Clubes
+-- 6. Histórico
 -- ========================
 
-SELECT * FROM historico_clubes;
--- -- DELETE FROM historico_clubes where jogador_id = 1;
--- ALTER SEQUENCE historico_clubes_id_seq RESTART WITH 1;
-
-CREATE TABLE historico_clubes (
+CREATE TABLE IF NOT EXISTS historico_clubes (
 	id SERIAL PRIMARY KEY,
 	jogador_id INT NOT NULL,
 	clube_id INT NOT NULL,
-	data_entrada DATE NOT NULL,
-	data_saida DATE,
+	data_entrada INT NOT NULL,
+	data_saida INT,
 	jogos INT DEFAULT 0,
 	created_at TIMESTAMP DEFAULT NOW(),
 	updated_at TIMESTAMP DEFAULT NOW(),
@@ -313,19 +256,7 @@ CREATE TABLE historico_clubes (
 	CONSTRAINT fkey_historico_clube FOREIGN KEY (clube_id) REFERENCES clubes(id)
 );
 
-ALTER TABLE historico_clubes
-ADD COLUMN jogos INT DEFAULT 0;
--- LEMBRA DE COLOCAR ISSO NA TABELA DELE
-
--- ========================
--- Histórico de Lesões
--- ========================
-
-SELECT * FROM historico_lesoes;
--- -- DELETE FROM historico_lesoes;
--- ALTER SEQUENCE historico_lesoes_id_seq RESTART WITH 1;
-
-CREATE TABLE historico_lesoes (
+CREATE TABLE IF NOT EXISTS historico_lesoes (
 	id SERIAL PRIMARY KEY,
 	jogador_id INT NOT NULL,
 	tipo_lesao VARCHAR(255) NOT NULL,
@@ -341,11 +272,7 @@ CREATE TABLE historico_lesoes (
 -- 7. Títulos
 -- ========================
 
-SELECT * FROM titulos;
--- -- DELETE FROM titulos;
--- ALTER SEQUENCE titulos_id_seq RESTART WITH 1;
-
-CREATE TABLE titulos (
+CREATE TABLE IF NOT EXISTS titulos (
 	id SERIAL PRIMARY KEY,
 	nome VARCHAR(255) NOT NULL,
 	tipo tipo_titulo NOT NULL,
@@ -353,46 +280,68 @@ CREATE TABLE titulos (
 	updated_at TIMESTAMP DEFAULT NOW()
 );
 
-SELECT * FROM jogadores_titulos;
--- -- DELETE FROM jogadores_titulos;
--- ALTER SEQUENCE jogadores_titulos_id_seq RESTART WITH 1;
-
-CREATE TABLE jogadores_titulos (
-    id SERIAL PRIMARY KEY,
-    jogador_id INT NOT NULL,
-    titulo_id INT NOT NULL,
-    ano SMALLINT NOT NULL,
-    clube_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    CONSTRAINT fkey_titulos_jogador FOREIGN KEY (jogador_id) REFERENCES jogadores(id) ON DELETE CASCADE,
-    CONSTRAINT fkey_titulos_titulo FOREIGN KEY (titulo_id) REFERENCES titulos(id),
-    CONSTRAINT fkey_titulos_clube FOREIGN KEY (clube_id) REFERENCES clubes(id),
-    CONSTRAINT unique_jogador_titulo UNIQUE (jogador_id, titulo_id)
+CREATE TABLE IF NOT EXISTS jogadores_titulos (
+	id SERIAL PRIMARY KEY,
+	jogador_id INT NOT NULL,
+	titulo_id INT NOT NULL,
+	ano SMALLINT NOT NULL,
+	clube_id INT NOT NULL,
+	created_at TIMESTAMP DEFAULT NOW(),
+	updated_at TIMESTAMP DEFAULT NOW(),
+	CONSTRAINT fkey_titulos_jogador FOREIGN KEY (jogador_id) REFERENCES jogadores(id) ON DELETE CASCADE,
+	CONSTRAINT fkey_titulos_titulo FOREIGN KEY (titulo_id) REFERENCES titulos(id),
+	CONSTRAINT fkey_titulos_clube FOREIGN KEY (clube_id) REFERENCES clubes(id),
+	CONSTRAINT unique_jogador_titulo UNIQUE (jogador_id, titulo_id)
 );
 
+-- ========================
 -- 8. Índices
+-- ========================
 
-CREATE INDEX idx_jogadores_nome ON jogadores(nome);
-CREATE INDEX idx_partidas_data ON partidas(data);
-CREATE INDEX idx_estatisticas_partidas_jogador ON estatisticas_partidas(jogador_id);
-CREATE INDEX idx_estatisticas_partidas_partida ON estatisticas_partidas(partida_id);
-CREATE INDEX idx_jogadores_cidade ON jogadores(cidade_id);
+CREATE INDEX IF NOT EXISTS idx_jogadores_nome ON jogadores(nome);
+CREATE INDEX IF NOT EXISTS idx_partidas_data ON partidas(data);
+CREATE INDEX IF NOT EXISTS idx_estatisticas_partidas_jogador ON estatisticas_partidas(jogador_id);
+CREATE INDEX IF NOT EXISTS idx_estatisticas_partidas_partida ON estatisticas_partidas(partida_id);
+CREATE INDEX IF NOT EXISTS idx_jogadores_cidade ON jogadores(cidade_id);
 
--- -- apagar e recriar tudo do zero
+-- ========================
+-- 9. Consulta Geral de Termo
+-- ========================
+
+DO $$
+DECLARE
+    r RECORD;
+    query TEXT;
+    termo TEXT := '1969';
+    resultado INT;
+BEGIN
+    FOR r IN
+        SELECT table_schema, table_name, column_name
+        FROM information_schema.columns
+        WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
+        AND data_type NOT IN ('bytea')
+    LOOP
+        query := format(
+            'SELECT COUNT(*) FROM %I.%I WHERE %I::text ILIKE %L',
+            r.table_schema,
+            r.table_name,
+            r.column_name,
+            '%' || termo || '%'
+        );
+
+        EXECUTE query INTO resultado;
+
+        IF resultado > 0 THEN
+            RAISE NOTICE '🔎 Encontrado % ocorrências em %.% coluna %',
+                resultado, r.table_schema, r.table_name, r.column_name;
+        END IF;
+    END LOOP;
+END
+$$ LANGUAGE plpgsql;
+
+-- ========================
+-- 10. DROP/RESET opcional
+-- ========================
+
 -- DROP SCHEMA public CASCADE;
 -- CREATE SCHEMA public;
-
-
-
-SELECT * FROM bandeiras;
--- -- DELETE FROM bandeiras;
--- ALTER SEQUENCE bandeiras_id_seq RESTART WITH 1;
-
-CREATE TABLE IF NOT EXISTS bandeiras (
-	id SERIAL PRIMARY KEY NOT NULL,
-	nome VARCHAR(255) NOT NULL,
-	logo_bandeira TEXT NOT NULL
-)
-
-
