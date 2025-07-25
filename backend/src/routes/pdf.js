@@ -476,7 +476,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
         // Chamar para histórico normal
         if (historicoNormal.length > 0) {
-            renderHistorico("Histórico de clubes (PROFISSIONAL) :", historicoNormal);
+            renderHistorico("Histórico de clubes (PROFISSIONAL):", historicoNormal);
         }
 
         // Chamar para histórico profissionais
@@ -592,8 +592,8 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
         (jogador.caracteristicas.length
             ? jogador.caracteristicas
-            : [{ descricao: "Sem características informadas" }])
-            .forEach(c => doc.text(`• ${c.descricao}`, doc.x, doc.y));
+            : [{ descricao: "Sem características informadas." }])
+            .forEach(c => doc.text(`${c.descricao}`, doc.x, doc.y));
 
 
         // Estatísticas por partida
