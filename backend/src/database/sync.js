@@ -286,10 +286,10 @@ const seedData = async () => {
         { id: 16, nome: 'Meia Direito' },
         { id: 17, nome: 'Meia Esquerdo e Direito' },
         { id: 18, nome: 'Falso Nove' },
-        { id: 19, nome: 'Atacante' },
-        { id: 20, nome: 'Atacante direito' },
-        { id: 21, nome: 'Atacante esquerdo' },
-        { id: 22, nome: 'Atacante Esquerdo e Direito' },
+        { id: 19, nome: 'Centroavante' },
+        { id: 20, nome: 'Ponta direita' },
+        { id: 21, nome: 'Ponta esquerda' },
+        { id: 22, nome: 'Ponta Esquerda e Direita' },
     ]);
 
 };

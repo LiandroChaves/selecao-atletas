@@ -124,7 +124,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
         if (!jogador) return res.status(404).json({ error: "Jogador não encontrado" });
 
-        let logoPath = ASSETS.logo;
+        let logoPath = null;
 
         if (req.query.clube) {
             const clube = await models.Clubes.findOne({
@@ -141,7 +141,10 @@ router.get("/gerar-pdf/:id", async (req, res) => {
                 });
 
                 if (logoClube) {
-                    logoPath = path.join(basePath, logoClube.url_logo);
+                    const fullPath = path.join(basePath, logoClube.url_logo);
+                    if (fs.existsSync(fullPath)) {
+                        logoPath = fullPath;
+                    }
                 }
             }
         }
@@ -156,55 +159,63 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
         // ---------- cabeçalho ----------
 
-        // Logo do clube
-        doc.image(logoPath, 40, 40, {
-            fit: [90, 90], // mantém proporção até 90x90
-            align: 'left',
-            valign: 'top'
-        });
+        if (req.query.clube) {
+            // Logo do clube
+            if (logoPath) {
+                doc.image(logoPath, 40, 40, {
+                    fit: [90, 90],
+                    align: 'left',
+                    valign: 'top'
+                });
+            }
 
-        // doc.image(ASSETS.borda, 410, -60, { width: 250 });
+            const largura = 180;
+            const altura = 10;
 
-        const largura = 180;
-        const altura = 10;
+            doc.save();
 
-        doc.save();
+            doc.translate(490, -15);  // ponto de rotação (ajuste conforme necessário)
+            doc.rotate(30); // rotaciona -30 graus (negativo inclina para esquerda)
 
-        doc.translate(490, -15);  // ponto de rotação (ajuste conforme necessário)
-        doc.rotate(30); // rotaciona -30 graus (negativo inclina para esquerda)
+            // Primeira faixa (cor principal)
+            doc.fillColor(corSegundaBorda)
+                .moveTo(0, 0)
+                .lineTo(largura, 0)
+                .lineTo(largura - 10, altura)
+                .lineTo(-10, altura)
+                .closePath()
+                .fill();
 
-        // Primeira faixa (cor principal)
-        doc.fillColor(corSegundaBorda)
+            // Segunda faixa (cor secundária)
+            doc.fillColor(corTituloeBorda)
+                .moveTo(-10, altura)
+                .lineTo(largura - 10, altura)
+                .lineTo(largura - 20, altura * 2)
+                .lineTo(-20, altura * 2)
+                .closePath()
+                .fill();
 
-            .moveTo(0, 0)
-            .lineTo(largura, 0)
-            .lineTo(largura - 10, altura)
-            .lineTo(-10, altura)
-            .closePath()
-            .fill();
+            doc.restore();
 
-        // Segunda faixa (cor secundária)
-        doc.fillColor(corTituloeBorda)
-            .moveTo(-10, altura)
-            .lineTo(largura - 10, altura)
-            .lineTo(largura - 20, altura * 2)
-            .lineTo(-20, altura * 2)
-            .closePath()
-            .fill();
+            // Título com cor
+            doc.fillColor(corTituloeBorda)
+                .font('Helvetica-Bold')
+                .fontSize(16)
+                .text(`${formatarNomeClube(req.query.clube)}`, 0, 50, { align: 'center' });
 
-        // Restaura o estado do canvas
-        doc.restore();
+            doc.fontSize(13)
+                .text(`Ficha Individual do Atleta – ${categoria}`, { align: 'center' });
 
-        // Título do cabeçalho
-        const nomeClube = clube || "Esporte Clube Limoeiro";
+        } else {
+            // Cabeçalho sem logo, sem cor e sem faixa
+            doc.fillColor('black')
+                .font('Helvetica-Bold')
+                .fontSize(16)
+                .text(`Ficha Individual do Atleta`, 0, 50, { align: 'center' });
 
-        doc.fillColor(corTituloeBorda)
-            .font('Helvetica-Bold')
-            .fontSize(16)
-            .text(`${nomeClube}`, 0, 50, { align: 'center' });
-
-        doc.fontSize(13)
-            .text(`Ficha Individual do Atleta – ${categoria}`, { align: 'center' });
+            doc.fontSize(13)
+                .text(`${categoria}`, { align: 'center' });
+        }
 
         // Volta para o estilo padrão (texto preto, sem negrito)
         doc.fillColor('black')
@@ -255,8 +266,8 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         const ycamposText = doc.y + 10;
 
         // Posição principal
-        doc.text("Posição principal:", 90, ycamposText + 30);
-        safeImage(doc, ASSETS.campo(jogador.posicao?.id), 150, ycamposText + 45, { width: 120 });
+        doc.text(`Posição principal: ${jogador.posicao?.nome}`, 90, ycamposText - 15);
+        safeImage(doc, ASSETS.campo(jogador.posicao?.id), 150, ycamposText, { width: 180 });
 
         // Altura da imagem (aproximada) + espaço entre as seções
         const imagemAltura = 120;
@@ -264,15 +275,15 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
         // Posição secundária, mais abaixo
         const yCamposSecundaria = ycamposText + imagemAltura + espacoEntre;
-        doc.text("Posição secundária:", 90, yCamposSecundaria + 75);
-        safeImage(doc, ASSETS.campo(jogador.posicao_secundaria?.id), 150, yCamposSecundaria + 90, { width: 120 });
+        doc.text(`Posição secundária: ${jogador.posicao_secundaria?.nome}`, 90, yCamposSecundaria + 110);
+        safeImage(doc, ASSETS.campo(jogador.posicao_secundaria?.id), 150, yCamposSecundaria + 120, { width: 180 });
 
 
         // ---------- ambidestria ----------
         // ---------- pé dominante ----------
         doc.text(
             `Grau de ambidestria: ${jogador.nivel_ambidestria?.descricao ?? "Não informado"}`,
-            330, ycamposText + 115, { align: "left" }
+            360, ycamposText + 115, { align: "left" }
         );
         doc.text(
             `Pé dominante: ${jogador.pe_dominante === "E"
@@ -281,7 +292,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
                     ? "Direito"
                     : "Não informado"
             }`,
-            330, ycamposText + 130,
+            360, ycamposText + 130,
         );
 
         // Determine o caminho da imagem do pé dominante
@@ -298,7 +309,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
         // Renderiza a imagem no PDF, se aplicável
         if (imagemPe) {
-            doc.image(imagemPe, 330, ycamposText + 150, { width: 140 }); // ajuste o tamanho e posição conforme necessário
+            doc.image(imagemPe, 360, ycamposText + 150, { width: 140 }); // ajuste o tamanho e posição conforme necessário
         }
 
         // Histórico clubes
@@ -310,42 +321,49 @@ router.get("/gerar-pdf/:id", async (req, res) => {
             const [antes, depois] = nome.split("-");
             const depoisTrimado = depois.trim();
 
-            // Se tiver exatamente 2 letras, considera como UF e coloca em maiúsculas
-            if (depoisTrimado.length === 2) {
-                return `${antes.trim()} - ${depoisTrimado.toUpperCase()}`;
-            }
+            // Capitaliza cada palavra depois do hífen
+            const depoisFormatado = depoisTrimado
+                .split(" ")
+                .map(palavra => {
+                    if (palavra.length === 2) return palavra.toUpperCase(); // ex: CE
+                    return palavra.charAt(0).toUpperCase() + palavra.slice(1).toLowerCase(); // ex: U20
+                })
+                .join(" ");
 
-            // Caso contrário, mantém como foi digitado
-            return `${antes.trim()} - ${depoisTrimado}`;
+            return `${antes.trim()} - ${depoisFormatado}`;
         }
 
         // Função que detecta se o clube é profissional (tem sufixo "- Ux")
-        function isProfissional(nomeClube) {
-            return /- U\d+$/.test(nomeClube);
+        function isBase(nomeClube) {
+            const partes = nomeClube.split("-");
+            if (partes.length < 2) return false; // sem hífen, ignora
+
+            const depoisDoHifen = partes.slice(1).join("-").trim();
+            return /\bU\d+\b/.test(depoisDoHifen);
         }
+
 
         // Separar histórico em normal e profissional
         const historicoNormal = [];
-        const historicoProfissional = [];
+        const historicoBase = [];
 
         jogador.historico.forEach(h => {
             const nomeClube = h.clube?.nome ?? "";
-            if (isProfissional(nomeClube)) {
-                historicoProfissional.push(h);
+            if (isBase(nomeClube)) {
+                historicoBase.push(h);
             } else {
                 historicoNormal.push(h);
             }
         });
 
-        // Função para desenhar o cabeçalho das colunas
-        function desenharCabecalho(x, colAno, colClube, colJogos, colSaida, larguraTotal) {
+        // Função para desenhar o cabeçalho das colunas (sem a coluna Saída)
+        function desenharCabecalho(x, colAno, colClube, colJogos, larguraTotal) {
             doc.font("Helvetica-Bold").fontSize(10);
             const y = doc.y;
 
             doc.text("Ano", x, y, { width: colAno, align: "left" });
             doc.text("Clube", x + colAno, y, { width: colClube, align: "left" });
             doc.text("Jogos", x + colAno + colClube, y, { width: colJogos, align: "right" });
-            doc.text("Saída", x + colAno + colClube + colJogos, y, { width: colSaida, align: "right" });
 
             doc.moveTo(x - 15, y + 12)
                 .lineTo(x + larguraTotal + 15, y + 12)
@@ -376,14 +394,12 @@ router.get("/gerar-pdf/:id", async (req, res) => {
             doc.moveDown();
 
             const larguraColunaAno = 50;
-            const larguraColunaClube = 200;
-            const larguraColunaJogos = 40;
-            const larguraColunaSaida = 50;
-            const totalLargura = larguraColunaAno + larguraColunaClube + larguraColunaJogos + larguraColunaSaida;
-
+            const larguraColunaClube = 250;
+            const larguraColunaJogos = 50;
+            const totalLargura = larguraColunaAno + larguraColunaClube + larguraColunaJogos;
             const posicaoInicialX = (doc.page.width - totalLargura) / 2;
 
-            desenharCabecalho(posicaoInicialX, larguraColunaAno, larguraColunaClube, larguraColunaJogos, larguraColunaSaida, totalLargura);
+            desenharCabecalho(posicaoInicialX, larguraColunaAno, larguraColunaClube, larguraColunaJogos, totalLargura);
 
             // Ordenar por bandeira e por ano DESC
             const historico = [...historicoArray].sort((a, b) => {
@@ -453,10 +469,6 @@ router.get("/gerar-pdf/:id", async (req, res) => {
                             width: larguraColunaJogos,
                             align: "right"
                         });
-                        doc.text(saida, posicaoInicialX + larguraColunaAno + larguraColunaClube + larguraColunaJogos, yAtual, {
-                            width: larguraColunaSaida,
-                            align: "right"
-                        });
                     });
                     doc.moveDown(0.3);
                 });
@@ -468,12 +480,12 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         }
 
         // Chamar para histórico profissionais
-        if (historicoProfissional.length > 0) {
-            renderHistorico("Histórico de clubes (BASE):", historicoProfissional);
+        if (historicoBase.length > 0) {
+            renderHistorico("Histórico de clubes (BASE):", historicoBase);
         }
 
         // Caso não haja nenhum histórico em ambos
-        if (historicoNormal.length === 0 && historicoProfissional.length === 0) {
+        if (historicoNormal.length === 0 && historicoBase.length === 0) {
             const larguraColunaAno = 50;
             const larguraColunaClube = 250;
             const larguraColunaJogos = 50;
@@ -564,7 +576,9 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         doc.moveDown(2);
 
         // Título da página
-        doc.fontSize(14).fillColor(`${corTituloeBorda}`).text("Dados Específicos do Atleta", 50, doc.y);
+        doc.fontSize(14)
+            .fillColor(req.query.clube ? corTituloeBorda : 'black')
+            .text("Dados Específicos do Atleta", 50, doc.y);
         doc.moveDown();
 
         // voltar tudo ao estilo padrão

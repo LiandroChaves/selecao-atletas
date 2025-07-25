@@ -24,6 +24,7 @@ import {
 } from "react-icons/fa";
 
 const cadastros = [
+    { label: "Bandeiras", icon: <FaFlagCheckered /> },
     { label: "Países", icon: <FaFlag /> },
     { label: "Estados", icon: <FaMapMarkedAlt /> },
     { label: "Cidades", icon: <FaCity /> },
@@ -39,7 +40,6 @@ const cadastros = [
     { label: "Histórico de Lesões", icon: <FaBriefcaseMedical /> },
     { label: "Títulos", icon: <FaTrophy /> },
     { label: "Jogadores - Títulos", icon: <FaTrophy /> },
-    { label: "Bandeiras", icon: <FaFlagCheckered /> },
 ];
 
 function slugify(text: string) {
