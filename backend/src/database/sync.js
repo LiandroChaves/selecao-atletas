@@ -291,7 +291,6 @@ const seedData = async () => {
         { id: 21, nome: 'Ponta esquerda' },
         { id: 22, nome: 'Ponta Esquerda e Direita' },
     ]);
-
 };
 
 const syncDatabase = async () => {

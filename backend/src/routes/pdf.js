@@ -46,11 +46,6 @@ const ASSETS = {
     },
     campo: pos => path.join(basePath, `campo_${pos}.png`),
     bandeiraBrasil: path.join(basePath, "brasil.png"),
-
-
-
-
-
 };
 
 router.get("/gerar-pdf/:id", async (req, res) => {
