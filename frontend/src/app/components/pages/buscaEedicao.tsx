@@ -96,7 +96,7 @@ export default function BuscaEedicao() {
 
                 <h1 className={`text-3xl md:text-4xl font-extrabold mb-6 tracking-wide ${isDarkMode ? "text-white" : "text-gray-700"
                     }`}>
-                    O que deseja buscar?
+                    O que deseja buscar ou editar?
                 </h1>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">

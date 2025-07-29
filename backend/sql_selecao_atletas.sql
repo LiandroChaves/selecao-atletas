@@ -170,6 +170,9 @@ CREATE TABLE IF NOT EXISTS jogadores (
 	CONSTRAINT fkey_jogadores_clube FOREIGN KEY (clube_atual_id) REFERENCES clubes(id)
 );
 
+ALTER TABLE jogadores
+ALTER COLUMN clube_atual_id DROP NOT NULL;
+
 -- Características principais
 CREATE TABLE IF NOT EXISTS caracteristicas (
 	id SERIAL PRIMARY KEY,
@@ -252,9 +255,14 @@ CREATE TABLE IF NOT EXISTS historico_clubes (
 	jogos INT DEFAULT 0,
 	created_at TIMESTAMP DEFAULT NOW(),
 	updated_at TIMESTAMP DEFAULT NOW(),
+	categoria VARCHAR(20) DEFAULT 'Profissional',
 	CONSTRAINT fkey_historico_jogador FOREIGN KEY (jogador_id) REFERENCES jogadores(id) ON DELETE CASCADE,
 	CONSTRAINT fkey_historico_clube FOREIGN KEY (clube_id) REFERENCES clubes(id)
 );
+
+-- Adicionar campo categoria na tabela historico_clubes
+ALTER TABLE historico_clubes 
+ADD COLUMN categoria VARCHAR(20) DEFAULT 'Profissional' CHECK (categoria IN ('Amador', 'Profissional', 'Base'));
 
 CREATE TABLE IF NOT EXISTS historico_lesoes (
 	id SERIAL PRIMARY KEY,
@@ -345,3 +353,46 @@ $$ LANGUAGE plpgsql;
 
 -- DROP SCHEMA public CASCADE;
 -- CREATE SCHEMA public;
+
+
+
+
+
+
+
+-- Script para verificar os dados de logos dos clubes
+SELECT 
+    c.id as clube_id,
+    c.nome as clube_nome,
+    lc.id as logo_id,
+    lc.url_logo,
+    lc.created_at as logo_created_at
+FROM clubes c
+LEFT JOIN logos_clubes lc ON c.id = lc.clube_id
+ORDER BY c.id;
+
+-- Verificar se há logos órfãs
+SELECT 
+    lc.*,
+    c.nome as clube_nome
+FROM logos_clubes lc
+LEFT JOIN clubes c ON lc.clube_id = c.id
+WHERE c.id IS NULL;
+
+-- Contar clubes com e sem logo
+SELECT 
+    'Com logo' as status,
+    COUNT(*) as quantidade
+FROM clubes c
+INNER JOIN logos_clubes lc ON c.id = lc.clube_id
+
+UNION ALL
+
+SELECT 
+    'Sem logo' as status,
+    COUNT(*) as quantidade
+FROM clubes c
+LEFT JOIN logos_clubes lc ON c.id = lc.clube_id
+WHERE lc.id IS NULL;
+
+

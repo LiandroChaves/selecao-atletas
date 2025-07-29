@@ -1,115 +1,104 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { FaArrowLeft } from "react-icons/fa";
-import { useTheme } from "@/utils/context/ThemeContext";
-import { useLoading } from "@/utils/context/LoadingProvider";
-import { verificarTokenValido } from "@/utils/verificarTokenValido";
-import BotaoTema from "@/utils/utilities/changeTheme";
-import { motion } from "framer-motion";
-import { useDisableOnSubmit } from "@/utils/hooks/useDisableOnSubmit";
+import type React from "react"
+
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { FaArrowLeft } from "react-icons/fa"
+import { useTheme } from "@/utils/context/ThemeContext"
+import { useLoading } from "@/utils/context/LoadingProvider"
+import { verificarTokenValido } from "@/utils/verificarTokenValido"
+import BotaoTema from "@/utils/utilities/changeTheme"
+import { motion } from "framer-motion"
+import { useDisableOnSubmit } from "@/utils/hooks/useDisableOnSubmit"
 
 export default function CadastroHistoricoClubes() {
-    const [historicos, setHistoricos] = useState<any[]>([]);
-    const [jogadores, setJogadores] = useState<any[]>([]);
-    const [clubes, setClubes] = useState<any[]>([]);
+    const [historicos, setHistoricos] = useState<any[]>([])
+    const [jogadores, setJogadores] = useState<any[]>([])
+    const [clubes, setClubes] = useState<any[]>([])
     const [form, setForm] = useState({
         jogador_id: "",
         clube_id: "",
         data_entrada: "",
         data_saida: "",
         jogos: "",
-    });
-    const [atualizarHistorico, setAtualizarHistorico] = useState(0);
-    const [erro, setErro] = useState("");
-    const { isDarkMode } = useTheme();
-    const { setIsLoading } = useLoading();
-    const router = useRouter();
-    const { isSubmitting, handleSubmitWrapper } = useDisableOnSubmit();
-
-
-    useEffect(() => {
-        setIsLoading(false);
-        fetchJogadores();
-        fetchClubes();
-    }, []);
+        categoria: "Profissional", // Novo campo
+    })
+    const [atualizarHistorico, setAtualizarHistorico] = useState(0)
+    const [erro, setErro] = useState("")
+    const { isDarkMode } = useTheme()
+    const { setIsLoading } = useLoading()
+    const router = useRouter()
+    const { isSubmitting, handleSubmitWrapper } = useDisableOnSubmit()
 
     useEffect(() => {
-        fetchHistoricos();
-    }, [atualizarHistorico]);
+        setIsLoading(false)
+        fetchJogadores()
+        fetchClubes()
+    }, [])
+
+    useEffect(() => {
+        fetchHistoricos()
+    }, [atualizarHistorico])
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "Enter") {
-                e.preventDefault(); // evita comportamento padrão como abrir dropdown
-                const form = document.querySelector("form");
+                e.preventDefault()
+                const form = document.querySelector("form")
                 if (form) {
-                    form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+                    form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }))
                 }
             }
-        };
+        }
 
-        window.addEventListener("keydown", handleKeyDown);
-
+        window.addEventListener("keydown", handleKeyDown)
         return () => {
-            window.removeEventListener("keydown", handleKeyDown);
-        };
-    }, []);
+            window.removeEventListener("keydown", handleKeyDown)
+        }
+    }, [])
 
     const fetchJogadores = async () => {
-        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-        const API_URL = isLocalhost
-            ? 'http://localhost:3001'
-            : `http://${window.location.hostname}:3001`;
-
-        const res = await fetch(`${API_URL}/api/jogadores/pegarJogadores`);
-        const data = await res.json();
-        setJogadores(data);
-    };
+        const isLocalhost = typeof window !== "undefined" && window.location.hostname === "localhost"
+        const API_URL = isLocalhost ? "http://localhost:3001" : `http://${window.location.hostname}:3001`
+        const res = await fetch(`${API_URL}/api/jogadores/pegarJogadores`)
+        const data = await res.json()
+        setJogadores(data)
+    }
 
     const fetchClubes = async () => {
-        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-        const API_URL = isLocalhost
-            ? 'http://localhost:3001'
-            : `http://${window.location.hostname}:3001`;
-
-        const res = await fetch(`${API_URL}/api/clubes/pegarClubes`);
-        const data = await res.json();
-        setClubes(data);
-    };
+        const isLocalhost = typeof window !== "undefined" && window.location.hostname === "localhost"
+        const API_URL = isLocalhost ? "http://localhost:3001" : `http://${window.location.hostname}:3001`
+        const res = await fetch(`${API_URL}/api/clubes/pegarClubes`)
+        const data = await res.json()
+        setClubes(data)
+    }
 
     const fetchHistoricos = async () => {
-        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-        const API_URL = isLocalhost
-            ? 'http://localhost:3001'
-            : `http://${window.location.hostname}:3001`;
-
-        const res = await fetch(`${API_URL}/api/historico-clubes/pegarHistorico`);
-
-        const data = await res.json();
-        setHistoricos(data);
-    };
+        const isLocalhost = typeof window !== "undefined" && window.location.hostname === "localhost"
+        const API_URL = isLocalhost ? "http://localhost:3001" : `http://${window.location.hostname}:3001`
+        const res = await fetch(`${API_URL}/api/historico-clubes/pegarHistorico`)
+        const data = await res.json()
+        setHistoricos(data)
+    }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
+        setForm({ ...form, [e.target.name]: e.target.value })
+    }
 
     async function submitForm() {
         if (!form.jogador_id || !form.clube_id || !form.data_entrada) {
-            setErro("⚠️ Nome do jogador, nome do clube e data de entrada são obrigatórios.");
-            setTimeout(() => setErro(""), 3000);
-            return;
+            setErro("⚠️ Nome do jogador, nome do clube e data de entrada são obrigatórios.")
+            setTimeout(() => setErro(""), 3000)
+            return
         }
 
-        if (!verificarTokenValido()) return;
-        const token = localStorage.getItem("token");
+        if (!verificarTokenValido()) return
 
+        const token = localStorage.getItem("token")
         try {
-            const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-            const API_URL = isLocalhost
-                ? 'http://localhost:3001'
-                : `http://${window.location.hostname}:3001`;
+            const isLocalhost = typeof window !== "undefined" && window.location.hostname === "localhost"
+            const API_URL = isLocalhost ? "http://localhost:3001" : `http://${window.location.hostname}:3001`
 
             const res = await fetch(`${API_URL}/api/historico-clubes/inserirHistorico`, {
                 method: "POST",
@@ -122,35 +111,42 @@ export default function CadastroHistoricoClubes() {
                     clube_id: Number(form.clube_id),
                     data_entrada: Number(form.data_entrada),
                     data_saida: Number(form.data_saida) || null,
-                    jogos: form.jogos
+                    jogos: form.jogos,
+                    categoria: form.categoria, // Incluir categoria
                 }),
-            });
+            })
 
-            const data = await res.json();
-
+            const data = await res.json()
             if (res.ok) {
-                setForm({ jogador_id: "", clube_id: "", data_entrada: "", data_saida: "", jogos: "" });
-                setAtualizarHistorico(prev => prev + 1); // força novo fetch
+                setForm({
+                    jogador_id: "",
+                    clube_id: "",
+                    data_entrada: "",
+                    data_saida: "",
+                    jogos: "",
+                    categoria: "Profissional",
+                })
+                setAtualizarHistorico((prev) => prev + 1)
             } else {
-                setErro(data.error || "Erro ao cadastrar histórico.");
-                setTimeout(() => setErro(""), 3000);
+                setErro(data.error || "Erro ao cadastrar histórico.")
+                setTimeout(() => setErro(""), 3000)
             }
         } catch (error) {
-            console.error("Erro ao cadastrar:", error);
-            setErro("Erro ao cadastrar.");
+            console.error("Erro ao cadastrar:", error)
+            setErro("Erro ao cadastrar.")
         }
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        handleSubmitWrapper(submitForm);
-    };
+        e.preventDefault()
+        handleSubmitWrapper(submitForm)
+    }
 
     return (
         <main
             className={`min-h-screen flex items-center justify-center p-4 transition-all duration-500 ${isDarkMode
-                ? "bg-gradient-to-br from-gray-900 via-gray-800 to-teal-900"
-                : "bg-gradient-to-br from-white via-gray-100 to-gray-200"
+                    ? "bg-gradient-to-br from-gray-900 via-gray-800 to-teal-900"
+                    : "bg-gradient-to-br from-white via-gray-100 to-gray-200"
                 }`}
         >
             <motion.div
@@ -180,7 +176,9 @@ export default function CadastroHistoricoClubes() {
                     >
                         <option value="">Selecione o jogador</option>
                         {jogadores.map((j) => (
-                            <option key={j.id} value={j.id}>{j.nome}</option>
+                            <option key={j.id} value={j.id}>
+                                {j.nome}
+                            </option>
                         ))}
                     </select>
 
@@ -192,11 +190,33 @@ export default function CadastroHistoricoClubes() {
                     >
                         <option value="">Selecione o clube</option>
                         {clubes.map((c) => (
-                            <option key={c.id} value={c.id}>{c.nome}</option>
+                            <option key={c.id} value={c.id}>
+                                {c.nome}
+                            </option>
                         ))}
                     </select>
+
+                    {/* Novo campo Categoria */}
                     <div className="flex flex-col gap-1">
-                        <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>Jogos</label>
+                        <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                            Categoria
+                        </label>
+                        <select
+                            name="categoria"
+                            value={form.categoria}
+                            onChange={handleChange}
+                            className="p-2 rounded text-black bg-white"
+                        >
+                            <option value="Profissional">Profissional</option>
+                            <option value="Base">Base</option>
+                            <option value="Amador">Amador</option>
+                        </select>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                        <label className={`text-sm text-left font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+                            Jogos
+                        </label>
                         <input
                             type="number"
                             name="jogos"
@@ -206,6 +226,7 @@ export default function CadastroHistoricoClubes() {
                             placeholder="Jogos"
                         />
                     </div>
+
                     <div className="flex flex-col gap-1">
                         <label className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                             Ano de entrada no clube
@@ -237,14 +258,15 @@ export default function CadastroHistoricoClubes() {
                             max="9999"
                         />
                     </div>
+
                     {erro && <p className="text-red-400 text-sm font-medium">{erro}</p>}
 
                     <button
                         type="submit"
                         disabled={isSubmitting}
                         className={`px-4 py-2 rounded font-semibold transition duration-300 hover:scale-[1.03] ${isDarkMode
-                            ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900"
-                            : "bg-gray-600 hover:bg-gray-500 text-white"
+                                ? "bg-emerald-400 hover:bg-emerald-300 text-teal-900"
+                                : "bg-gray-600 hover:bg-gray-500 text-white"
                             } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
                         {isSubmitting ? "Cadastrando..." : "Cadastrar"}
@@ -252,21 +274,28 @@ export default function CadastroHistoricoClubes() {
                 </form>
 
                 <ul className="space-y-2 text-left max-h-72 overflow-y-auto">
-                    {Array.isArray(historicos) && historicos.map((h) => (
-                        <li
-                            key={h.id}
-                            className={`p-2 rounded ${isDarkMode ? "bg-teal-600 text-white" : "bg-white text-black border border-gray-300"}`}
-                        >
-                            <strong>Jogador:</strong> {h.jogador?.nome ?? "Desconhecido"}<br />
-                            <strong>Clube:</strong> {h.clube?.nome ?? "Desconhecido"}<br />
-                            <strong>Jogos:</strong> {h.jogos ?? "Quantidade de jogos não informados"}<br />
-                            Ano de entrada no clube: {h.data_entrada}<br />
-                            Ano de saída do clube: {h.data_saida ? h.data_saida : "Ainda permanece no clube"}
-                        </li>
-                    ))}
+                    {Array.isArray(historicos) &&
+                        historicos.map((h) => (
+                            <li
+                                key={h.id}
+                                className={`p-2 rounded ${isDarkMode ? "bg-teal-600 text-white" : "bg-white text-black border border-gray-300"}`}
+                            >
+                                <strong>Jogador:</strong> {h.jogador?.nome ?? "Desconhecido"}
+                                <br />
+                                <strong>Clube:</strong> {h.clube?.nome ?? "Desconhecido"}
+                                <br />
+                                <strong>Categoria:</strong> {h.categoria ?? "Não informado"}
+                                <br />
+                                <strong>Jogos:</strong> {h.jogos ?? "Quantidade de jogos não informados"}
+                                <br />
+                                Ano de entrada no clube: {h.data_entrada}
+                                <br />
+                                Ano de saída do clube: {h.data_saida ? h.data_saida : "Ainda permanece no clube"}
+                            </li>
+                        ))}
                 </ul>
             </motion.div>
             <BotaoTema />
         </main>
-    );
+    )
 }

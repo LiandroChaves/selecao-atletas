@@ -9,10 +9,10 @@ import { Op } from "sequelize";
 
 export const criarJogador = async (req, res) => {
     try {
-        const { nome, pe_dominante, nivel_ambidestria_id, clube_atual_id, posicao_id } = req.body;
+        const { nome, pe_dominante, nivel_ambidestria_id, posicao_id } = req.body;
 
-        if (!nome || !pe_dominante || !nivel_ambidestria_id || !clube_atual_id || !posicao_id) {
-            return res.status(400).json({ erro: "Campos obrigatórios: nome, pe_dominante, nivel_ambidestria_id, clube_atual_id, posicao_id." });
+        if (!nome || !pe_dominante || !nivel_ambidestria_id || !posicao_id) {
+            return res.status(400).json({ erro: "Campos obrigatórios: nome, pe_dominante, nivel_ambidestria_id, posicao_id." });
         }
 
         // Tratamento dos campos de data e outros opcionais

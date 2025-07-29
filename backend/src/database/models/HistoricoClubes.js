@@ -44,6 +44,14 @@ const HistoricoClubes = sequelize.define("historico_clubes", {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
     },
+    categoria: {
+        type: DataTypes.STRING(20),
+        allowNull: false,
+        defaultValue: "Profissional",
+        validate: {
+            isIn: [["Amador", "Profissional", "Base"]],
+        },
+    },
 }, {
     timestamps: false,
 });

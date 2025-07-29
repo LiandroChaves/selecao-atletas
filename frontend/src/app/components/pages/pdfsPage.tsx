@@ -1,3 +1,5 @@
+// frontend/src/app/components/pages/pdfsPage.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -283,14 +285,14 @@ export default function PdfsPage() {
                         </div>
                         {/* Campo Categoria */}
                         <div className="mb-4">
-                            <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-gray-700"}`}>Categoria</label>
+                            <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-white" : "text-gray-700"}`}>Categoria da ficha</label>
                             <select
                                 className={`w-full border rounded p-2 text-black focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white`}
                                 value={categoria}
                                 onChange={(e) => setCategoria(e.target.value)}
                             >
-                                <option value="Base">Base</option>
                                 <option value="Profissional">Profissional</option>
+                                <option value="Base">Base</option>
                                 <option value="Amador">Amador</option>
                             </select>
                         </div>

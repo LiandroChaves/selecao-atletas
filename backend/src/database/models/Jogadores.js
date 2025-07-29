@@ -94,7 +94,7 @@ const Jogador = sequelize.define("jogadores", {
     },
     clube_atual_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: "clubes",
             key: "id",

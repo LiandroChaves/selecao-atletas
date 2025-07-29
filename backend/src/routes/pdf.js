@@ -1,4 +1,5 @@
-// routes/pdf.js
+// backend/src/routes/pdf.js
+
 import express from "express";
 import PDFDocument from "pdfkit";
 import models from "../database/models/index.js"; // ajuste conforme seu setup
@@ -234,17 +235,17 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
             // linha 2  – nome curto  |  naturalidade
             .text(
-                `Nome curto: ${jogador.nome_curto || jogador.apelido}  |  ` +
-                `Naturalidade: ${jogador.cidade?.nome ?? "Não informado"} - ${jogador.estado?.uf}`,
+                `Nome curto: ${jogador.nome_curto || jogador.apelido || "Não informado"}  |  ` +
+                `Naturalidade: ${jogador.cidade?.nome ?? "Não informada"} - ${jogador.estado?.uf ?? "Sem UF"}`,
                 { align: "center" }
             )
             .moveDown()
 
             // linha 3  – apelido  |  data nasc.  |  idade
             .text(
-                `Apelido: ${jogador.apelido || "Não informado"} | ` +
-                `Data nasc.: ${dayjs(jogador.data_nascimento).format("DD/MM/YYYY")}  |  ` +
-                `Idade: ${calcularIdade(jogador.data_nascimento)} anos`,
+                `Apelido: ${jogador.apelido || "Nenhum"} | ` +
+                `Data nasc.: ${jogador.data_nascimento ? dayjs(jogador.data_nascimento).format("DD/MM/YYYY") : "Data não informada"}  |  ` +
+                `Idade: ${jogador.data_nascimento ? calcularIdade(jogador.data_nascimento) + " anos": "Não informada"}`,
                 { align: "center" }
             )
             .moveDown()
@@ -270,7 +271,7 @@ router.get("/gerar-pdf/:id", async (req, res) => {
 
         // Posição secundária, mais abaixo
         const yCamposSecundaria = ycamposText + imagemAltura + espacoEntre;
-        doc.text(`Posição secundária: ${jogador.posicao_secundaria?.nome}`, 90, yCamposSecundaria + 110);
+        doc.text(`Posição secundária: ${jogador.posicao_secundaria?.nome ? jogador.posicao_secundaria?.nome : "Posição não informada"}`, 90, yCamposSecundaria + 110);
         safeImage(doc, ASSETS.campo(jogador.posicao_secundaria?.id), 150, yCamposSecundaria + 120, { width: 180 });
 
 
@@ -308,189 +309,175 @@ router.get("/gerar-pdf/:id", async (req, res) => {
         }
 
         // Histórico clubes
-        doc.addPage();
+        doc.addPage()
 
         function formatarNomeClube(nome) {
-            if (!nome.includes("-")) return nome;
-
-            const [antes, depois] = nome.split("-");
-            const depoisTrimado = depois.trim();
-
-            // Capitaliza cada palavra depois do hífen
+            if (!nome.includes("-")) return nome
+            const [antes, depois] = nome.split("-")
+            const depoisTrimado = depois.trim()
             const depoisFormatado = depoisTrimado
                 .split(" ")
-                .map(palavra => {
-                    if (palavra.length === 2) return palavra.toUpperCase(); // ex: CE
-                    return palavra.charAt(0).toUpperCase() + palavra.slice(1).toLowerCase(); // ex: U20
+                .map((palavra) => {
+                    if (palavra.length === 2) return palavra.toUpperCase()
+                    return palavra.charAt(0).toUpperCase() + palavra.slice(1).toLowerCase()
                 })
-                .join(" ");
-
-            return `${antes.trim()} - ${depoisFormatado}`;
+                .join(" ")
+            return `${antes.trim()} - ${depoisFormatado}`
         }
 
-        // Função que detecta se o clube é profissional (tem sufixo "- Ux")
-        function isBase(nomeClube) {
-            const partes = nomeClube.split("-");
-            if (partes.length < 2) return false; // sem hífen, ignora
+        // Separar histórico por categoria usando o campo categoria do banco
+        const historicoAmador = []
+        const historicoProfissional = []
+        const historicoBase = []
 
-            const depoisDoHifen = partes.slice(1).join("-").trim();
-            return /\bU\d+\b/.test(depoisDoHifen);
-        }
+        jogador.historico.forEach((h) => {
+            const categoria = h.categoria || "Profissional" // fallback para registros antigos
 
-
-        // Separar histórico em normal e profissional
-        const historicoNormal = [];
-        const historicoBase = [];
-
-        jogador.historico.forEach(h => {
-            const nomeClube = h.clube?.nome ?? "";
-            if (isBase(nomeClube)) {
-                historicoBase.push(h);
-            } else {
-                historicoNormal.push(h);
+            switch (categoria) {
+                case "Amador":
+                    historicoAmador.push(h)
+                    break
+                case "Base":
+                    historicoBase.push(h)
+                    break
+                case "Profissional":
+                default:
+                    historicoProfissional.push(h)
+                    break
             }
-        });
+        })
 
-        // Função para desenhar o cabeçalho das colunas (sem a coluna Saída)
+        // Função para desenhar o cabeçalho das colunas
         function desenharCabecalho(x, colAno, colClube, colJogos, larguraTotal) {
-            doc.font("Helvetica-Bold").fontSize(10);
-            const y = doc.y;
-
-            doc.text("Ano", x, y, { width: colAno, align: "left" });
-            doc.text("Clube", x + colAno, y, { width: colClube, align: "left" });
-            doc.text("Jogos", x + colAno + colClube, y, { width: colJogos, align: "right" });
-
-            doc.moveTo(x - 15, y + 12)
+            doc.font("Helvetica-Bold").fontSize(10)
+            const y = doc.y
+            doc.text("Ano", x, y, { width: colAno, align: "left" })
+            doc.text("Clube", x + colAno, y, { width: colClube, align: "left" })
+            doc.text("Jogos", x + colAno + colClube, y, { width: colJogos, align: "right" })
+            doc
+                .moveTo(x - 15, y + 12)
                 .lineTo(x + larguraTotal + 15, y + 12)
-                .stroke();
-
-            doc.y = y + 18;
-            doc.font("Helvetica");
+                .stroke()
+            doc.y = y + 18
+            doc.font("Helvetica")
         }
 
         // Função para renderizar o histórico
         function renderHistorico(titulo, historicoArray) {
-            if (historicoArray.length === 0) return;
+            if (historicoArray.length === 0) return
 
-            if (doc.y > 50) doc.moveDown(2);
+            if (doc.y > 50) doc.moveDown(2)
 
-            const margemEsquerda = doc.page.margins.left;
-            const larguraDisponivel = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+            const margemEsquerda = doc.page.margins.left
+            const larguraDisponivel = doc.page.width - doc.page.margins.left - doc.page.margins.right
 
-            doc
-                .font("Helvetica-Bold")
-                .fontSize(13)
-                .text(titulo, margemEsquerda, doc.y, {
-                    width: larguraDisponivel,
-                    align: "center",
-                    underline: true,
-                });
+            doc.font("Helvetica-Bold").fontSize(13).text(titulo, margemEsquerda, doc.y, {
+                width: larguraDisponivel,
+                align: "center",
+                underline: true,
+            })
+            doc.moveDown()
 
-            doc.moveDown();
+            const larguraColunaAno = 50
+            const larguraColunaClube = 250
+            const larguraColunaJogos = 50
+            const totalLargura = larguraColunaAno + larguraColunaClube + larguraColunaJogos
+            const posicaoInicialX = (doc.page.width - totalLargura) / 2
 
-            const larguraColunaAno = 50;
-            const larguraColunaClube = 250;
-            const larguraColunaJogos = 50;
-            const totalLargura = larguraColunaAno + larguraColunaClube + larguraColunaJogos;
-            const posicaoInicialX = (doc.page.width - totalLargura) / 2;
+            desenharCabecalho(posicaoInicialX, larguraColunaAno, larguraColunaClube, larguraColunaJogos, totalLargura)
 
-            desenharCabecalho(posicaoInicialX, larguraColunaAno, larguraColunaClube, larguraColunaJogos, totalLargura);
-
-            // Ordenar por bandeira e por ano DESC
+            // Ordenar por ano DESC
             const historico = [...historicoArray].sort((a, b) => {
-                const dataA = a.data_entrada ?? 0;
-                const dataB = b.data_entrada ?? 0;
-
-                if (dataA !== dataB) return dataB - dataA;
-
-                // Mais recente primeiro (id maior)
-                return (b.id ?? 0) - (a.id ?? 0);
-            });
+                const dataA = a.data_entrada ?? 0
+                const dataB = b.data_entrada ?? 0
+                if (dataA !== dataB) return dataB - dataA
+                return (b.id ?? 0) - (a.id ?? 0)
+            })
 
             // Agrupar por ano
-            const gruposPorAno = {};
-            historico.forEach(h => {
-                const ano = h.data_entrada ? h.data_entrada.toString() : "Sem data";
-                if (!gruposPorAno[ano]) gruposPorAno[ano] = [];
-                gruposPorAno[ano].push(h);
-            });
+            const gruposPorAno = {}
+            historico.forEach((h) => {
+                const ano = h.data_entrada ? h.data_entrada.toString() : "Sem data"
+                if (!gruposPorAno[ano]) gruposPorAno[ano] = []
+                gruposPorAno[ano].push(h)
+            })
 
-            doc.font("Helvetica").fontSize(10);
-
+            doc.font("Helvetica").fontSize(10)
             Object.keys(gruposPorAno)
-                .sort((a, b) => parseInt(b) - parseInt(a)) // anos decrescentes
-                .forEach(ano => {
-                    const lista = gruposPorAno[ano]; // já está na ordem correta
-
+                .sort((a, b) => Number.parseInt(b) - Number.parseInt(a))
+                .forEach((ano) => {
+                    const lista = gruposPorAno[ano]
                     lista.forEach((h, idx) => {
-                        const alturaLinha = 14;
-                        const limiteInferior = doc.page.height - doc.page.margins.bottom;
+                        const alturaLinha = 14
+                        const limiteInferior = doc.page.height - doc.page.margins.bottom
 
                         if (doc.y + alturaLinha > limiteInferior) {
-                            doc.addPage();
-                            desenharCabecalho(posicaoInicialX, larguraColunaAno, larguraColunaClube, larguraColunaJogos, larguraColunaSaida, totalLargura);
+                            doc.addPage()
+                            desenharCabecalho(posicaoInicialX, larguraColunaAno, larguraColunaClube, larguraColunaJogos, totalLargura)
                         }
 
-                        const clube = h.clube?.nome ? formatarNomeClube(h.clube.nome) : "Clube desconhecido";
-                        const jogos = h.jogos ?? 0;
-                        const saida = h.data_saida ? h.data_saida.toString() : "–";
-                        const yAtual = doc.y;
+                        const clube = h.clube?.nome ? formatarNomeClube(h.clube.nome) : "Clube desconhecido"
+                        const jogos = h.jogos ?? 0
+                        const yAtual = doc.y
 
-                        let caminhoBandeira = ASSETS.bandeiraBrasil;
-                        const logoPath = h.clube?.pais?.bandeira?.logo_bandeira;
+                        let caminhoBandeira = ASSETS.bandeiraBrasil
+                        const logoPath = h.clube?.pais?.bandeira?.logo_bandeira
                         if (logoPath) {
-                            const fullPath = path.join(basePath, logoPath);
+                            const fullPath = path.join(basePath, logoPath)
                             if (fs.existsSync(fullPath)) {
-                                caminhoBandeira = fullPath;
+                                caminhoBandeira = fullPath
                             }
                         }
 
                         safeImage(doc, caminhoBandeira, posicaoInicialX + larguraColunaAno - 15, yAtual, {
                             width: 12,
                             height: 8,
-                        });
+                        })
 
-                        const textoAno = idx === 0 ? ano : "";
-
+                        const textoAno = idx === 0 ? ano : ""
                         doc.text(textoAno, posicaoInicialX, yAtual, {
                             width: larguraColunaAno,
-                            align: "left"
-                        });
+                            align: "left",
+                        })
+
                         doc.text(clube, posicaoInicialX + larguraColunaAno, yAtual, {
                             width: larguraColunaClube,
-                            align: "left"
-                        });
+                            align: "left",
+                        })
+
                         doc.text(jogos.toString(), posicaoInicialX + larguraColunaAno + larguraColunaClube, yAtual, {
                             width: larguraColunaJogos,
-                            align: "right"
-                        });
-                    });
-                    doc.moveDown(0.3);
-                });
+                            align: "right",
+                        })
+                    })
+                    doc.moveDown(0.3)
+                })
         }
 
-        // Chamar para histórico normal
-        if (historicoNormal.length > 0) {
-            renderHistorico("Histórico de clubes (PROFISSIONAL):", historicoNormal);
+        // Renderizar cada categoria de histórico
+        if (historicoProfissional.length > 0) {
+            renderHistorico("Histórico de clubes (PROFISSIONAL):", historicoProfissional)
         }
 
-        // Chamar para histórico profissionais
         if (historicoBase.length > 0) {
-            renderHistorico("Histórico de clubes (BASE):", historicoBase);
+            renderHistorico("Histórico de clubes (BASE):", historicoBase)
         }
 
-        // Caso não haja nenhum histórico em ambos
-        if (historicoNormal.length === 0 && historicoBase.length === 0) {
-            const larguraColunaAno = 50;
-            const larguraColunaClube = 250;
-            const larguraColunaJogos = 50;
-            const totalLargura = larguraColunaAno + larguraColunaClube + larguraColunaJogos;
-            const posicaoInicialX = (doc.page.width - totalLargura) / 2;
-
-            doc.text("Sem histórico informado", posicaoInicialX, doc.y);
+        if (historicoAmador.length > 0) {
+            renderHistorico("Histórico de clubes (AMADOR):", historicoAmador)
         }
 
-        doc.moveDown(2);
+        // Caso não haja nenhum histórico
+        if (historicoProfissional.length === 0 && historicoBase.length === 0 && historicoAmador.length === 0) {
+            const larguraColunaAno = 50
+            const larguraColunaClube = 250
+            const larguraColunaJogos = 50
+            const totalLargura = larguraColunaAno + larguraColunaClube + larguraColunaJogos
+            const posicaoInicialX = (doc.page.width - totalLargura) / 2
+            doc.text("Sem histórico informado", posicaoInicialX, doc.y)
+        }
+
+        doc.moveDown(2)
 
         // voltar ao estilo padrão
         doc.font("Helvetica").fontSize(10);

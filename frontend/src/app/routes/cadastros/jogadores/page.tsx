@@ -181,9 +181,9 @@ export default function CadastroJogadores() {
     async function submitForm() {
 
         if (
-            !nome.trim() || !peDominante || !nivelAmbidestriaId || !posicaoId || !clubeId
+            !nome.trim() || !peDominante || !nivelAmbidestriaId || !posicaoId
         ) {
-            setErro("⚠️ OS campos (nome, pé dominante, nivel de ambidestria, posição e clube) são obrigatórios.");
+            setErro("⚠️ OS campos (nome, pé dominante, nivel de ambidestria e posição) são obrigatórios.");
             setTimeout(() => setErro(""), 3000);
             return;
         }

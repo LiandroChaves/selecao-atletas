@@ -1,9 +1,9 @@
 // File: backend/src/controllers/clubesController.js
 
-import Clubes from "../database/models/Clubes.js";
-import Paises from "../database/models/Pais.js";
-import { Op } from "sequelize";
-import LogosClubes from "../database/models/LogoClubes.js";
+import Clubes from "../database/models/Clubes.js"
+import Paises from "../database/models/Pais.js"
+import { Op } from "sequelize"
+import LogosClubes from "../database/models/LogoClubes.js"
 
 export const inserirClube = async (req, res) => {
     try {
@@ -40,7 +40,6 @@ export const inserirClube = async (req, res) => {
     }
 };
 
-
 export const pegarClubes = async (_req, res) => {
     try {
         const { search } = _req.query;
@@ -48,18 +47,24 @@ export const pegarClubes = async (_req, res) => {
 
         if (search) {
             where = {
-                nome: {
-                    [Op.iLike]: `%${search}%`, // busca insensível a maiúsculas/minúsculas
-                },
+                nome: { [Op.iLike]: `%${search}%` },
             };
         }
 
         const clubes = await Clubes.findAll({
-            include: {
-                model: Paises,
-                as: "pais",
-                attributes: ["nome"],
-            },
+            include: [
+                {
+                    model: Paises,
+                    as: "pais",
+                    attributes: ["id", "nome"],
+                },
+                {
+                    model: LogosClubes,
+                    as: "logo",
+                    attributes: ["id", "url_logo"], // pegando id tbm pra edição/filtro
+                    required: false,
+                },
+            ],
             where,
             order: [["id", "ASC"]],
         });
@@ -74,15 +79,42 @@ export const pegarClubes = async (_req, res) => {
 export const pegarClube = async (req, res) => {
     try {
         const { id } = req.params;
+
         const clube = await Clubes.findByPk(id, {
-            attributes: ["id", "nome"]
+            include: [
+                {
+                    model: Paises,
+                    as: "pais",
+                    attributes: ["id", "nome"],
+                },
+                {
+                    model: LogosClubes,
+                    as: "logo",
+                    attributes: ["id", "url_logo"],
+                    required: false,
+                },
+            ],
         });
 
         if (!clube) {
             return res.status(404).json({ error: "Clube não encontrado" });
         }
 
-        res.json(clube);
+        const response = {
+            id: clube.id,
+            nome: clube.nome,
+            pais_id: clube.pais_id,
+            fundacao: clube.fundacao,
+            estadio: clube.estadio,
+            inicio_contrato: clube.inicio_contrato,
+            fim_contrato: clube.fim_contrato,
+            created_at: clube.created_at,
+            updated_at: clube.updated_at,
+            pais: clube.pais,
+            logo: clube.logo,
+        };
+
+        res.json(response);
     } catch (error) {
         console.error("Erro ao buscar clube:", error);
         res.status(500).json({ error: "Erro ao buscar clube", details: error.message });
@@ -148,15 +180,23 @@ export const pegarClubeAtualPorId = async (req, res) => {
         }
 
         const clube = await Clubes.findByPk(id, {
-            include: {
-                model: Paises,
-                as: "pais",
-                attributes: ["nome"],
-            },
+            include: [
+                {
+                    model: Paises,
+                    as: "pais",
+                    attributes: ["nome"],
+                },
+                {
+                    model: LogosClubes,
+                    as: "logo",
+                    attributes: ["id", "url_logo"],
+                    required: false,
+                },
+            ],
         });
 
         if (!clube) {
-            return res.status(200).json({ error: "Clube não encontrado" });
+            return res.status(404).json({ error: "Clube não encontrado" });
         }
 
         res.status(200).json(clube);
@@ -164,7 +204,7 @@ export const pegarClubeAtualPorId = async (req, res) => {
         console.error("Erro ao buscar clube:", error);
         res.status(500).json({ error: "Erro interno ao buscar clube." });
     }
-}
+};
 
 export const pegarClubesComLogo = async (_req, res) => {
     try {
@@ -173,8 +213,8 @@ export const pegarClubesComLogo = async (_req, res) => {
                 {
                     model: LogosClubes,
                     as: "logo",
-                    required: true, // isso faz INNER JOIN: só clubes com logo
                     attributes: ["url_logo"],
+                    required: true, // só clubes que têm logo
                 },
                 {
                     model: Paises,
