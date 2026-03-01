@@ -394,5 +394,3 @@ SELECT
 FROM clubes c
 LEFT JOIN logos_clubes lc ON c.id = lc.clube_id
 WHERE lc.id IS NULL;
-
-

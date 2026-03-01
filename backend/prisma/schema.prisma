@@ -1,0 +1,281 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TipoTitulo {
+  Nacional
+  Internacional
+  Individual
+}
+
+enum PeDominante {
+  D
+  E
+  A
+}
+
+model Usuario {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  senha      String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("usuarios")
+}
+
+model Bandeira {
+  id            Int    @id @default(autoincrement())
+  nome          String
+  logo_bandeira String
+  paises        Pais[]
+
+  @@map("bandeiras")
+}
+
+model Pais {
+  id          Int       @id @default(autoincrement())
+  nome        String
+  bandeira_id Int?
+  bandeira    Bandeira? @relation(fields: [bandeira_id], references: [id])
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  estados   Estado[]
+  cidades   Cidade[]
+  clubes    Clube[]
+  jogadores Jogador[]
+
+  @@map("paises")
+}
+
+model Estado {
+  id         Int       @id @default(autoincrement())
+  nome       String
+  uf         String    @db.Char(2)
+  pais_id    Int
+  pais       Pais      @relation(fields: [pais_id], references: [id])
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  cidades    Cidade[]
+  jogadores  Jogador[]
+
+  @@map("estados")
+}
+
+model Cidade {
+  id         Int       @id @default(autoincrement())
+  nome       String
+  pais_id    Int?
+  estado_id  Int?
+  pais       Pais?     @relation(fields: [pais_id], references: [id])
+  estado     Estado?   @relation(fields: [estado_id], references: [id])
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  jogadores  Jogador[]
+
+  @@map("cidades")
+}
+
+model NivelAmbidestria {
+  id        Int       @id @default(autoincrement())
+  descricao String
+  jogadores Jogador[]
+
+  @@map("niveis_ambidestria")
+}
+
+model Posicao {
+  id                    Int       @id @default(autoincrement())
+  nome                  String
+  jogadores_principais  Jogador[] @relation("PosicaoPrincipal")
+  jogadores_secundarios Jogador[] @relation("PosicaoSecundaria")
+
+  @@map("posicoes")
+}
+
+model Clube {
+  id              Int              @id @default(autoincrement())
+  nome            String
+  pais_id         Int
+  pais            Pais             @relation(fields: [pais_id], references: [id])
+  fundacao        Int?
+  estadio         String?
+  inicio_contrato DateTime?
+  fim_contrato    DateTime?
+  created_at      DateTime         @default(now())
+  updated_at      DateTime         @updatedAt
+  logos           LogoClube[]
+  jogadores       Jogador[]
+  partidas_casa   Partida[]        @relation("ClubeCasa")
+  partidas_fora   Partida[]        @relation("ClubeFora")
+  historico       HistoricoClube[]
+  titulos         JogadorTitulo[]
+
+  @@map("clubes")
+}
+
+model LogoClube {
+  id         Int      @id @default(autoincrement())
+  clube_id   Int
+  clube      Clube    @relation(fields: [clube_id], references: [id], onDelete: Cascade)
+  url_logo   String   @unique
+  created_at DateTime @default(now())
+
+  @@map("logos_clubes")
+}
+
+model Jogador {
+  id                    Int         @id @default(autoincrement())
+  nome                  String
+  nome_curto            String?
+  apelido               String?
+  data_nascimento       DateTime?
+  pais_id               Int?
+  estado_id             Int?
+  cidade_id             Int?
+  altura                Decimal?    @db.Decimal(4, 2)
+  peso                  Decimal?    @db.Decimal(5, 2)
+  pe_dominante          PeDominante
+  nivel_ambidestria_id  Int
+  posicao_id            Int
+  posicao_secundaria_id Int?
+  clube_atual_id        Int?
+  foto                  String?
+  video                 String?
+  observacoes           String?
+  created_at            DateTime    @default(now())
+  updated_at            DateTime    @updatedAt
+
+  pais               Pais?            @relation(fields: [pais_id], references: [id])
+  estado             Estado?          @relation(fields: [estado_id], references: [id])
+  cidade             Cidade?          @relation(fields: [cidade_id], references: [id])
+  nivel_ambidestria  NivelAmbidestria @relation(fields: [nivel_ambidestria_id], references: [id])
+  posicao_principal  Posicao          @relation("PosicaoPrincipal", fields: [posicao_id], references: [id])
+  posicao_secundaria Posicao?         @relation("PosicaoSecundaria", fields: [posicao_secundaria_id], references: [id])
+  clube_atual        Clube?           @relation(fields: [clube_atual_id], references: [id], onDelete: SetNull)
+
+  caracteristicas      Caracteristica[]
+  estatisticas_gerais  EstatisticaGeral?
+  estatisticas_partida EstatisticaPartida[]
+  historico_clubes     HistoricoClube[]
+  lesoes               HistoricoLesao[]
+  titulos              JogadorTitulo[]
+
+  @@map("jogadores")
+}
+
+model Caracteristica {
+  id         Int     @id @default(autoincrement())
+  jogador_id Int
+  jogador    Jogador @relation(fields: [jogador_id], references: [id], onDelete: Cascade)
+  descricao  String
+
+  @@map("caracteristicas")
+}
+
+model EstatisticaGeral {
+  jogador_id        Int     @id
+  jogador           Jogador @relation(fields: [jogador_id], references: [id], onDelete: Cascade)
+  partidas_jogadas  Int     @default(0)
+  gols              Int     @default(0)
+  assistencias      Int     @default(0)
+  titulos           Int     @default(0)
+  faltas_cometidas  Int     @default(0)
+  cartoes_amarelos  Int     @default(0)
+  cartoes_vermelhos Int     @default(0)
+
+  @@map("estatisticas_gerais")
+}
+
+model Partida {
+  id            Int                  @id @default(autoincrement())
+  data          DateTime
+  campeonato    String?
+  estadio       String?
+  clube_casa_id Int
+  clube_fora_id Int
+  gols_casa     Int                  @default(0)
+  gols_fora     Int                  @default(0)
+  clube_casa    Clube                @relation("ClubeCasa", fields: [clube_casa_id], references: [id], onDelete: Cascade)
+  clube_fora    Clube                @relation("ClubeFora", fields: [clube_fora_id], references: [id], onDelete: Cascade)
+  estatisticas  EstatisticaPartida[]
+
+  @@map("partidas")
+}
+
+model EstatisticaPartida {
+  id                Int     @id @default(autoincrement())
+  jogador_id        Int
+  partida_id        Int
+  minutos_jogados   Int     @default(0)
+  gols              Int     @default(0)
+  assistencias      Int     @default(0)
+  passes_totais     Int     @default(0)
+  passes_certos     Int     @default(0)
+  passes_errados    Int     @default(0)
+  finalizacoes      Int     @default(0)
+  finalizacoes_alvo Int     @default(0)
+  desarmes          Int     @default(0)
+  faltas_cometidas  Int     @default(0)
+  cartoes_amarelos  Int     @default(0)
+  cartoes_vermelhos Int     @default(0)
+  jogador           Jogador @relation(fields: [jogador_id], references: [id], onDelete: Cascade)
+  partida           Partida @relation(fields: [partida_id], references: [id], onDelete: Cascade)
+
+  @@map("estatisticas_partidas")
+}
+
+model HistoricoClube {
+  id           Int     @id @default(autoincrement())
+  jogador_id   Int
+  clube_id     Int
+  data_entrada Int
+  data_saida   Int?
+  jogos        Int     @default(0)
+  categoria    String  @default("Profissional")
+  jogador      Jogador @relation(fields: [jogador_id], references: [id], onDelete: Cascade)
+  clube        Clube   @relation(fields: [clube_id], references: [id], onDelete: Cascade)
+
+  @@map("historico_clubes")
+}
+
+model HistoricoLesao {
+  id           Int       @id @default(autoincrement())
+  jogador_id   Int
+  tipo_lesao   String
+  data_inicio  DateTime
+  data_retorno DateTime?
+  descricao    String?
+  jogador      Jogador   @relation(fields: [jogador_id], references: [id], onDelete: Cascade)
+
+  @@map("historico_lesoes")
+}
+
+model Titulo {
+  id        Int             @id @default(autoincrement())
+  nome      String
+  tipo      TipoTitulo
+  jogadores JogadorTitulo[]
+
+  @@map("titulos")
+}
+
+model JogadorTitulo {
+  id         Int     @id @default(autoincrement())
+  jogador_id Int
+  titulo_id  Int
+  ano        Int
+  clube_id   Int
+  jogador    Jogador @relation(fields: [jogador_id], references: [id], onDelete: Cascade)
+  titulo     Titulo  @relation(fields: [titulo_id], references: [id])
+  clube      Clube   @relation(fields: [clube_id], references: [id], onDelete: Cascade)
+
+  @@unique([jogador_id, titulo_id])
+  @@map("jogadores_titulos")
+}

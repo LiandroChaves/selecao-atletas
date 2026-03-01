@@ -1,0 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 120 10% 97%;
+    --foreground: 160 30% 8%;
+    --card: 0 0% 100%;
+    --card-foreground: 160 30% 8%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 160 30% 8%;
+    --primary: 142 72% 29%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 120 8% 93%;
+    --secondary-foreground: 160 20% 20%;
+    --muted: 120 8% 93%;
+    --muted-foreground: 160 8% 45%;
+    --accent: 43 96% 56%;
+    --accent-foreground: 30 60% 15%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 120 10% 88%;
+    --input: 120 10% 88%;
+    --ring: 142 72% 29%;
+    --radius: 0.625rem;
+    --sidebar: 158 62% 7%;
+    --sidebar-foreground: 120 15% 88%;
+    --sidebar-accent: 158 50% 13%;
+    --sidebar-accent-foreground: 120 15% 95%;
+    --sidebar-border: 158 40% 13%;
+    --chart-1: 142 72% 36%;
+    --chart-2: 199 89% 48%;
+    --chart-3: 43 96% 56%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 12 76% 61%;
+  }
+
+  .dark {
+    --background: 158 25% 5%;
+    --foreground: 120 15% 93%;
+    --card: 158 22% 8%;
+    --card-foreground: 120 15% 93%;
+    --popover: 158 22% 8%;
+    --popover-foreground: 120 15% 93%;
+    --primary: 142 65% 40%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 158 18% 13%;
+    --secondary-foreground: 120 15% 88%;
+    --muted: 158 18% 13%;
+    --muted-foreground: 158 10% 55%;
+    --accent: 43 92% 52%;
+    --accent-foreground: 30 60% 10%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 158 18% 15%;
+    --input: 158 18% 15%;
+    --ring: 142 65% 40%;
+    --sidebar: 158 35% 4%;
+    --sidebar-foreground: 120 15% 88%;
+    --sidebar-accent: 158 30% 10%;
+    --sidebar-accent-foreground: 120 15% 95%;
+    --sidebar-border: 158 25% 12%;
+    --chart-1: 142 65% 45%;
+    --chart-2: 199 89% 55%;
+    --chart-3: 43 96% 60%;
+    --chart-4: 280 65% 65%;
+    --chart-5: 12 76% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Outfit', sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+
+  /* Football accent stripe */
+  .football-stripe {
+    background: linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+  }
+}

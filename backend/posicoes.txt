@@ -1,0 +1,22 @@
+goleiro
+zagueiro central
+zagueiro esquerdo
+zagueiro direito
+zagueiro esquerdo e direito
+lateral esquerdo
+lateral direito
+lateral esquerdo e direito
+primeiro volante
+segundo volante
+atacante esquerdo
+atacante direito
+atacante esquerdo e direito
+meia central
+meia esquerdo
+meia direito
+meia esquerdo e direito
+falso nove
+centro avante
+ponta esquerda
+ponta direita
+ponta direita e esquerda
