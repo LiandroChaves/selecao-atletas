@@ -29,16 +29,6 @@ const newPosicoes = [
 async function main() {
     console.log('🚀 Iniciando migração de posições...');
 
-    // 1. Mapear jogadores atuais e suas posições (pelo nome)
-    const jogadoresAtuais = await prisma.jogador.findMany({
-        include: { posicao_principal: true }
-    });
-
-    console.log(`📊 Encontrados ${jogadoresAtuais.length} jogadores para remapear.`);
-
-    // 2. Desabilitar FKs temporariamente (PostgreSQL)
-    await prisma.$executeRawUnsafe('SET session_replication_role = \'replica\';');
-
     try {
         // 3. Limpar tabela de posições
         await prisma.posicao.deleteMany();
@@ -52,41 +42,12 @@ async function main() {
         }
         console.log('✅ Novas posições inseridas (1-22).');
 
-        // 5. Atualizar jogadores
-        for (const jogador of jogadoresAtuais) {
-            const nomeAntigo = jogador.posicao_principal.nome.toLowerCase();
-
-            // Tenta encontrar o novo ID pelo nome (mesmo que parcial/aproximado)
-            const novaPosicao = newPosicoes.find(p => p.nome.toLowerCase() === nomeAntigo)
-                || newPosicoes.find(p => p.nome.toLowerCase().includes(nomeAntigo))
-                || newPosicoes.find(p => nomeAntigo.includes(p.nome.toLowerCase()));
-
-            if (novaPosicao) {
-                await prisma.jogador.update({
-                    where: { id: jogador.id },
-                    data: { posicao_id: novaPosicao.id }
-                });
-                console.log(`👤 Jogador ${jogador.nome}: ${nomeAntigo} -> ${novaPosicao.nome} (ID ${novaPosicao.id})`);
-            } else {
-                // Fallback: Goleiro se não encontrar nada (ID 1)
-                await prisma.jogador.update({
-                    where: { id: jogador.id },
-                    data: { posicao_id: 1 }
-                });
-                console.warn(`⚠️ Jogador ${jogador.nome}: Não foi possível mapear "${nomeAntigo}". Definido como Goleiro.`);
-            }
-        }
-
         // 6. Resetar sequence da tabela (PostgreSQL)
         await prisma.$executeRawUnsafe('SELECT setval(\'posicoes_id_seq\', 22);');
         console.log('🔄 Sequence de IDs resetada para 22.');
 
     } catch (error) {
         console.error('❌ Erro durante a migração:', error);
-    } finally {
-        // 7. Reativar FKs
-        await prisma.$executeRawUnsafe('SET session_replication_role = \'origin\';');
-        console.log('🔗 Constraints de FK reativadas.');
     }
 
     console.log('🏁 Migração concluída!');

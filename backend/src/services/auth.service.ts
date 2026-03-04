@@ -24,7 +24,7 @@ export class AuthService {
         const token = jwt.sign(
             { id: usuario.id, email: usuario.email },
             secret,
-            { expiresIn: '1d' }
+            { expiresIn: '2h' }
         );
 
         return {
