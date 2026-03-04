@@ -47,9 +47,9 @@ export default function NovoJogadorPage() {
     setLoading(true);
     try {
       const fd = new FormData(e.currentTarget);
-      fd.set("nome", nome.trim());
-      fd.set("nome_curto", nomeCurto.trim());
-      fd.set("apelido", apelido.trim());
+      fd.set("nome", capitalizeName(nome.trim()));
+      fd.set("nome_curto", capitalizeName(nomeCurto.trim()));
+      fd.set("apelido", capitalizeName(apelido.trim()));
       if (foto) fd.set("foto", foto);
 
       await apiFetch("/jogadores", { method: "POST", body: fd });

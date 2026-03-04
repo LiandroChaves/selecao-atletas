@@ -77,12 +77,13 @@ function PosicoesTab() {
 
   async function handleEditSubmit(e: React.FormEvent, id: number) {
     e.preventDefault();
-    if (!editNome.trim()) return;
+    const formattedNome = capitalizeName(editNome.trim());
+    if (!formattedNome) return;
     setSavingEdit(true);
     try {
       await apiFetch(`/configuracoes/posicoes/${id}`, {
         method: "PUT",
-        body: JSON.stringify({ nome: editNome }),
+        body: JSON.stringify({ nome: formattedNome }),
       });
       setEditId(null);
       mutate();
@@ -91,12 +92,13 @@ function PosicoesTab() {
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    if (!nome.trim()) return;
+    const formattedNome = capitalizeName(nome.trim());
+    if (!formattedNome) return;
     setLoading(true);
     try {
       await apiFetch("/configuracoes/posicoes", {
         method: "POST",
-        body: JSON.stringify({ nome }),
+        body: JSON.stringify({ nome: formattedNome }),
       });
       setNome("");
       mutate();
@@ -112,7 +114,8 @@ function PosicoesTab() {
       <form onSubmit={handleCreate} className="mb-8 flex gap-3">
         <input
           value={nome}
-          onChange={(e) => setNome(simpleCapitalize(e.target.value))}
+          onChange={(e) => setNome(e.target.value)}
+          onBlur={(e) => setNome(capitalizeName(e.target.value))}
           placeholder="Ex: Meio-Campo"
           className="h-12 flex-1 rounded-xl border border-input bg-background px-4 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
         />
@@ -132,7 +135,8 @@ function PosicoesTab() {
               <form onSubmit={(e) => handleEditSubmit(e, p.id)} className="flex w-full gap-2">
                 <input
                   value={editNome}
-                  onChange={(e) => setEditNome(simpleCapitalize(e.target.value))}
+                  onChange={(e) => setEditNome(e.target.value)}
+                  onBlur={(e) => setEditNome(capitalizeName(e.target.value))}
                   className="h-9 flex-1 rounded-lg border border-input bg-background px-3 text-sm focus:ring-1 focus:ring-ring"
                   autoFocus
                 />
@@ -186,12 +190,13 @@ function AmbiDestriaTab() {
 
   async function handleEditSubmit(e: React.FormEvent, id: number) {
     e.preventDefault();
-    if (!editDescricao.trim()) return;
+    const formattedDesc = capitalizeName(editDescricao.trim());
+    if (!formattedDesc) return;
     setSavingEdit(true);
     try {
       await apiFetch(`/configuracoes/ambidestria/${id}`, {
         method: "PUT",
-        body: JSON.stringify({ descricao: editDescricao }),
+        body: JSON.stringify({ descricao: formattedDesc }),
       });
       setEditId(null);
       mutate();
@@ -200,12 +205,13 @@ function AmbiDestriaTab() {
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    if (!descricao.trim()) return;
+    const formattedDesc = capitalizeName(descricao.trim());
+    if (!formattedDesc) return;
     setLoading(true);
     try {
       await apiFetch("/configuracoes/ambidestria", {
         method: "POST",
-        body: JSON.stringify({ descricao }),
+        body: JSON.stringify({ descricao: formattedDesc }),
       });
       setDescricao("");
       mutate();
@@ -221,7 +227,8 @@ function AmbiDestriaTab() {
       <form onSubmit={handleCreate} className="mb-8 flex gap-3">
         <input
           value={descricao}
-          onChange={(e) => setDescricao(simpleCapitalize(e.target.value))}
+          onChange={(e) => setDescricao(e.target.value)}
+          onBlur={(e) => setDescricao(capitalizeName(e.target.value))}
           placeholder="Ex: Destro"
           className="h-12 flex-1 rounded-xl border border-input bg-background px-4 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
         />
@@ -241,7 +248,8 @@ function AmbiDestriaTab() {
               <form onSubmit={(e) => handleEditSubmit(e, n.id)} className="flex w-full gap-2">
                 <input
                   value={editDescricao}
-                  onChange={(e) => setEditDescricao(simpleCapitalize(e.target.value))}
+                  onChange={(e) => setEditDescricao(e.target.value)}
+                  onBlur={(e) => setEditDescricao(capitalizeName(e.target.value))}
                   className="h-9 flex-1 rounded-lg border border-input bg-background px-3 text-sm focus:ring-1 focus:ring-ring"
                   autoFocus
                 />
@@ -297,11 +305,12 @@ function PaisesTab() {
 
   async function handleEditSubmit(e: React.FormEvent, id: number) {
     e.preventDefault();
-    if (!editNome.trim()) return;
+    const formattedNome = capitalizeName(editNome.trim());
+    if (!formattedNome) return;
     setSavingEdit(true);
     try {
       const fd = new FormData();
-      fd.append("nome", editNome);
+      fd.append("nome", formattedNome);
       if (editFile) fd.append("bandeira_file", editFile);
       await apiFetch(`/localidades/paises/${id}`, { method: "PUT", body: fd });
       setEditId(null); setEditFile(null); mutate();
@@ -310,11 +319,12 @@ function PaisesTab() {
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    if (!nome.trim()) return;
+    const formattedNome = capitalizeName(nome.trim());
+    if (!formattedNome) return;
     setLoading(true);
     try {
       const fd = new FormData();
-      fd.append("nome", nome);
+      fd.append("nome", formattedNome);
       if (createFile) fd.append("bandeira_file", createFile);
       await apiFetch("/localidades/paises", { method: "POST", body: fd });
       setNome(""); setCreateFile(null); mutate();
@@ -423,20 +433,22 @@ function EstadosTab() {
 
   async function handleEditSubmit(e: React.FormEvent, id: number) {
     e.preventDefault();
-    if (!editNome.trim() || !editUf.trim() || !editPaisId) return;
+    const formattedNome = capitalizeName(editNome.trim());
+    if (!formattedNome || !editUf.trim() || !editPaisId) return;
     setSavingEdit(true);
     try {
-      await apiFetch(`/localidades/estados/${id}`, { method: "PUT", body: JSON.stringify({ nome: editNome, uf: editUf.toUpperCase(), pais_id: Number(editPaisId) }) });
+      await apiFetch(`/localidades/estados/${id}`, { method: "PUT", body: JSON.stringify({ nome: formattedNome, uf: editUf.toUpperCase(), pais_id: Number(editPaisId) }) });
       setEditId(null); mutate();
     } catch { } finally { setSavingEdit(false); }
   }
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    if (!nome.trim() || !uf.trim() || !paisId) return;
+    const formattedNome = capitalizeName(nome.trim());
+    if (!formattedNome || !uf.trim() || !paisId) return;
     setLoading(true);
     try {
-      await apiFetch("/localidades/estados", { method: "POST", body: JSON.stringify({ nome, uf: uf.toUpperCase(), pais_id: Number(paisId) }) });
+      await apiFetch("/localidades/estados", { method: "POST", body: JSON.stringify({ nome: formattedNome, uf: uf.toUpperCase(), pais_id: Number(paisId) }) });
       setNome(""); setUf(""); setPaisId(""); mutate();
     } catch { } finally { setLoading(false); }
   }
@@ -539,20 +551,22 @@ function CidadesTab() {
 
   async function handleEditSubmit(e: React.FormEvent, id: number) {
     e.preventDefault();
-    if (!editNome.trim() || (!editEstadoId && !editPaisId)) return;
+    const formattedNome = capitalizeName(editNome.trim());
+    if (!formattedNome || (!editEstadoId && !editPaisId)) return;
     setSavingEdit(true);
     try {
-      await apiFetch(`/localidades/cidades/${id}`, { method: "PUT", body: JSON.stringify({ nome: editNome, estado_id: editEstadoId ? Number(editEstadoId) : undefined, pais_id: editPaisId ? Number(editPaisId) : undefined }) });
+      await apiFetch(`/localidades/cidades/${id}`, { method: "PUT", body: JSON.stringify({ nome: formattedNome, estado_id: editEstadoId ? Number(editEstadoId) : undefined, pais_id: editPaisId ? Number(editPaisId) : undefined }) });
       setEditId(null); mutate();
     } catch { } finally { setSavingEdit(false); }
   }
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    if (!nome.trim() || (!estadoId && !paisId)) return;
+    const formattedNome = capitalizeName(nome.trim());
+    if (!formattedNome || (!estadoId && !paisId)) return;
     setLoading(true);
     try {
-      await apiFetch("/localidades/cidades", { method: "POST", body: JSON.stringify({ nome, estado_id: estadoId ? Number(estadoId) : undefined, pais_id: paisId ? Number(paisId) : undefined }) });
+      await apiFetch("/localidades/cidades", { method: "POST", body: JSON.stringify({ nome: formattedNome, estado_id: estadoId ? Number(estadoId) : undefined, pais_id: paisId ? Number(paisId) : undefined }) });
       setNome(""); mutate();
     } catch { } finally { setLoading(false); }
   }

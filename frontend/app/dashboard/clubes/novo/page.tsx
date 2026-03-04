@@ -38,8 +38,10 @@ export default function NovoClubeForm() {
     setLoading(true);
     try {
       const fd = new FormData(e.currentTarget);
-      fd.set("nome", nome.trim());
-      fd.set("estadio", estadio.trim());
+      const formattedNome = capitalizeName(nome.trim());
+      const formattedEstadio = capitalizeName(estadio.trim());
+      fd.set("nome", formattedNome);
+      fd.set("estadio", formattedEstadio);
       fd.set("fundacao", fundacao);
       if (logo) fd.set("logo", logo);
 
@@ -78,7 +80,7 @@ export default function NovoClubeForm() {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <div className="flex flex-col gap-2 sm:col-span-2">
             <label className={labelClass}>Nome do Clube *</label>
-            <input name="nome" required value={nome} onChange={(e) => setNome(capitalizeName(e.target.value))} className={inputClass} />
+            <input name="nome" required value={nome} onChange={(e) => setNome(e.target.value)} onBlur={(e) => setNome(capitalizeName(e.target.value))} className={inputClass} />
           </div>
 
           <div className="flex flex-col gap-2">
@@ -106,7 +108,7 @@ export default function NovoClubeForm() {
 
           <div className="flex flex-col gap-2 sm:col-span-2">
             <label className={labelClass}>Estádio / Arena</label>
-            <input name="estadio" value={estadio} onChange={(e) => setEstadio(capitalizeName(e.target.value))} className={inputClass} />
+            <input name="estadio" value={estadio} onChange={(e) => setEstadio(e.target.value)} onBlur={(e) => setEstadio(capitalizeName(e.target.value))} className={inputClass} />
           </div>
         </div>
 

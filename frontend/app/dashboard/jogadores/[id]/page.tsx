@@ -5,7 +5,7 @@ import useSWR from "swr";
 import { apiFetch, fetcher } from "@/lib/api";
 import { generatePlayerPDF } from "@/lib/pdf";
 import type { Jogador, Clube } from "@/types";
-import { calcAge, formatDate, API_URL, parseCharacteristic, formatCharacteristic, simpleCapitalize } from "@/lib/utils";
+import { calcAge, formatDate, API_URL, parseCharacteristic, formatCharacteristic, simpleCapitalize, capitalizeName } from "@/lib/utils";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -112,7 +112,7 @@ export default function JogadorPerfilPage({ params }: { params: Promise<{ id: st
         <div className="rounded-[2rem] border border-destructive/20 bg-destructive/10 p-12 text-destructive shadow-xl">
           <AlertTriangle className="mx-auto mb-6 h-16 w-16 opacity-80" />
           <h2 className="text-3xl font-black uppercase tracking-tighter mb-4">Erro ao carregar atleta</h2>
-          <p className="opacity-80 font-medium">Não foi possível carregar os dados deste jogador. Verifique sua conexão ou se o atleta foi excluído recém.</p>
+          <p className="opacity-80 font-medium">Não foi possível carregar os dados deste jogador. Verifique sua conexão ou se o atleta foi excluído recentemente.</p>
         </div>
       </div>
     );
@@ -296,10 +296,10 @@ export default function JogadorPerfilPage({ params }: { params: Promise<{ id: st
           {showAddCaracteristica && (
             <div className="mb-12 p-10 bg-muted/40 rounded-[2.5rem] border border-border flex flex-col gap-6 animate-in slide-in-from-top-4 duration-500 shadow-xl">
               <div className="flex gap-5">
-                <input value={formCaracteristica.descricao} onChange={(e) => setFormCaracteristica({ ...formCaracteristica, descricao: simpleCapitalize(e.target.value) })} placeholder="Atributo" className={`${inputClass} flex-1`} />
+                <input value={formCaracteristica.descricao} onChange={(e) => setFormCaracteristica({ ...formCaracteristica, descricao: e.target.value })} onBlur={(e) => setFormCaracteristica({ ...formCaracteristica, descricao: capitalizeName(e.target.value) })} placeholder="Atributo" className={`${inputClass} flex-1`} />
                 <input type="number" min="1" max="10" value={formCaracteristica.nota} onChange={(e) => setFormCaracteristica({ ...formCaracteristica, nota: Number(e.target.value) || 0 })} className={`${inputClass} w-32 text-center font-black text-3xl`} />
               </div>
-              <button onClick={() => handleAction('caracteristica', 'POST', undefined, { jogador_id: Number(id), descricao: formatCharacteristic(formCaracteristica.descricao, formCaracteristica.nota) })} disabled={!formCaracteristica.descricao || loadingAction} className="h-16 w-full rounded-2xl bg-primary text-primary-foreground font-black uppercase text-sm shadow-2xl shadow-primary/20">Confirmar Atributo</button>
+              <button onClick={() => handleAction('caracteristica', 'POST', undefined, { jogador_id: Number(id), descricao: formatCharacteristic(capitalizeName(formCaracteristica.descricao), formCaracteristica.nota) })} disabled={!formCaracteristica.descricao || loadingAction} className="h-16 w-full rounded-2xl bg-primary text-primary-foreground font-black uppercase text-sm shadow-2xl shadow-primary/20">Confirmar Atributo</button>
             </div>
           )}
           {radarData.length > 0 && (

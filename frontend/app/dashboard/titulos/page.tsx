@@ -38,10 +38,12 @@ export default function TitulosPage() {
     setError("");
     try {
       const fd = new FormData(e.currentTarget);
+      const formattedNome = capitalizeName(nome.trim());
+      if (!formattedNome) return;
       await apiFetch("/titulos", {
         method: "POST",
         body: JSON.stringify({
-          nome: nome.trim(),
+          nome: formattedNome,
           tipo: fd.get("tipo"),
         }),
       });
@@ -64,10 +66,12 @@ export default function TitulosPage() {
     setError("");
     try {
       const fd = new FormData(e.currentTarget);
+      const formattedNome = capitalizeName(nome.trim());
+      if (!formattedNome) return;
       await apiFetch(`/titulos/${editingTitulo.id}`, {
         method: "PUT",
         body: JSON.stringify({
-          nome: nome.trim(),
+          nome: formattedNome,
           tipo: fd.get("tipo"),
         }),
       });
@@ -178,7 +182,8 @@ export default function TitulosPage() {
                 name="nome"
                 required
                 value={nome}
-                onChange={(e) => setNome(capitalizeName(e.target.value))}
+                onChange={(e) => setNome(e.target.value)}
+                onBlur={(e) => setNome(capitalizeName(e.target.value))}
                 className={inputClass}
                 placeholder="Ex: Champions League"
               />

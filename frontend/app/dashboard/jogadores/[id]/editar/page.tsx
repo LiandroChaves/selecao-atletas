@@ -68,9 +68,9 @@ export default function EditarJogadorPage({ params }: { params: Promise<{ id: st
         setLoading(true);
         try {
             const fd = new FormData(e.currentTarget);
-            fd.set("nome", nome.trim());
-            fd.set("nome_curto", nomeCurto.trim());
-            fd.set("apelido", apelido.trim());
+            fd.set("nome", capitalizeName(nome.trim()));
+            fd.set("nome_curto", capitalizeName(nomeCurto.trim()));
+            fd.set("apelido", capitalizeName(apelido.trim()));
             fd.set("video", video.trim());
             fd.set("observacoes", observacoes.trim());
             if (foto) fd.set("foto", foto);
