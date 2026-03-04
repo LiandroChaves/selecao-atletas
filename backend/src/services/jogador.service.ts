@@ -100,44 +100,64 @@ export class JogadorService {
     }
 
     async findById(id: number) {
-        return await prisma.jogador.findUnique({
+        // Step 1: Fetch core player data with basic relations
+        const jogador: any = await prisma.jogador.findUnique({
             where: { id },
             include: {
                 nivel_ambidestria: true,
                 posicao_principal: true,
                 posicao_secundaria: true,
-                clube_atual: true, // Simplified from { include: { logos: true } }
+                clube_atual: {
+                    include: { logos: true }
+                },
                 pais: {
                     include: { bandeira: true }
                 },
                 estado: true,
                 cidade: true,
-                caracteristicas: true,
-                estatisticas_gerais: true,
-                lesoes: true,
-                // Temporarily disabled complex nested relations to isolate the error
-                // historico_clubes: {
-                //     include: {
-                //         clube: {
-                //             include: {
-                //                 logos: true,
-                //                 pais: { include: { bandeira: true } }
-                //             }
-                //         }
-                //     }
-                // },
-                // titulos: {
-                //     include: {
-                //         titulo: true,
-                //         clube: {
-                //             include: {
-                //                 logos: true,
-                //                 pais: { include: { bandeira: true } }
-                //             }
-                //         }
-                //     }
-                // }
             }
         });
+
+        if (!jogador) return null;
+
+        // Step 2: Fetch collections separately to avoid complex JOIN bugs (common in Driver Adapters)
+        const [caracteristicas, estatisticas_gerais, lesoes, historico_clubes, titulos] = await Promise.all([
+            prisma.caracteristica.findMany({ where: { jogador_id: id } }),
+            prisma.estatisticaGeral.findMany({ where: { jogador_id: id } }),
+            prisma.historicoLesao.findMany({ where: { jogador_id: id } }),
+            prisma.historicoClube.findMany({
+                where: { jogador_id: id },
+                include: {
+                    clube: {
+                        include: {
+                            logos: true,
+                            pais: { include: { bandeira: true } }
+                        }
+                    }
+                }
+            }),
+            prisma.jogadorTitulo.findMany({
+                where: { jogador_id: id },
+                include: {
+                    titulo: true,
+                    clube: {
+                        include: {
+                            logos: true,
+                            pais: { include: { bandeira: true } }
+                        }
+                    }
+                }
+            })
+        ]);
+
+        // Merge and return
+        return {
+            ...jogador,
+            caracteristicas,
+            estatisticas_gerais,
+            lesoes,
+            historico_clubes,
+            titulos
+        };
     }
 }
