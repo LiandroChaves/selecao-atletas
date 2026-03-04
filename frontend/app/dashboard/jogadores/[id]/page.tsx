@@ -107,6 +107,7 @@ export default function JogadorPerfilPage({ params }: { params: Promise<{ id: st
   }
 
   if (loadError) {
+    console.error("Erro ao carregar jogador (detalhes):", loadError);
     return (
       <div className="mx-auto max-w-6xl p-10 text-center">
         <div className="rounded-[2rem] border border-destructive/20 bg-destructive/10 p-12 text-destructive shadow-xl">

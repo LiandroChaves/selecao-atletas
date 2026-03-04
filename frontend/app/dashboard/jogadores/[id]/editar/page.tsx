@@ -88,6 +88,7 @@ export default function EditarJogadorPage({ params }: { params: Promise<{ id: st
     const labelClass = "text-sm font-bold text-foreground ml-1";
 
     if (loadError) {
+        console.error("Erro ao carregar jogador (edição):", loadError);
         return (
             <div className="mx-auto max-w-4xl p-10 text-center">
                 <div className="rounded-2xl border border-destructive/20 bg-destructive/10 p-8 text-destructive">
