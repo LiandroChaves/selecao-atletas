@@ -115,7 +115,7 @@ export async function generatePlayerPDF(jogador: Jogador, options: PDFOptions) {
   // Quebrar em duas linhas se necessário
   doc.text(subInfo.slice(0, 3).join("  |  "), 14, y);
   y += 5;
-  doc.text(subInfo.slice(3).join("  |  "), 14, y);
+  doc.text(subInfo.slice(4).join("  |  "), 14, y);
   y += 15;
 
   // 4. POSITIONAL ANALYSIS & FOOT
