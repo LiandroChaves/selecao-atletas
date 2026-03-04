@@ -45,21 +45,23 @@ import type { PDFOptions } from "@/types";
 
 export default function JogadorPerfilPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { data: jogador, isLoading, mutate } = useSWR<any>(`/jogadores/${id}`, fetcher);
+  const { data: jogador, isLoading, error: loadError, mutate } = useSWR<any>(`/jogadores/${id}`, fetcher);
   const { data: clubes } = useSWR<Clube[]>("/clubes", fetcher);
 
   const [showAddCaracteristica, setShowAddCaracteristica] = useState(false);
   const [showAddClube, setShowAddClube] = useState(false);
   const [showAddLesao, setShowAddLesao] = useState(false);
 
-  const [deleteData, setDeleteData] = useState<{ id: number, type: 'caracteristica' | 'clube' | 'lesao' } | null>(null);
+  const [deleteData, setDeleteData] = useState<{ id: number, type: 'caracteristica' | 'clube' | 'lesao' | 'estatistica' } | null>(null);
   const [editCaracteristicaId, setEditCaracteristicaId] = useState<number | null>(null);
   const [editClubeId, setEditClubeId] = useState<number | null>(null);
   const [editLesaoId, setEditLesaoId] = useState<number | null>(null);
+  const [showAddEstatistica, setShowAddEstatistica] = useState(false);
 
   const [formCaracteristica, setFormCaracteristica] = useState({ descricao: "", nota: 5 });
   const [formClube, setFormClube] = useState({ clube_id: "", data_entrada: "", data_saida: "", jogos: "", categoria: "Profissional" });
   const [formLesao, setFormLesao] = useState({ tipo_lesao: "", data_inicio: "", data_retorno: "", descricao: "" });
+  const [formEstatistica, setFormEstatistica] = useState({ temporada: "", clube_id: "", partidas_jogadas: 0, gols: 0, assistencias: 0, faltas_cometidas: 0, cartoes_amarelos: 0, cartoes_vermelhos: 0 });
 
   const [loadingAction, setLoadingAction] = useState(false);
   const [isPDFModalOpen, setIsPDFModalOpen] = useState(false);
@@ -77,7 +79,7 @@ export default function JogadorPerfilPage({ params }: { params: Promise<{ id: st
     }
   }
 
-  async function handleAction(type: 'caracteristica' | 'clube' | 'lesao', method: 'POST' | 'PUT' | 'DELETE', actionId?: number, bodyData?: any) {
+  async function handleAction(type: 'caracteristica' | 'clube' | 'lesao' | 'estatistica', method: 'POST' | 'PUT' | 'DELETE', actionId?: number, bodyData?: any) {
     setLoadingAction(true);
     let url = `/historicos/${type}`;
     if (actionId) url += `/${actionId}`;
@@ -91,6 +93,7 @@ export default function JogadorPerfilPage({ params }: { params: Promise<{ id: st
         if (type === 'caracteristica') { setShowAddCaracteristica(false); setFormCaracteristica({ descricao: "", nota: 5 }); }
         if (type === 'clube') { setShowAddClube(false); setFormClube({ clube_id: "", data_entrada: "", data_saida: "", jogos: "", categoria: "Profissional" }); }
         if (type === 'lesao') { setShowAddLesao(false); setFormLesao({ tipo_lesao: "", data_inicio: "", data_retorno: "", descricao: "" }); }
+        if (type === 'estatistica') { setShowAddEstatistica(false); setFormEstatistica({ temporada: "", clube_id: "", partidas_jogadas: 0, gols: 0, assistencias: 0, faltas_cometidas: 0, cartoes_amarelos: 0, cartoes_vermelhos: 0 }); }
       }
       setEditCaracteristicaId(null);
       setEditClubeId(null);
@@ -101,6 +104,18 @@ export default function JogadorPerfilPage({ params }: { params: Promise<{ id: st
     } finally {
       setLoadingAction(false);
     }
+  }
+
+  if (loadError) {
+    return (
+      <div className="mx-auto max-w-6xl p-10 text-center">
+        <div className="rounded-[2rem] border border-destructive/20 bg-destructive/10 p-12 text-destructive shadow-xl">
+          <AlertTriangle className="mx-auto mb-6 h-16 w-16 opacity-80" />
+          <h2 className="text-3xl font-black uppercase tracking-tighter mb-4">Erro ao carregar atleta</h2>
+          <p className="opacity-80 font-medium">Não foi possível carregar os dados deste jogador. Verifique sua conexão ou se o atleta foi excluído recém.</p>
+        </div>
+      </div>
+    );
   }
 
   if (isLoading || !jogador) {
@@ -192,16 +207,64 @@ export default function JogadorPerfilPage({ params }: { params: Promise<{ id: st
       </div>
 
       {/* Stats Grid */}
-      {jogador.estatisticas_gerais && (
-        <div className="grid grid-cols-3 gap-8 sm:grid-cols-4 lg:grid-cols-6 px-2">
-          <StatBox label="Gols" value={jogador.estatisticas_gerais.gols} icon={Target} color="text-primary" />
-          <StatBox label="Assists" value={jogador.estatisticas_gerais.assistencias} icon={Star} color="text-amber-500" />
-          <StatBox label="Jogos" value={jogador.estatisticas_gerais.partidas_jogadas} icon={Activity} color="text-blue-500" />
-          <StatBox label="Amarelos" value={jogador.estatisticas_gerais.cartoes_amarelos} icon={AlertTriangle} color="text-yellow-500" />
-          <StatBox label="Vermelhos" value={jogador.estatisticas_gerais.cartoes_vermelhos} icon={Trash2} color="text-destructive" />
-          <StatBox label="Faltas" value={jogador.estatisticas_gerais.faltas_cometidas} icon={Blocks} color="text-red-500" />
+      <div className="rounded-[3rem] border border-border bg-card p-12 shadow-sm mx-2">
+        <div className="mb-12 flex items-center justify-between">
+          <h3 className="text-3xl font-black flex items-center gap-5 uppercase tracking-tighter"><Activity className="h-10 w-10 text-primary" /> Estatísticas por Temporada</h3>
+          <button onClick={() => setShowAddEstatistica(!showAddEstatistica)} className="h-14 px-8 rounded-2xl bg-primary/10 text-primary font-black text-xs uppercase tracking-widest hover:bg-primary/20 transition-all">+ Add</button>
         </div>
-      )}
+
+        {showAddEstatistica && (
+          <div className="mb-10 p-10 bg-muted/40 rounded-[2.5rem] border border-border space-y-6 animate-in slide-in-from-top-4 duration-500 shadow-xl">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <input value={formEstatistica.temporada} onChange={(e) => setFormEstatistica({ ...formEstatistica, temporada: e.target.value })} placeholder="Temporada (Ex: 2024)" className={inputClass} />
+              <select value={formEstatistica.clube_id} onChange={(e) => setFormEstatistica({ ...formEstatistica, clube_id: e.target.value })} className={inputClass}>
+                <option value="">Selecione o Clube (Opcional)</option>
+                {clubes?.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-5 md:grid-cols-6">
+              <div className="flex flex-col gap-2"><span className="text-[10px] font-black uppercase text-muted-foreground ml-2">Jogos</span><input type="number" value={formEstatistica.partidas_jogadas} onChange={(e) => setFormEstatistica({ ...formEstatistica, partidas_jogadas: Number(e.target.value) })} className={inputClass} /></div>
+              <div className="flex flex-col gap-2"><span className="text-[10px] font-black uppercase text-muted-foreground ml-2">Gols</span><input type="number" value={formEstatistica.gols} onChange={(e) => setFormEstatistica({ ...formEstatistica, gols: Number(e.target.value) })} className={inputClass} /></div>
+              <div className="flex flex-col gap-2"><span className="text-[10px] font-black uppercase text-muted-foreground ml-2">Assists</span><input type="number" value={formEstatistica.assistencias} onChange={(e) => setFormEstatistica({ ...formEstatistica, assistencias: Number(e.target.value) })} className={inputClass} /></div>
+              <div className="flex flex-col gap-2"><span className="text-[10px] font-black uppercase text-muted-foreground ml-2">Faltas</span><input type="number" value={formEstatistica.faltas_cometidas} onChange={(e) => setFormEstatistica({ ...formEstatistica, faltas_cometidas: Number(e.target.value) })} className={inputClass} /></div>
+              <div className="flex flex-col gap-2"><span className="text-[10px] font-black uppercase text-muted-foreground ml-2">Amarelos</span><input type="number" value={formEstatistica.cartoes_amarelos} onChange={(e) => setFormEstatistica({ ...formEstatistica, cartoes_amarelos: Number(e.target.value) })} className={inputClass} /></div>
+              <div className="flex flex-col gap-2"><span className="text-[10px] font-black uppercase text-muted-foreground ml-2">Vermelhos</span><input type="number" value={formEstatistica.cartoes_vermelhos} onChange={(e) => setFormEstatistica({ ...formEstatistica, cartoes_vermelhos: Number(e.target.value) })} className={inputClass} /></div>
+            </div>
+            <button onClick={() => handleAction('estatistica', 'POST', undefined, { jogador_id: Number(id), temporada: formEstatistica.temporada, clube_id: formEstatistica.clube_id ? Number(formEstatistica.clube_id) : null, partidas_jogadas: formEstatistica.partidas_jogadas, gols: formEstatistica.gols, assistencias: formEstatistica.assistencias, faltas_cometidas: formEstatistica.faltas_cometidas, cartoes_amarelos: formEstatistica.cartoes_amarelos, cartoes_vermelhos: formEstatistica.cartoes_vermelhos })} className="h-16 w-full rounded-2xl bg-primary text-primary-foreground font-black uppercase text-sm shadow-2xl">Salvar Estatísticas</button>
+          </div>
+        )}
+
+        <div className="flex flex-col gap-6">
+          {jogador.estatisticas_gerais && jogador.estatisticas_gerais.length > 0 ? (
+            jogador.estatisticas_gerais.map((est: any) => {
+              const clubeNome = est.clube_id ? clubes?.find(c => c.id === est.clube_id)?.nome : "Geral";
+              return (
+                <div key={est.id} className="group relative flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 rounded-[2.5rem] bg-secundary/5 border border-border shadow-sm hover:shadow-xl hover:border-primary/20 transition-all overflow-hidden">
+                  <div className="absolute top-0 left-0 w-2 h-full bg-primary/80"></div>
+
+                  <div className="flex flex-col pl-4">
+                    <span className="text-sm font-black text-primary uppercase tracking-[0.2em]">{est.temporada}</span>
+                    <span className="text-3xl font-black text-foreground tracking-tighter uppercase leading-none mt-1">{clubeNome}</span>
+                  </div>
+
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-x-8 gap-y-4 md:flex-1 md:justify-end">
+                    <StatMini label="Jogos" value={est.partidas_jogadas} />
+                    <StatMini label="Gols" value={est.gols} />
+                    <StatMini label="Assists" value={est.assistencias} />
+                    <StatMini label="Faltas" value={est.faltas_cometidas} />
+                    <StatMini label="Amarelos" value={est.cartoes_amarelos} />
+                    <StatMini label="Vermelhos" value={est.cartoes_vermelhos} />
+                  </div>
+
+                  <button onClick={() => setDeleteData({ id: est.id, type: 'estatistica' })} className="absolute top-4 right-4 h-12 w-12 flex items-center justify-center rounded-xl text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-all shadow-sm"><Trash2 className="h-5 w-5" /></button>
+                </div>
+              );
+            })
+          ) : (
+            <div className="py-12 text-center text-muted-foreground font-medium italic opacity-40">Nenhuma estatística registrada.</div>
+          )}
+        </div>
+      </div>
 
       {/* Media & Scouting Notes */}
       {(jogador.video || jogador.observacoes) && (
@@ -417,6 +480,15 @@ function StatBox({ label, value, icon: Icon, color }: any) {
         <span className="block text-7xl font-black text-foreground tracking-tighter mb-2 leading-none">{value}</span>
         <span className="block text-xs font-black uppercase tracking-[0.5em] text-muted-foreground opacity-30">{label}</span>
       </div>
+    </div>
+  );
+}
+
+function StatMini({ label, value }: { label: string, value: number }) {
+  return (
+    <div className="flex flex-col gap-1 items-center">
+      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-50">{label}</span>
+      <span className="text-2xl font-black text-foreground">{value}</span>
     </div>
   );
 }

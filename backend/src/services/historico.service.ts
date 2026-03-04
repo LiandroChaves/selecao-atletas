@@ -77,4 +77,34 @@ export class HistoricoService {
     async deleteLesao(id: number) {
         return await prisma.historicoLesao.delete({ where: { id } });
     }
+
+    async addEstatistica(data: {
+        jogador_id: number;
+        temporada?: string;
+        clube_id?: number | null;
+        partidas_jogadas?: number;
+        gols?: number;
+        assistencias?: number;
+        faltas_cometidas?: number;
+        cartoes_amarelos?: number;
+        cartoes_vermelhos?: number;
+    }) {
+        return await prisma.estatisticaGeral.create({
+            data: {
+                ...data,
+                temporada: data.temporada || "Geral"
+            }
+        });
+    }
+
+    async updateEstatistica(id: number, data: any) {
+        return await prisma.estatisticaGeral.update({
+            where: { id },
+            data
+        });
+    }
+
+    async deleteEstatistica(id: number) {
+        return await prisma.estatisticaGeral.delete({ where: { id } });
+    }
 }

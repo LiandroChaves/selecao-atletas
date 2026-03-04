@@ -50,4 +50,19 @@ export class HistoricoController {
         await service.deleteCaracteristica(Number(req.params.id));
         return res.status(204).send();
     }
+
+    async storeEstatistica(req: Request, res: Response) {
+        const estatistica = await service.addEstatistica(req.body);
+        return res.status(201).json(estatistica);
+    }
+
+    async updateEstatistica(req: Request, res: Response) {
+        const estatistica = await service.updateEstatistica(Number(req.params.id), req.body);
+        return res.json(estatistica);
+    }
+
+    async destroyEstatistica(req: Request, res: Response) {
+        await service.deleteEstatistica(Number(req.params.id));
+        return res.status(204).send();
+    }
 }

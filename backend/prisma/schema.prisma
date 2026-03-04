@@ -100,22 +100,23 @@ model Posicao {
 }
 
 model Clube {
-  id              Int              @id @default(autoincrement())
+  id              Int                @id @default(autoincrement())
   nome            String
   pais_id         Int
-  pais            Pais             @relation(fields: [pais_id], references: [id])
+  pais            Pais               @relation(fields: [pais_id], references: [id])
   fundacao        Int?
   estadio         String?
   inicio_contrato DateTime?
   fim_contrato    DateTime?
-  created_at      DateTime         @default(now())
-  updated_at      DateTime         @updatedAt
+  created_at      DateTime           @default(now())
+  updated_at      DateTime           @updatedAt
   logos           LogoClube[]
   jogadores       Jogador[]
-  partidas_casa   Partida[]        @relation("ClubeCasa")
-  partidas_fora   Partida[]        @relation("ClubeFora")
+  partidas_casa   Partida[]          @relation("ClubeCasa")
+  partidas_fora   Partida[]          @relation("ClubeFora")
   historico       HistoricoClube[]
   titulos         JogadorTitulo[]
+  estatisticas    EstatisticaGeral[]
 
   @@map("clubes")
 }
@@ -161,7 +162,7 @@ model Jogador {
   clube_atual        Clube?           @relation(fields: [clube_atual_id], references: [id], onDelete: SetNull)
 
   caracteristicas      Caracteristica[]
-  estatisticas_gerais  EstatisticaGeral?
+  estatisticas_gerais  EstatisticaGeral[]
   estatisticas_partida EstatisticaPartida[]
   historico_clubes     HistoricoClube[]
   lesoes               HistoricoLesao[]
@@ -180,12 +181,15 @@ model Caracteristica {
 }
 
 model EstatisticaGeral {
-  jogador_id        Int     @id
+  id                Int     @id @default(autoincrement())
+  jogador_id        Int
   jogador           Jogador @relation(fields: [jogador_id], references: [id], onDelete: Cascade)
+  temporada         String  @default("Geral")
+  clube_id          Int?
+  clube             Clube?  @relation(fields: [clube_id], references: [id], onDelete: SetNull)
   partidas_jogadas  Int     @default(0)
   gols              Int     @default(0)
   assistencias      Int     @default(0)
-  titulos           Int     @default(0)
   faltas_cometidas  Int     @default(0)
   cartoes_amarelos  Int     @default(0)
   cartoes_vermelhos Int     @default(0)

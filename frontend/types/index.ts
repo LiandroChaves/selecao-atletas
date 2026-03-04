@@ -82,10 +82,12 @@ export interface Clube {
   logos?: LogoClube[];
 }
 
-// EstatisticaGeral
 export interface EstatisticaGeral {
   id: number;
   jogador_id: number;
+  temporada: string;
+  clube_id?: number | null;
+  clube?: Clube | null;
   partidas_jogadas: number;
   gols: number;
   assistencias: number;
@@ -122,7 +124,7 @@ export interface Jogador {
   estado?: Estado | null;
   cidade?: Cidade | null;
   caracteristicas?: Caracteristica[];
-  estatisticas_gerais?: EstatisticaGeral | null;
+  estatisticas_gerais?: EstatisticaGeral[];
   lesoes?: Lesao[];
   historico_clubes?: HistoricoClube[];
   titulos?: JogadorTitulo[];
@@ -208,6 +210,7 @@ export interface EstatisticaPartida {
 export interface PDFOptions {
   category: "Base" | "Amador" | "Profissional";
   clube_id?: number;
+  temporada?: string;
   primaryColor: string;
   secondaryColor: string;
 }

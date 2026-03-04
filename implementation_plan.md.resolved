@@ -1,0 +1,61 @@
+# Automatic Game Statistics with Manual Fallback
+
+This plan details how we will evolve the newly introduced "Season Statistics" feature into an intelligent, hybrid system that calculates game-by-game statistics while preserving the ability to register past seasons manually.
+
+## Goal Description
+Enhance [EstatisticaGeral](file:///c:/Users/Liandro/Documents/Programacao/selecao-atletas/frontend/types/index.ts#85-98) to track where the data came from (origin). 
+* Data added manually via the "Estatísticas por Temporada" panel will be tagged as `MANUAL`.
+* Data aggregated from real match records ([Partida](file:///c:/Users/Liandro/Documents/Programacao/selecao-atletas/frontend/types/index.ts#182-195)) will be calculated per season (year) and club, and tagged as `SISTEMA`.
+* Finally, the frontend and PDF generation will intelligently group these records by Season and Club to present unified statistics without overwriting historical manual data.
+
+## Proposed Changes
+
+---
+
+### Database Schema Updates
+Add the `origem` field to the statistics table to differentiate system-generated logs from manual entries.
+
+#### [MODIFY] schema.prisma
+- Add an `enum OrigemEstatistica { MANUAL SISTEMA }`
+- Add an `origem` field to the [EstatisticaGeral](file:///c:/Users/Liandro/Documents/Programacao/selecao-atletas/frontend/types/index.ts#85-98) model with a default value of `MANUAL`. `origem OrigemEstatistica @default(MANUAL)`.
+
+---
+
+### Backend Logic Updates
+Refactor how [PartidaService](file:///c:/Users/Liandro/Documents/Programacao/selecao-atletas/backend/src/services/partida.service.ts#4-118) updates a player's statistics to create/update records specific to the match's year and club instead of a single generalized "Geral" tally.
+
+#### [MODIFY] src/services/partida.service.ts
+- Modify [updateEstatisticasGerais(jogador_id: number)](file:///c:/Users/Liandro/Documents/Programacao/selecao-atletas/backend/src/services/partida.service.ts#31-72) to calculate the stats independently per match year and club.
+- Use `prisma.estatisticaPartida.findMany` with related [Partida](file:///c:/Users/Liandro/Documents/Programacao/selecao-atletas/frontend/types/index.ts#182-195) data to group stats by `partida.data.getFullYear()` and `partida.clube_casa_id / clube_fora_id`.
+- Upsert [EstatisticaGeral](file:///c:/Users/Liandro/Documents/Programacao/selecao-atletas/frontend/types/index.ts#85-98) records for each group, explicitly setting `origem: 'SISTEMA'`.
+- This ensures if a player played games in 2024 for "Clube A" and then in 2024 for "Clube B", they get two separate, automatic system entries with their distinct totals.
+
+#### [MODIFY] src/services/historico.service.ts
+- When adding or editing a manual stat through the API, ensure `origem` is strictly enforced or defaulted to `MANUAL`.
+
+---
+
+### Frontend UI & PDF Updates
+Make the UI aware of the `origem` to present the data clearly and aggregate it if necessary.
+
+#### [MODIFY] frontend/types/index.ts
+- Add `origem: 'MANUAL' | 'SISTEMA'` to the [EstatisticaGeral](file:///c:/Users/Liandro/Documents/Programacao/selecao-atletas/frontend/types/index.ts#85-98) interface.
+
+#### [MODIFY] frontend/app/dashboard/jogadores/[id]/page.tsx
+- On the "Estatísticas por Temporada" table, add a small visual badge (e.g., a robot icon `Bot` for `SISTEMA`, and a user icon [User](file:///c:/Users/Liandro/Documents/Programacao/selecao-atletas/frontend/lib/api.ts#16-21) for `MANUAL`).
+- *(Optional but recommended)* Prevent the user from deleting `SISTEMA` records via the panel, since they should be managed by deleting the respective [Partida](file:///c:/Users/Liandro/Documents/Programacao/selecao-atletas/frontend/types/index.ts#182-195) (match) itself.
+
+#### [MODIFY] frontend/lib/pdf.ts & frontend/app/dashboard/page.tsx
+- Ensure the aggregation logic (which groups stats to display in the PDF) adds up goals/assists properly even if there is a `MANUAL` entry and a `SISTEMA` entry for exactly the same season and club.
+
+## Verification Plan
+
+### Automated Tests
+- Run `npx prisma db push` and `npx prisma generate` to apply the enum.
+- Re-run the frontend and backend servers to ensure types align perfectly.
+
+### Manual Verification
+- Go to the player profile and add a manual statistic for "2024" and "Clube X" (e.g., 5 goals).
+- Create a new match ([Partida](file:///c:/Users/Liandro/Documents/Programacao/selecao-atletas/frontend/types/index.ts#182-195)) in 2024 involving "Clube X" and assign 2 goals to the same player.
+- Verify that the profile page shows *two* distinct records (one Manual, one Sistema).
+- Verify that the PDF generation for the season "2024" combines them into 7 goals total for "Clube X".

@@ -17,4 +17,8 @@ historicoRoutes.post('/caracteristica', authMiddleware, controller.storeCaracter
 historicoRoutes.put('/caracteristica/:id', authMiddleware, controller.updateCaracteristica);
 historicoRoutes.delete('/caracteristica/:id', authMiddleware, controller.destroyCaracteristica);
 
+historicoRoutes.post('/estatistica', authMiddleware, controller.storeEstatistica);
+historicoRoutes.put('/estatistica/:id', authMiddleware, controller.updateEstatistica);
+historicoRoutes.delete('/estatistica/:id', authMiddleware, controller.destroyEstatistica);
+
 export { historicoRoutes };

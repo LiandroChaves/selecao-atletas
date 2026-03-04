@@ -41,30 +41,33 @@ export class PartidaService {
             }
         });
 
-        const totalTitulos = await prisma.jogadorTitulo.count({
-            where: { jogador_id }
+        const geralStat = await prisma.estatisticaGeral.findFirst({
+            where: { jogador_id, temporada: "Geral" }
         });
 
-        await prisma.estatisticaGeral.upsert({
-            where: { jogador_id },
-            update: {
-                partidas_jogadas: stats._count.id,
-                gols: stats._sum.gols || 0,
-                assistencias: stats._sum.assistencias || 0,
-                cartoes_amarelos: stats._sum.cartoes_amarelos || 0,
-                cartoes_vermelhos: stats._sum.cartoes_vermelhos || 0,
-                faltas_cometidas: stats._sum.faltas_cometidas || 0,
-                titulos: totalTitulos,
-            },
-            create: {
-                jogador_id,
-                partidas_jogadas: stats._count.id,
-                gols: stats._sum.gols || 0,
-                assistencias: stats._sum.assistencias || 0,
-                faltas_cometidas: stats._sum.faltas_cometidas || 0,
-                titulos: totalTitulos,
-            }
-        });
+        const newStats = {
+            partidas_jogadas: stats._count.id,
+            gols: stats._sum.gols || 0,
+            assistencias: stats._sum.assistencias || 0,
+            cartoes_amarelos: stats._sum.cartoes_amarelos || 0,
+            cartoes_vermelhos: stats._sum.cartoes_vermelhos || 0,
+            faltas_cometidas: stats._sum.faltas_cometidas || 0,
+        };
+
+        if (geralStat) {
+            await prisma.estatisticaGeral.update({
+                where: { id: geralStat.id },
+                data: newStats
+            });
+        } else {
+            await prisma.estatisticaGeral.create({
+                data: {
+                    jogador_id,
+                    temporada: "Geral",
+                    ...newStats
+                }
+            });
+        }
     }
 
     async findPartidaById(id: number) {

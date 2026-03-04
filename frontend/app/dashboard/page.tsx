@@ -44,14 +44,19 @@ export default function DashboardPage() {
 
   // Top 5 goleadores
   const topScorers = jogadores
-    ?.filter((j) => j.estatisticas_gerais && j.estatisticas_gerais.gols > 0)
-    ?.sort((a, b) => (b.estatisticas_gerais?.gols ?? 0) - (a.estatisticas_gerais?.gols ?? 0))
-    ?.slice(0, 5)
-    ?.map((j) => ({
-      nome: j.nome.split(" ").slice(0, 2).join(" "),
-      gols: j.estatisticas_gerais?.gols ?? 0,
-      assistencias: j.estatisticas_gerais?.assistencias ?? 0,
-    })) ?? [];
+    ?.map((j) => {
+      const stats = j.estatisticas_gerais || [];
+      const totalGols = stats.reduce((sum, s) => sum + (s.gols || 0), 0);
+      const totalAssistencias = stats.reduce((sum, s) => sum + (s.assistencias || 0), 0);
+      return {
+        nome: j.nome.split(" ").slice(0, 2).join(" "),
+        gols: totalGols,
+        assistencias: totalAssistencias,
+      };
+    })
+    ?.filter((j) => j.gols > 0)
+    ?.sort((a, b) => b.gols - a.gols)
+    ?.slice(0, 5) ?? [];
 
   // Distribuicao por posicao
   const positionMap: Record<string, number> = {};

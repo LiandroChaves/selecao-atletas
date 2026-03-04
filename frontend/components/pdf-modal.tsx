@@ -21,6 +21,7 @@ export function PDFModal({
 }: PDFModalProps) {
     const [category, setCategory] = useState<PDFOptions["category"]>("Profissional");
     const [clubeId, setClubeId] = useState<number | undefined>(undefined);
+    const [temporada, setTemporada] = useState<string>("");
     const [primaryColor, setPrimaryColor] = useState("#10b981"); // Default green
     const [secondaryColor, setSecondaryColor] = useState("#1e1e1e"); // Default dark gray
 
@@ -89,6 +90,17 @@ export function PDFModal({
                             </select>
                         </div>
 
+                        {/* Temporada (Opcional - para filtrar stats no PDF) */}
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Temporada (Deixe vazio para todas)</label>
+                            <input
+                                value={temporada}
+                                onChange={(e) => setTemporada(e.target.value)}
+                                placeholder="E.g., 2024, 2024/2025"
+                                className="w-full h-12 rounded-xl border border-border bg-muted px-4 text-sm font-medium outline-none focus:ring-2 focus:ring-primary transition-all"
+                            />
+                        </div>
+
                         {/* Cores */}
                         <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-3">
@@ -119,7 +131,7 @@ export function PDFModal({
                     </div>
 
                     <button
-                        onClick={() => onConfirm({ category, clube_id: clubeId, primaryColor, secondaryColor })}
+                        onClick={() => onConfirm({ category, clube_id: clubeId, temporada: temporada || undefined, primaryColor, secondaryColor })}
                         disabled={loading}
                         className="h-16 w-full rounded-2xl bg-primary text-primary-foreground font-black uppercase tracking-widest text-sm shadow-xl shadow-primary/30 hover:bg-primary/90 transition-all flex items-center justify-center gap-3"
                     >

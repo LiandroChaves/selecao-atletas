@@ -13,7 +13,7 @@ export default function EditarJogadorPage({ params }: { params: Promise<{ id: st
     const { id } = use(params);
     const router = useRouter();
 
-    const { data: jogador, isLoading } = useSWR<any>(`/jogadores/${id}`, fetcher);
+    const { data: jogador, isLoading, error: loadError } = useSWR<any>(`/jogadores/${id}`, fetcher);
     const { data: posicoes } = useSWR<Posicao[]>("/configuracoes/posicoes", fetcher);
     const { data: ambidestria } = useSWR<NivelAmbidestria[]>("/configuracoes/ambidestria", fetcher);
     const { data: clubes } = useSWR<Clube[]>("/clubes", fetcher);
@@ -36,6 +36,7 @@ export default function EditarJogadorPage({ params }: { params: Promise<{ id: st
     // Lógica de localidade em cascata
     const [selectedPais, setSelectedPais] = useState<string>("");
     const [selectedEstado, setSelectedEstado] = useState<string>("");
+    const [selectedCity, setSelectedCity] = useState<string>("");
 
     const filteredEstados = estados?.filter(e => String(e.pais_id) === selectedPais) || [];
     const filteredCidades = cidades?.filter(c => String(c.estado_id) === selectedEstado) || [];
@@ -49,6 +50,7 @@ export default function EditarJogadorPage({ params }: { params: Promise<{ id: st
             setObservacoes(jogador.observacoes || "");
             setSelectedPais(String(jogador.pais_id || ""));
             setSelectedEstado(String(jogador.estado_id || ""));
+            setSelectedCity(String(jogador.cidade_id || ""));
         }
     }, [jogador]);
 
@@ -84,6 +86,17 @@ export default function EditarJogadorPage({ params }: { params: Promise<{ id: st
 
     const inputClass = "h-12 rounded-xl border border-input bg-background px-4 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all";
     const labelClass = "text-sm font-bold text-foreground ml-1";
+
+    if (loadError) {
+        return (
+            <div className="mx-auto max-w-4xl p-10 text-center">
+                <div className="rounded-2xl border border-destructive/20 bg-destructive/10 p-8 text-destructive">
+                    <h2 className="text-xl font-bold mb-2">Erro ao carregar jogador</h2>
+                    <p className="opacity-80">Por favor, verifique sua conexão ou contate o administrador.</p>
+                </div>
+            </div>
+        );
+    }
 
     if (isLoading || !jogador) {
         return (
@@ -217,7 +230,7 @@ export default function EditarJogadorPage({ params }: { params: Promise<{ id: st
 
                     <div className="flex flex-col gap-2">
                         <label className={labelClass}>Cidade</label>
-                        <select name="cidade_id" defaultValue={jogador.cidade_id || ""} disabled={!selectedEstado} className={inputClass}>
+                        <select name="cidade_id" value={selectedCity} disabled={!selectedEstado} className={inputClass}>
                             <option value="">Selecione</option>
                             {filteredCidades.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
                         </select>
