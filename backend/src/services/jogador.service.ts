@@ -106,9 +106,7 @@ export class JogadorService {
                 nivel_ambidestria: true,
                 posicao_principal: true,
                 posicao_secundaria: true,
-                clube_atual: {
-                    include: { logos: true }
-                },
+                clube_atual: true, // Simplified from { include: { logos: true } }
                 pais: {
                     include: { bandeira: true }
                 },
@@ -117,27 +115,28 @@ export class JogadorService {
                 caracteristicas: true,
                 estatisticas_gerais: true,
                 lesoes: true,
-                historico_clubes: {
-                    include: {
-                        clube: {
-                            include: {
-                                logos: true,
-                                pais: { include: { bandeira: true } }
-                            }
-                        }
-                    }
-                },
-                titulos: {
-                    include: {
-                        titulo: true,
-                        clube: {
-                            include: {
-                                logos: true,
-                                pais: { include: { bandeira: true } }
-                            }
-                        }
-                    }
-                }
+                // Temporarily disabled complex nested relations to isolate the error
+                // historico_clubes: {
+                //     include: {
+                //         clube: {
+                //             include: {
+                //                 logos: true,
+                //                 pais: { include: { bandeira: true } }
+                //             }
+                //         }
+                //     }
+                // },
+                // titulos: {
+                //     include: {
+                //         titulo: true,
+                //         clube: {
+                //             include: {
+                //                 logos: true,
+                //                 pais: { include: { bandeira: true } }
+                //             }
+                //         }
+                //     }
+                // }
             }
         });
     }
