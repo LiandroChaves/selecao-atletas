@@ -19,7 +19,7 @@ export function SessionExpiredModal({ isOpen, onConfirm }: SessionExpiredModalPr
                         Sessão Expirada
                     </DialogTitle>
                     <DialogDescription className="pt-2 text-base">
-                        Sua sessão de 1 hora expirou por motivos de segurança. Por favor, faça login novamente para continuar.
+                        Sua sessão de 2 horas expirou por motivos de segurança. Por favor, faça login novamente para continuar.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="flex justify-end pt-4">
