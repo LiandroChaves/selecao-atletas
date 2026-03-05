@@ -15,4 +15,9 @@ export interface CreateJogadorDTO {
     cidade_id?: number;
     video?: string;
     observacoes?: string;
+    whatsapp?: string;
+    instagram?: string;
+    twitter?: string;
+    facebook?: string;
+    tiktok?: string;
 }

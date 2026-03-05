@@ -6,7 +6,10 @@
     "scripts": {
         "dev": "nodemon src/server.ts",
         "build": "prisma generate && prisma migrate deploy && tsc",
-        "start": "node dist/server.js"
+        "start": "node dist/server.js",
+        "create-user": "ts-node src/scripts/create-user.ts",
+        "migrate-posicoes": "ts-node src/scripts/migrate-posicoes.ts",
+        "seed": "ts-node src/scripts/seed.ts"
     },
     "keywords": [],
     "author": "",

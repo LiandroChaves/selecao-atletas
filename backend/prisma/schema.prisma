@@ -150,6 +150,11 @@ model Jogador {
   foto                  String?
   video                 String?
   observacoes           String?
+  whatsapp              String?
+  instagram             String?
+  twitter               String?
+  facebook              String?
+  tiktok                String?
   created_at            DateTime    @default(now())
   updated_at            DateTime    @updatedAt
 

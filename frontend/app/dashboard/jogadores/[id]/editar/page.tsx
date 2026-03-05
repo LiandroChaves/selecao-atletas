@@ -4,9 +4,9 @@ import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { apiFetch, fetcher } from "@/lib/api";
-import { ArrowLeft, Upload, Loader2, Save, Video, Notebook, User } from "lucide-react";
+import { ArrowLeft, Upload, Loader2, Save, Video, Notebook, MessageCircle, Instagram, Facebook, Twitter, Smartphone } from "lucide-react";
 import Link from "next/link";
-import type { Jogador, Posicao, NivelAmbidestria, Clube, Pais, Cidade, Estado } from "@/types";
+import type { Posicao, NivelAmbidestria, Clube, Pais, Cidade, Estado } from "@/types";
 import { API_URL, capitalizeName } from "@/lib/utils";
 
 export default function EditarJogadorPage({ params }: { params: Promise<{ id: string }> }) {
@@ -26,20 +26,41 @@ export default function EditarJogadorPage({ params }: { params: Promise<{ id: st
     const [foto, setFoto] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
 
-    // Estados controlados para capitalize e inputs
     const [nome, setNome] = useState("");
     const [nomeCurto, setNomeCurto] = useState("");
     const [apelido, setApelido] = useState("");
     const [video, setVideo] = useState("");
     const [observacoes, setObservacoes] = useState("");
 
-    // Lógica de localidade em cascata
+    const [whatsapp, setWhatsapp] = useState("");
+    const [instagram, setInstagram] = useState("");
+    const [twitter, setTwitter] = useState("");
+    const [facebook, setFacebook] = useState("");
+    const [tiktok, setTiktok] = useState("");
+
     const [selectedPais, setSelectedPais] = useState<string>("");
     const [selectedEstado, setSelectedEstado] = useState<string>("");
     const [selectedCity, setSelectedCity] = useState<string>("");
 
     const filteredEstados = estados?.filter(e => String(e.pais_id) === selectedPais) || [];
     const filteredCidades = cidades?.filter(c => String(c.estado_id) === selectedEstado) || [];
+
+    const formatWhatsApp = (value: string) => {
+        const digits = value.replace(/\D/g, "");
+        let res = "";
+        if (digits.length > 0) res += "+" + digits.substring(0, 2);
+        if (digits.length > 2) res += " (" + digits.substring(2, 4);
+        if (digits.length > 4) res += ") " + digits.substring(4, 5);
+        if (digits.length > 5) res += "." + digits.substring(5, 9);
+        if (digits.length > 9) res += "-" + digits.substring(9, 13);
+        return res;
+    };
+
+    const extractHandle = (url: string) => {
+        if (!url) return "";
+        const parts = url.replace(/\/$/, "").split("/");
+        return parts[parts.length - 1].replace("@", "");
+    };
 
     useEffect(() => {
         if (jogador) {
@@ -51,6 +72,12 @@ export default function EditarJogadorPage({ params }: { params: Promise<{ id: st
             setSelectedPais(String(jogador.pais_id || ""));
             setSelectedEstado(String(jogador.estado_id || ""));
             setSelectedCity(String(jogador.cidade_id || ""));
+
+            setWhatsapp(jogador.whatsapp || "");
+            setInstagram(extractHandle(jogador.instagram));
+            setTwitter(extractHandle(jogador.twitter));
+            setFacebook(extractHandle(jogador.facebook));
+            setTiktok(extractHandle(jogador.tiktok));
         }
     }, [jogador]);
 
@@ -73,6 +100,13 @@ export default function EditarJogadorPage({ params }: { params: Promise<{ id: st
             fd.set("apelido", capitalizeName(apelido.trim()));
             fd.set("video", video.trim());
             fd.set("observacoes", observacoes.trim());
+
+            fd.set("whatsapp", whatsapp);
+            fd.set("instagram", instagram ? `https://instagram.com/${instagram.replace("@", "")}` : "");
+            fd.set("twitter", twitter ? `https://x.com/${twitter.replace("@", "")}` : "");
+            fd.set("facebook", facebook ? `https://facebook.com/${facebook.replace("@", "")}` : "");
+            fd.set("tiktok", tiktok ? `https://tiktok.com/@${tiktok.replace("@", "")}` : "");
+
             if (foto) fd.set("foto", foto);
 
             await apiFetch(`/jogadores/${id}`, { method: "PUT", body: fd });
@@ -88,7 +122,6 @@ export default function EditarJogadorPage({ params }: { params: Promise<{ id: st
     const labelClass = "text-sm font-bold text-foreground ml-1";
 
     if (loadError) {
-        console.error("Erro ao carregar jogador (edição):", loadError);
         return (
             <div className="mx-auto max-w-4xl p-10 text-center">
                 <div className="rounded-2xl border border-destructive/20 bg-destructive/10 p-8 text-destructive">
@@ -112,9 +145,9 @@ export default function EditarJogadorPage({ params }: { params: Promise<{ id: st
     const dataNasc = jogador.data_nascimento ? new Date(jogador.data_nascimento).toISOString().split("T")[0] : "";
 
     return (
-        <div className="mx-auto max-w-4xl mb-12">
+        <div className="mx-auto max-w-4xl mb-12 px-4 sm:px-0">
             <div className="mb-8 flex items-center gap-4">
-                <Link href={`/dashboard/jogadores`} className="flex h-11 w-11 items-center justify-center rounded-xl border border-border text-muted-foreground hover:bg-accent transition-all shadow-sm">
+                <Link href={`/dashboard/jogadores/${id}`} className="flex h-11 w-11 items-center justify-center rounded-xl border border-border text-muted-foreground hover:bg-accent transition-all shadow-sm">
                     <ArrowLeft className="h-5 w-5" />
                 </Link>
                 <div>
@@ -128,9 +161,8 @@ export default function EditarJogadorPage({ params }: { params: Promise<{ id: st
             )}
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-8 rounded-[2rem] border border-border bg-card p-8 shadow-md">
-                {/* Foto Section */}
                 <div className="flex flex-col items-center gap-4">
-                    <label htmlFor="fotoInput" className="flex h-40 w-40 cursor-pointer items-center justify-center overflow-hidden rounded-full border-4 border-dashed border-border bg-muted transition-all hover:border-primary shadow-inner group">
+                    <label htmlFor="fotoInput" className="flex h-40 w-40 cursor-pointer items-center justify-center overflow-hidden rounded-full border-4 border-dashed border-border bg-muted transition-all hover:border-primary shadow-inner">
                         {preview ? (
                             <img src={preview} className="h-full w-full object-cover" />
                         ) : currentFotoUrl ? (
@@ -140,7 +172,7 @@ export default function EditarJogadorPage({ params }: { params: Promise<{ id: st
                         )}
                     </label>
                     <input id="fotoInput" type="file" accept="image/*" className="hidden" onChange={handleFoto} />
-                    <span className="text-xs font-black uppercase text-muted-foreground tracking-widest">Alterar Foto do Atleta</span>
+                    <span className="text-xs font-black uppercase text-muted-foreground tracking-widest">Alterar Foto</span>
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -174,12 +206,20 @@ export default function EditarJogadorPage({ params }: { params: Promise<{ id: st
                     </div>
 
                     <div className="flex flex-col gap-2">
+                        <label className={labelClass}>Nível de Ambidestria *</label>
+                        <select name="nivel_ambidestria_id" required defaultValue={jogador.nivel_ambidestria_id} className={inputClass}>
+                            {ambidestria?.map((a) => <option key={a.id} value={a.id}>{a.descricao}</option>)}
+                        </select>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
                         <label className={labelClass}>Posição Principal *</label>
                         <select name="posicao_id" required defaultValue={jogador.posicao_id} className={inputClass}>
                             {posicoes?.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
                         </select>
                     </div>
 
+                    {/* RESTAURADO AQUI Ó */}
                     <div className="flex flex-col gap-2">
                         <label className={labelClass}>Posição Secundária</label>
                         <select name="posicao_secundaria_id" defaultValue={jogador.posicao_secundaria_id || ""} className={inputClass}>
@@ -188,13 +228,7 @@ export default function EditarJogadorPage({ params }: { params: Promise<{ id: st
                         </select>
                     </div>
 
-                    <div className="flex flex-col gap-2">
-                        <label className={labelClass}>Nível de Ambidestria *</label>
-                        <select name="nivel_ambidestria_id" required defaultValue={jogador.nivel_ambidestria_id} className={inputClass}>
-                            {ambidestria?.map((a) => <option key={a.id} value={a.id}>{a.descricao}</option>)}
-                        </select>
-                    </div>
-
+                    {/* RESTAURADO AQUI TAMBÉM */}
                     <div className="flex flex-col gap-2">
                         <label className={labelClass}>Clube Atual</label>
                         <select name="clube_atual_id" defaultValue={jogador.clube_atual_id || ""} className={inputClass}>
@@ -231,25 +265,76 @@ export default function EditarJogadorPage({ params }: { params: Promise<{ id: st
 
                     <div className="flex flex-col gap-2">
                         <label className={labelClass}>Cidade</label>
-                        <select name="cidade_id" value={selectedCity} disabled={!selectedEstado} className={inputClass}>
+                        <select name="cidade_id" value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)} disabled={!selectedEstado} className={inputClass}>
                             <option value="">Selecione</option>
                             {filteredCidades.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
                         </select>
                     </div>
+                </div>
 
-                    <div className="flex flex-col gap-2 sm:col-span-2 lg:col-span-3">
-                        <label className={labelClass}>Link de Vídeo (Youtube/Vimeo)</label>
-                        <div className="relative">
-                            <Video className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/40" />
-                            <input value={video} onChange={(e) => setVideo(e.target.value)} className={`${inputClass} w-full pl-12`} placeholder="https://..." />
+                <div className="border-t border-border/50 pt-8 flex flex-col gap-6">
+                    <h3 className="text-lg font-black uppercase tracking-widest text-primary">Redes Sociais</h3>
+
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div className="flex flex-col gap-2">
+                            <label className={labelClass}>WhatsApp</label>
+                            <div className="relative">
+                                <MessageCircle className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-green-500/60" />
+                                <input value={whatsapp} onChange={(e) => setWhatsapp(formatWhatsApp(e.target.value))} className={`${inputClass} w-full pl-12`} placeholder="+55 (88) 9.9999-9999" />
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            <label className={labelClass}>Instagram (@usuario)</label>
+                            <div className="relative">
+                                <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-pink-500/60" />
+                                <input value={instagram} onChange={(e) => setInstagram(e.target.value.replace("@", ""))} className={`${inputClass} w-full pl-12`} placeholder="ex: liandrochaves" />
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            <label className={labelClass}>TikTok (@usuario)</label>
+                            <div className="relative">
+                                <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground/60" />
+                                <input value={tiktok} onChange={(e) => setTiktok(e.target.value.replace("@", ""))} className={`${inputClass} w-full pl-12`} placeholder="ex: liandro_ecl" />
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            <label className={labelClass}>X / Twitter (@usuario)</label>
+                            <div className="relative">
+                                <Twitter className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-sky-500/60" />
+                                <input value={twitter} onChange={(e) => setTwitter(e.target.value.replace("@", ""))} className={`${inputClass} w-full pl-12`} placeholder="ex: chaves_volante" />
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-2 sm:col-span-2">
+                            <label className={labelClass}>Facebook (usuario)</label>
+                            <div className="relative">
+                                <Facebook className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-blue-600/60" />
+                                <input value={facebook} onChange={(e) => setFacebook(e.target.value)} className={`${inputClass} w-full pl-12`} placeholder="seu.nome.perfil" />
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <div className="flex flex-col gap-2 sm:col-span-2 lg:col-span-3">
-                        <label className={labelClass}>Observações Técnicas</label>
-                        <div className="relative">
-                            <Notebook className="absolute left-4 top-4 h-5 w-5 text-muted-foreground/40" />
-                            <textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} className="min-h-32 w-full rounded-xl border border-input bg-background pl-12 pr-4 py-3 text-base focus:ring-2 focus:ring-ring outline-none transition-all" placeholder="Notas sobre o desempenho do atleta..." />
+                <div className="border-t border-border/50 pt-8 flex flex-col gap-6">
+                    <h3 className="text-lg font-black uppercase tracking-widest text-primary">Mídia & Scout</h3>
+                    <div className="grid grid-cols-1 gap-6">
+                        <div className="flex flex-col gap-2">
+                            <label className={labelClass}>Link de Vídeo</label>
+                            <div className="relative">
+                                <Video className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/40" />
+                                <input value={video} onChange={(e) => setVideo(e.target.value)} className={`${inputClass} w-full pl-12`} placeholder="https://..." />
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            <label className={labelClass}>Observações Técnicas</label>
+                            <div className="relative">
+                                <Notebook className="absolute left-4 top-4 h-5 w-5 text-muted-foreground/40" />
+                                <textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} className="min-h-32 w-full rounded-xl border border-input bg-background pl-12 pr-4 py-3 text-base outline-none focus:ring-2 focus:ring-ring transition-all" />
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -96,11 +96,6 @@ export default function JogadoresPage() {
                       <User className="h-8 w-8 text-muted-foreground/30" />
                     )}
                   </div>
-                  {j.posicao_principal && (
-                    <div className="absolute -bottom-2 -right-2 rounded-lg bg-primary px-2 py-1 text-[10px] font-black text-primary-foreground shadow-md uppercase tracking-tighter">
-                      {j.posicao_principal.nome.split(" ")[0]}
-                    </div>
-                  )}
                 </div>
 
                 {/* Actions */}
@@ -128,6 +123,13 @@ export default function JogadoresPage() {
 
               {/* Player Info */}
               <div className="flex flex-col gap-3">
+                <div className="mb-5">
+                  {j.posicao_principal && (
+                    <div className="absolute rounded-lg bg-primary px-2 py-1 text-[10px] font-black text-primary-foreground shadow-md uppercase tracking-tighter text-nowrap">
+                      {j.posicao_principal.nome}
+                    </div>
+                  )}
+                </div>
                 <div>
                   <h3 className="text-xl font-black text-foreground leading-tight group-hover:text-primary transition-colors line-clamp-1">
                     {j.nome}

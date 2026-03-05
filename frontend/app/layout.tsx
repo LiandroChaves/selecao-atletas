@@ -16,6 +16,10 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Selecao de Atletas",
   description: "Sistema profissional de gestao e selecao de atletas de futebol de Limoeiro do Norte - CE",
+  appleWebApp: {
+    title: "Selecao de Atletas",
+    statusBarStyle: "default",
+  },
 };
 
 export default function RootLayout({
