@@ -47,29 +47,20 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         )}
       >
         {/* Logo */}
-        <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-5">
-          <Link href="/dashboard" className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg overflow-hidden bg-primary text-primary-foreground shadow-lg shadow-primary/30">
-              {/* Football icon SVG */}
-              <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.8">
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 3c0 0 2 3 2 9s-2 9-2 9" />
-                <path d="M12 3c0 0-2 3-2 9s2 9 2 9" />
-                <path d="M3 12h18" />
-                <path d="M5.5 6.5l2.5 2" />
-                <path d="M18.5 6.5l-2.5 2" />
-                <path d="M5.5 17.5l2.5-2" />
-                <path d="M18.5 17.5l-2.5-2" />
-              </svg>
-            </div>
-            <div>
-              <span className="block text-sm font-bold tracking-tight text-sidebar-foreground">
-                Seleção
-              </span>
-              <span className="block text-[10px] font-medium tracking-widest text-sidebar-foreground/50 uppercase">
-                Atletas
-              </span>
-            </div>
+        <div className="flex h-20 items-center justify-between border-b border-sidebar-border px-5">
+          <Link href="/dashboard" className="flex items-center">
+            {/* Imagem para Tema Claro (aparece no claro, esconde no escuro) */}
+            <img
+              src="/assets/logo-light.jpeg"
+              alt="Seleção de Atletas"
+              className="h-12 w-auto object-contain dark:hidden"
+            />
+            {/* Imagem para Tema Escuro (esconde no claro, aparece no escuro) */}
+            <img
+              src="/assets/logo-dark.jpeg"
+              alt="Seleção de Atletas"
+              className="h-12 w-auto object-contain hidden dark:block"
+            />
           </Link>
           <button
             onClick={onClose}
