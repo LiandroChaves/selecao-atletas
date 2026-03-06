@@ -14,15 +14,15 @@ export class JogadorService {
                 apelido: data.apelido,
                 data_nascimento: data.data_nascimento ? new Date(data.data_nascimento) : null,
                 pe_dominante: data.pe_dominante,
-                nivel_ambidestria_id: Number(data.nivel_ambidestria_id),
-                posicao_id: Number(data.posicao_id),
-                posicao_secundaria_id: data.posicao_secundaria_id ? Number(data.posicao_secundaria_id) : null,
-                clube_atual_id: data.clube_atual_id ? Number(data.clube_atual_id) : null,
+                nivel_ambidestria: { connect: { id: Number(data.nivel_ambidestria_id) } },
+                posicao_principal: { connect: { id: Number(data.posicao_id) } },
+                ...(data.posicao_secundaria_id ? { posicao_secundaria: { connect: { id: Number(data.posicao_secundaria_id) } } } : {}),
+                ...(data.clube_atual_id ? { clube_atual: { connect: { id: Number(data.clube_atual_id) } } } : {}),
                 altura: data.altura,
                 peso: data.peso,
-                pais_id: data.pais_id ? Number(data.pais_id) : null,
-                estado_id: data.estado_id ? Number(data.estado_id) : null,
-                cidade_id: data.cidade_id ? Number(data.cidade_id) : null,
+                ...(data.pais_id ? { pais: { connect: { id: Number(data.pais_id) } } } : {}),
+                ...(data.estado_id ? { estado: { connect: { id: Number(data.estado_id) } } } : {}),
+                ...(data.cidade_id ? { cidade: { connect: { id: Number(data.cidade_id) } } } : {}),
                 video: data.video || null,
                 observacoes: data.observacoes || null,
                 whatsapp: data.whatsapp || null,
@@ -64,16 +64,28 @@ export class JogadorService {
             data_nascimento: data.data_nascimento ? new Date(data.data_nascimento) : existing.data_nascimento,
             pe_dominante: data.pe_dominante !== undefined ? data.pe_dominante : existing.pe_dominante,
 
-            // Convertendo FKs e Decimais para Number
-            nivel_ambidestria_id: data.nivel_ambidestria_id ? Number(data.nivel_ambidestria_id) : existing.nivel_ambidestria_id,
-            posicao_id: data.posicao_id ? Number(data.posicao_id) : existing.posicao_id,
-            posicao_secundaria_id: data.posicao_secundaria_id ? Number(data.posicao_secundaria_id) : existing.posicao_secundaria_id,
-            clube_atual_id: data.clube_atual_id ? Number(data.clube_atual_id) : existing.clube_atual_id,
-            altura: data.altura ? Number(data.altura) : existing.altura,
-            peso: data.peso ? Number(data.peso) : existing.peso,
-            pais_id: data.pais_id ? Number(data.pais_id) : existing.pais_id,
-            estado_id: data.estado_id ? Number(data.estado_id) : existing.estado_id,
-            cidade_id: data.cidade_id ? Number(data.cidade_id) : existing.cidade_id,
+            // Relações via connect/disconnect (obrigatório no modo Driver Adapter)
+            nivel_ambidestria: { connect: { id: data.nivel_ambidestria_id ? Number(data.nivel_ambidestria_id) : existing.nivel_ambidestria_id } },
+            posicao_principal: { connect: { id: data.posicao_id ? Number(data.posicao_id) : existing.posicao_id } },
+            posicao_secundaria: data.posicao_secundaria_id
+                ? { connect: { id: Number(data.posicao_secundaria_id) } }
+                : (existing.posicao_secundaria_id ? { connect: { id: existing.posicao_secundaria_id } } : { disconnect: true }),
+            clube_atual: data.clube_atual_id
+                ? { connect: { id: Number(data.clube_atual_id) } }
+                : (data.clube_atual_id === null ? { disconnect: true } : (existing.clube_atual_id ? { connect: { id: existing.clube_atual_id } } : { disconnect: true })),
+            pais: data.pais_id
+                ? { connect: { id: Number(data.pais_id) } }
+                : (existing.pais_id ? { connect: { id: existing.pais_id } } : {}),
+            estado: data.estado_id
+                ? { connect: { id: Number(data.estado_id) } }
+                : (existing.estado_id ? { connect: { id: existing.estado_id } } : {}),
+            cidade: data.cidade_id
+                ? { connect: { id: Number(data.cidade_id) } }
+                : (existing.cidade_id ? { connect: { id: existing.cidade_id } } : {}),
+
+            // Campos numéricos diretos
+            altura: data.altura !== undefined ? data.altura : existing.altura,
+            peso: data.peso !== undefined ? data.peso : existing.peso,
 
             // Textos e Redes Sociais
             video: data.video !== undefined ? (data.video || null) : existing.video,
