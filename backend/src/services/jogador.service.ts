@@ -64,13 +64,13 @@ export class JogadorService {
             data_nascimento: data.data_nascimento ? new Date(data.data_nascimento) : existing.data_nascimento,
             pe_dominante: data.pe_dominante !== undefined ? data.pe_dominante : existing.pe_dominante,
 
-            // FKs diretas (funciona normalmente sem Driver Adapter)
+            // Convertendo FKs e Decimais para Number
             nivel_ambidestria_id: data.nivel_ambidestria_id ? Number(data.nivel_ambidestria_id) : existing.nivel_ambidestria_id,
             posicao_id: data.posicao_id ? Number(data.posicao_id) : existing.posicao_id,
             posicao_secundaria_id: data.posicao_secundaria_id ? Number(data.posicao_secundaria_id) : existing.posicao_secundaria_id,
-            clube_atual_id: data.clube_atual_id !== undefined ? (data.clube_atual_id ? Number(data.clube_atual_id) : null) : existing.clube_atual_id,
-            altura: data.altura !== undefined ? data.altura : existing.altura,
-            peso: data.peso !== undefined ? data.peso : existing.peso,
+            clube_atual_id: data.clube_atual_id ? Number(data.clube_atual_id) : existing.clube_atual_id,
+            altura: data.altura ? Number(data.altura) : existing.altura,
+            peso: data.peso ? Number(data.peso) : existing.peso,
             pais_id: data.pais_id ? Number(data.pais_id) : existing.pais_id,
             estado_id: data.estado_id ? Number(data.estado_id) : existing.estado_id,
             cidade_id: data.cidade_id ? Number(data.cidade_id) : existing.cidade_id,
